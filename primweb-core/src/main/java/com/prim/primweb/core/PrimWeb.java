@@ -16,6 +16,7 @@ import com.prim.primweb.core.jsloader.ICallJsLoader;
 import com.prim.primweb.core.jsloader.SafeCallJsLoaderImpl;
 import com.prim.primweb.core.setting.DefaultWebSetting;
 import com.prim.primweb.core.setting.IAgentWebSetting;
+import com.prim.primweb.core.setting.X5DefaultWebSetting;
 import com.prim.primweb.core.urlloader.IUrlLoader;
 import com.prim.primweb.core.urlloader.UrlLoader;
 import com.prim.primweb.core.utils.PrimWebUtils;
@@ -23,6 +24,7 @@ import com.prim.primweb.core.webview.IAgentWebView;
 import com.prim.primweb.core.webview.PrimAgentWebView;
 import com.prim.primweb.core.webview.X5AgentWebView;
 import com.tencent.smtt.sdk.QbSdk;
+import com.tencent.smtt.sdk.WebView;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
@@ -105,7 +107,8 @@ public class PrimWeb {
         this.x5WebViewClient = builder.x5WebViewClient;
         this.webChromeClient = builder.webChromeClient;
         this.x5WebChromeClient = builder.x5WebChromeClient;
-
+        this.webViewType = builder.webViewType;
+        doCheckSafe();
         if (builder.mJavaObject != null && !builder.mJavaObject.isEmpty()) {
             this.mJavaObject.putAll(builder.mJavaObject);
         }
@@ -114,12 +117,14 @@ public class PrimWeb {
         } else {//考虑到极端的情况
             PrimWebUtils.scanForActivity(context.get()).setContentView(mView);
         }
-        doCheckSafe();
     }
 
     /** webview 安全检查 */
     private void doCheckSafe() {
-
+        if (null == webView) {
+            webView = new PrimAgentWebView(context.get());
+            mView = webView.getAgentWebView();
+        }
     }
 
     /** 调用js方法 */
@@ -148,7 +153,11 @@ public class PrimWeb {
     void ready() {
         // 加载设置
         if (null == setting) {
-            setting = new DefaultWebSetting(context.get());
+            if (webViewType == WebViewType.Android) {
+                setting = new DefaultWebSetting(context.get());
+            } else {
+                setting = new X5DefaultWebSetting(context.get());
+            }
         }
         setting.setSetting(webView);
 
@@ -233,8 +242,6 @@ public class PrimWeb {
 
         PrimBuilder(Context context) {
             this.context = new WeakReference<>(context);
-            this.webView = new PrimAgentWebView(this.context.get());
-            this.mView = webView.getAgentWebView();
         }
 
         /** 设置webview的父类 */
@@ -269,8 +276,14 @@ public class PrimWeb {
 
         private void setWebViewType(WebViewType webViewType) {
             this.webViewType = webViewType;
-            if (webViewType == WebViewType.X5) {
-                this.webView = new X5AgentWebView(context.get());
+            if (null == this.webView) {
+                if (webViewType == WebViewType.X5) {
+                    this.webView = new X5AgentWebView(context.get());
+                    this.mView = this.webView.getAgentWebView();
+                } else {
+                    this.webView = new PrimAgentWebView(context.get());
+                    this.mView = this.webView.getAgentWebView();
+                }
             }
         }
     }
@@ -286,6 +299,11 @@ public class PrimWeb {
         public CommonBuilder setAgentWebView(IAgentWebView webView) {
             primBuilder.webView = webView;
             primBuilder.mView = webView.getAgentWebView();
+            if (primBuilder.mView instanceof WebView) {
+                primBuilder.setWebViewType(WebViewType.X5);
+            } else {
+                primBuilder.setWebViewType(WebViewType.Android);
+            }
             return this;
         }
 
@@ -319,8 +337,7 @@ public class PrimWeb {
             return this;
         }
 
-
-        /** 设置WebView的类型 如果调用了setAgentWebView 此方法不用调用 */
+        /** 设置WebView的类型 如果设置了setAgentWebView 此方法最好不要调用 */
         public CommonBuilder setWebViewType(WebViewType webViewType) {
             primBuilder.setWebViewType(webViewType);
             return this;

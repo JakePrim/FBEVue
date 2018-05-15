@@ -25,11 +25,7 @@ public class MainActivity extends AppCompatActivity {
         frameLayout = (FrameLayout) findViewById(R.id.fl_web);
         PrimWeb primWeb = PrimWeb.with(this)
                 .setWebParent(frameLayout, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
-//                .setAgentWebView(new X5AgentWebView(this))
-//                .setAgentWebSetting(new X5DefaultWebSetting(this))
-//                .setAgentWebSetting(new DefaultWebSetting(this))
-//                .setAgentWebView(new PrimAgentWebView(this))
-                .setWebViewType(PrimWeb.WebViewType.X5)
+                .setWebViewType(PrimWeb.WebViewType.Android)
                 .addJavascriptInterface("jsAgent", new MyJavaObject())
                 .setModeType(PrimWeb.ModeType.Normal)
                 .setAgentWebViewClient(new MyWebViewClient(this))

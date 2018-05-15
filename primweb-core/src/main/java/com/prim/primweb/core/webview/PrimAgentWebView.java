@@ -20,6 +20,7 @@ import android.webkit.WebViewClient;
 
 
 import com.prim.primweb.core.client.IAgentWebViewClient;
+import com.prim.primweb.core.client.MyAndroidWebViewClient;
 import com.prim.primweb.core.jsloader.AgentValueCallback;
 
 import java.util.Map;
@@ -134,7 +135,7 @@ public class PrimAgentWebView extends WebView implements IAgentWebView<WebSettin
     @Override
     public void setAgentWebViewClient(IAgentWebViewClient webViewClient) {
         this.webViewClient = webViewClient;
-        setWebViewClient(new MyWebViewClient(this));
+        setWebViewClient(new MyAndroidWebViewClient(this, webViewClient));
     }
 
     @Override
@@ -183,72 +184,5 @@ public class PrimAgentWebView extends WebView implements IAgentWebView<WebSettin
     @Override
     public void setWebViewClient(WebViewClient client) {
         super.setWebViewClient(client);
-    }
-
-    private class MyWebViewClient extends WebViewClient {
-        private IAgentWebView webView;
-
-        public MyWebViewClient(IAgentWebView webView) {
-            this.webView = webView;
-        }
-
-        @Override
-        public void onPageStarted(WebView view, String url, Bitmap favicon) {
-            webViewClient.onPageStarted(webView, url, favicon);
-            super.onPageStarted(view, url, favicon);
-        }
-
-        @Override
-        public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            return webViewClient.shouldOverrideUrlLoading(webView, url);
-        }
-
-        @Override
-        public void onPageFinished(WebView view, String url) {
-            webViewClient.onPageFinished(webView, url);
-            super.onPageFinished(view, url);
-        }
-
-        @Override
-        public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-            webViewClient.onReceivedError(webView, errorCode, description, failingUrl);
-            super.onReceivedError(view, errorCode, description, failingUrl);
-        }
-
-        @Override
-        public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
-            webViewClient.shouldInterceptRequest(webView, url);
-            return super.shouldInterceptRequest(view, url);
-        }
-
-        @Override
-        public boolean shouldOverrideKeyEvent(WebView view, KeyEvent event) {
-            webViewClient.shouldOverrideKeyEvent(webView, event);
-            return super.shouldOverrideKeyEvent(view, event);
-        }
-
-        @Override
-        public void onLoadResource(WebView view, String url) {
-            webViewClient.onLoadResource(webView, url);
-            super.onLoadResource(view, url);
-        }
-
-        @Override
-        public void onPageCommitVisible(WebView view, String url) {
-            webViewClient.onPageCommitVisible(webView, url);
-            super.onPageCommitVisible(view, url);
-        }
-
-        @Override
-        public void doUpdateVisitedHistory(WebView view, String url, boolean isReload) {
-            webViewClient.doUpdateVisitedHistory(webView, url, isReload);
-            super.doUpdateVisitedHistory(view, url, isReload);
-        }
-
-        @Override
-        public void onUnhandledKeyEvent(WebView view, KeyEvent event) {
-            webViewClient.onUnhandledKeyEvent(webView, event);
-            super.onUnhandledKeyEvent(view, event);
-        }
     }
 }
