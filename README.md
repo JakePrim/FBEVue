@@ -110,7 +110,7 @@ public class X5DefaultWebSetting extends BaseAgentWebSetting<WebSettings> {
         }
     }
 ```
-如果不想使用代理的方法，可以使用以下API，当时 不 兼容android webview 和 x5 webview
+如果不想使用代理的方法，可以使用以下API，调用android和x5 系统自带的类，当然不兼容 android webview 和 x5 webview，只能分开使用
 ```
 .setAndroidWebChromeClient()
 .setX5WebChromeClient()
