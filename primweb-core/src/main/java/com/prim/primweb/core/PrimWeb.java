@@ -5,6 +5,8 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebChromeClient;
+import android.webkit.WebViewClient;
 
 import com.prim.primweb.core.client.DefaultAgentWebViewClient;
 import com.prim.primweb.core.client.IAgentWebViewClient;
@@ -19,6 +21,7 @@ import com.prim.primweb.core.urlloader.UrlLoader;
 import com.prim.primweb.core.utils.PrimWebUtils;
 import com.prim.primweb.core.webview.IAgentWebView;
 import com.prim.primweb.core.webview.PrimAgentWebView;
+import com.prim.primweb.core.webview.X5AgentWebView;
 import com.tencent.smtt.sdk.QbSdk;
 
 import java.lang.ref.WeakReference;
@@ -57,6 +60,12 @@ public class PrimWeb {
         Strict, Normal
     }
 
+    public enum WebViewType {
+        Android, X5
+    }
+
+    private WebViewType webViewType = WebViewType.Android;
+
     private ModeType modeType = ModeType.Normal;
 
     private static final String TAG = "PrimWeb";
@@ -68,6 +77,11 @@ public class PrimWeb {
     //初始化个数 30 * 0.75 多个左右,考虑到哈希表默认大小只有 4 * 0.75 个
     //而哈希表的缺点是:扩容性能会下降 初始化时提前计算好上限.
     private HashMap<String, Object> mJavaObject = new HashMap<>(30);
+
+    private WebViewClient webViewClient;
+    private com.tencent.smtt.sdk.WebViewClient x5WebViewClient;
+    private WebChromeClient webChromeClient;
+    private com.tencent.smtt.sdk.WebChromeClient x5WebChromeClient;
 
     public static void init(Application application) {
         // X5浏览器实列化
@@ -87,6 +101,11 @@ public class PrimWeb {
         this.callJsLoader = builder.callJsLoader;
         this.modeType = builder.modeType;
         this.agentWebViewClient = builder.agentWebViewClient;
+        this.webViewClient = builder.webViewClient;
+        this.x5WebViewClient = builder.x5WebViewClient;
+        this.webChromeClient = builder.webChromeClient;
+        this.x5WebChromeClient = builder.x5WebChromeClient;
+
         if (builder.mJavaObject != null && !builder.mJavaObject.isEmpty()) {
             this.mJavaObject.putAll(builder.mJavaObject);
         }
@@ -147,11 +166,32 @@ public class PrimWeb {
             mJsInterface.addJavaObjects(mJavaObject);
         }
 
-        // 加载webViewClient
-        if (null == agentWebViewClient) {
-            agentWebViewClient = new DefaultAgentWebViewClient(context.get());
+        // 加载webViewClient 系统设置的优先
+        if (webViewClient != null || x5WebViewClient != null) {
+            if (webViewClient != null) {
+                webView.setAndroidWebViewClient(webViewClient);
+            }
+            if (x5WebViewClient != null) {
+                webView.setX5WebViewClient(x5WebViewClient);
+            }
+        } else {
+            // 代理加载webViewClient
+            if (null == agentWebViewClient) {
+                agentWebViewClient = new DefaultAgentWebViewClient(context.get());
+            }
+            webView.setAgentWebViewClient(agentWebViewClient);
         }
-        webView.setAgentWebViewClient(agentWebViewClient);
+
+        //加载webChromeClient
+        if (webChromeClient != null || x5WebChromeClient != null) {
+            if (webChromeClient != null) {
+                webView.setAndroidWebChromeClient(webChromeClient);
+            }
+            if (x5WebChromeClient != null) {
+                webView.setX5WebChromeClient(x5WebChromeClient);
+            }
+        }
+
     }
 
     /** 发起阶段 */
@@ -185,6 +225,11 @@ public class PrimWeb {
         private ModeType modeType = ModeType.Normal;
         private HashMap<String, Object> mJavaObject;
         private IAgentWebViewClient agentWebViewClient;
+        private WebViewType webViewType = WebViewType.Android;
+        private WebViewClient webViewClient;
+        private com.tencent.smtt.sdk.WebViewClient x5WebViewClient;
+        private WebChromeClient webChromeClient;
+        private com.tencent.smtt.sdk.WebChromeClient x5WebChromeClient;
 
         PrimBuilder(Context context) {
             this.context = new WeakReference<>(context);
@@ -220,6 +265,13 @@ public class PrimWeb {
                 // 而哈希表的缺点是:扩容性能会下降 初始化时提前计算好上限.
             }
             mJavaObject.put(key, o);
+        }
+
+        private void setWebViewType(WebViewType webViewType) {
+            this.webViewType = webViewType;
+            if (webViewType == WebViewType.X5) {
+                this.webView = new X5AgentWebView(context.get());
+            }
         }
     }
 
@@ -267,9 +319,37 @@ public class PrimWeb {
             return this;
         }
 
+
+        /** 设置WebView的类型 如果调用了setAgentWebView 此方法不用调用 */
+        public CommonBuilder setWebViewType(WebViewType webViewType) {
+            primBuilder.setWebViewType(webViewType);
+            return this;
+        }
+
         /** 设置WebViewClient */
-        public CommonBuilder setWebViewClient(IAgentWebViewClient agentWebViewClient) {
+        public CommonBuilder setAgentWebViewClient(IAgentWebViewClient agentWebViewClient) {
             primBuilder.agentWebViewClient = agentWebViewClient;
+            return this;
+        }
+
+        /** 如果不想要使用代理的 通过以下方法来调用系统自带的 */
+        public CommonBuilder setAndroidWebViewClient(WebViewClient webViewClient) {
+            primBuilder.webViewClient = webViewClient;
+            return this;
+        }
+
+        public CommonBuilder setX5WebViewClient(com.tencent.smtt.sdk.WebViewClient webViewClient) {
+            primBuilder.x5WebViewClient = webViewClient;
+            return this;
+        }
+
+        public CommonBuilder setAndroidWebChromeClient(WebChromeClient webChromeClient) {
+            primBuilder.webChromeClient = webChromeClient;
+            return this;
+        }
+
+        public CommonBuilder setX5WebChromeClient(com.tencent.smtt.sdk.WebChromeClient webChromeClient) {
+            primBuilder.x5WebChromeClient = webChromeClient;
             return this;
         }
 

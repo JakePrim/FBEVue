@@ -1,10 +1,13 @@
 package com.prim.primweb.core.webview;
 
 import android.view.View;
+import android.webkit.WebChromeClient;
+import android.webkit.WebViewClient;
 
 import com.prim.primweb.core.client.IAgentWebViewClient;
 import com.prim.primweb.core.jsloader.AgentValueCallback;
 import com.prim.primweb.core.listener.OnScrollChangeListener;
+import com.tencent.smtt.sdk.WebView;
 
 import java.util.Map;
 
@@ -18,7 +21,7 @@ import java.util.Map;
  * 修订历史：v1.0.0
  * ================================================
  */
-public interface IAgentWebView<T> {
+public interface IAgentWebView<T, M> {
 
     /** 获取代理的webview */
     View getAgentWebView();
@@ -53,6 +56,19 @@ public interface IAgentWebView<T> {
 
     /** 设置代理的WebViewClient */
     void setAgentWebViewClient(IAgentWebViewClient webViewClient);
+
+    /** 设置代理的WebChromeClient */
+    void setAgentWebChromeClient(M webChromeClient);
+
+    /** 如果不想要使用代理的 通过以下方法来调用系统自带的 */
+    void setAndroidWebViewClient(WebViewClient webViewClient);
+
+    void setX5WebViewClient(com.tencent.smtt.sdk.WebViewClient webViewClient);
+
+    void setAndroidWebChromeClient(WebChromeClient webChromeClient);
+
+    void setX5WebChromeClient(com.tencent.smtt.sdk.WebChromeClient webChromeClient);
+
 
     void setOnScrollChangeListener(OnScrollChangeListener listener);
 

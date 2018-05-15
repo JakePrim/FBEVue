@@ -12,6 +12,7 @@ import com.prim.primweb.core.client.IAgentWebViewClient;
 import com.prim.primweb.core.jsloader.AgentValueCallback;
 import com.tencent.smtt.export.external.interfaces.WebResourceResponse;
 import com.tencent.smtt.sdk.ValueCallback;
+import com.tencent.smtt.sdk.WebChromeClient;
 import com.tencent.smtt.sdk.WebSettings;
 import com.tencent.smtt.sdk.WebView;
 import com.tencent.smtt.sdk.WebViewClient;
@@ -28,7 +29,7 @@ import java.util.Map;
  * 修订历史：
  * ================================================
  */
-public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings> {
+public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings, WebChromeClient> {
     private com.prim.primweb.core.listener.OnScrollChangeListener listener;
 
     private IAgentWebViewClient webViewClient;
@@ -112,6 +113,31 @@ public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings
     }
 
     @Override
+    public void setAgentWebChromeClient(WebChromeClient webChromeClient) {
+        setWebChromeClient(webChromeClient);
+    }
+
+    @Override
+    public void setAndroidWebViewClient(android.webkit.WebViewClient webViewClient) {
+
+    }
+
+    @Override
+    public void setX5WebViewClient(WebViewClient webViewClient) {
+        setWebViewClient(webViewClient);
+    }
+
+    @Override
+    public void setAndroidWebChromeClient(android.webkit.WebChromeClient webChromeClient) {
+
+    }
+
+    @Override
+    public void setX5WebChromeClient(WebChromeClient webChromeClient) {
+        setWebChromeClient(webChromeClient);
+    }
+
+    @Override
     public void loadAgentUrl(String url, Map headers) {
         this.loadUrl(url, headers);
     }
@@ -155,7 +181,7 @@ public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings
 
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            return  webViewClient.shouldOverrideUrlLoading(agentWebView, url);
+            return webViewClient.shouldOverrideUrlLoading(agentWebView, url);
         }
 
         @Override

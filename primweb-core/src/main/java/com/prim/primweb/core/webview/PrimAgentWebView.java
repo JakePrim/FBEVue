@@ -10,6 +10,7 @@ import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.ValueCallback;
+import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
@@ -33,7 +34,7 @@ import java.util.Map;
  * 修订历史：1.0.0
  * ================================================
  */
-public class PrimAgentWebView extends WebView implements IAgentWebView<WebSettings> {
+public class PrimAgentWebView extends WebView implements IAgentWebView<WebSettings, WebChromeClient> {
 
     private static final String TAG = "PrimAgentWebView";
     public com.prim.primweb.core.listener.OnScrollChangeListener listener;
@@ -134,6 +135,31 @@ public class PrimAgentWebView extends WebView implements IAgentWebView<WebSettin
     public void setAgentWebViewClient(IAgentWebViewClient webViewClient) {
         this.webViewClient = webViewClient;
         setWebViewClient(new MyWebViewClient(this));
+    }
+
+    @Override
+    public void setAgentWebChromeClient(WebChromeClient webChromeClient) {
+        setWebChromeClient(webChromeClient);
+    }
+
+    @Override
+    public void setAndroidWebViewClient(WebViewClient webViewClient) {
+        setWebViewClient(webViewClient);
+    }
+
+    @Override
+    public void setX5WebViewClient(com.tencent.smtt.sdk.WebViewClient webViewClient) {
+
+    }
+
+    @Override
+    public void setAndroidWebChromeClient(WebChromeClient webChromeClient) {
+        setWebChromeClient(webChromeClient);
+    }
+
+    @Override
+    public void setX5WebChromeClient(com.tencent.smtt.sdk.WebChromeClient webChromeClient) {
+
     }
 
     @SuppressLint("JavascriptInterface")
