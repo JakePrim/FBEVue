@@ -19,10 +19,10 @@ PrimWeb 是一个基于的 Android WebView 和 腾讯 x5 WebView，极度容易�
  ```
 ## TODO
 0. webview生命周期管理，及缓存的清理
-1. webview的安全设置
-2. webview上传文件，及权限设置
-3. webview下载文件
-4. webview 100% 安全注入js脚本
+1. webview的安全设置，及 webview 安全注入js脚本
+2. webview UI--> 加载和错误UI设置
+3. webview上传文件，及权限设置
+4. webview下载文件
 
 ### API 详解
 1. 动态切换X5和Android 的webview
