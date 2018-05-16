@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.prim.primweb.core.PrimWeb;
 import com.prim.primweb.core.client.MyX5WebChromeClient;
+import com.prim.primweb.core.client.WebChromeClient;
 import com.prim.primweb.core.client.WebViewClient;
 import com.prim.primweb.core.jsloader.AgentValueCallback;
 import com.prim.primweb.core.webview.IAgentWebView;
@@ -39,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
                 .setWebParent(frameLayout, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
                 .setWebViewType(PrimWeb.WebViewType.X5)
                 .setModeType(PrimWeb.ModeType.Normal)
+                .setAgentWebViewClient(new AgentWebViewClient(this))
+                .setAgentWebChromeClient(new AgentWebChromeClient(this))
                 .addJavascriptInterface("android", new MyJavaObject())
                 .buildWeb()
                 .readyOk()
@@ -46,8 +49,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /** 使用代理的WebViewClient */
-    public class MyWebViewClient extends WebViewClient {
-        MyWebViewClient(Context context) {
+    public class AgentWebViewClient extends WebViewClient {
+        AgentWebViewClient(Context context) {
             super(context);
         }
 
@@ -56,10 +59,16 @@ public class MainActivity extends AppCompatActivity {
             return super.shouldOverrideUrlLoading(view, url);
         }
 
-        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
         @Override
         public void onPageFinished(IAgentWebView view, String url) {
             super.onPageFinished(view, url);
+        }
+    }
+
+    public class AgentWebChromeClient extends WebChromeClient<com.tencent.smtt.sdk.WebChromeClient.FileChooserParams> {
+
+        public AgentWebChromeClient(Context context) {
+            super(context);
         }
     }
 

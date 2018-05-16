@@ -87,7 +87,6 @@ public class PrimWeb {
     //初始化个数 30 * 0.75 多个左右,考虑到哈希表默认大小只有 4 * 0.75 个
     //而哈希表的缺点是:扩容性能会下降 初始化时提前计算好上限.
     private HashMap<String, Object> mJavaObject = new HashMap<>(30);
-
     private WebViewClient webViewClient;
     private com.tencent.smtt.sdk.WebViewClient x5WebViewClient;
     private WebChromeClient webChromeClient;

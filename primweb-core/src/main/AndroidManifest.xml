@@ -1,2 +1,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.prim.primweb.core"/>
+          package="com.prim.primweb.core">
+
+    <application>
+
+        <activity
+            android:name=".premission.PermissionMiddleActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="false"
+            android:launchMode="standard"
+            android:theme="@style/PermissionActivity"
+            android:windowSoftInputMode="stateHidden|stateAlwaysHidden"/>
+    </application>
+
+</manifest>
