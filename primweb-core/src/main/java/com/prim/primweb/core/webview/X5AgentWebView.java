@@ -1,16 +1,21 @@
 package com.prim.primweb.core.webview;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
 
 import com.prim.primweb.core.client.IAgentWebViewClient;
 import com.prim.primweb.core.client.MyX5WebViewClient;
 import com.prim.primweb.core.jsloader.AgentValueCallback;
+import com.prim.primweb.core.utils.PrimWebUtils;
 import com.tencent.smtt.export.external.interfaces.WebResourceResponse;
 import com.tencent.smtt.sdk.ValueCallback;
 import com.tencent.smtt.sdk.WebChromeClient;
@@ -18,6 +23,7 @@ import com.tencent.smtt.sdk.WebSettings;
 import com.tencent.smtt.sdk.WebView;
 import com.tencent.smtt.sdk.WebViewClient;
 
+import java.lang.reflect.Method;
 import java.util.Map;
 
 
@@ -35,12 +41,41 @@ public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings
 
     private IAgentWebViewClient webViewClient;
 
+    private static final String TAG = "X5AgentWebView";
+
     public X5AgentWebView(Context context) {
         this(context, null);
     }
 
     public X5AgentWebView(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
+    }
+
+    @Override
+    public void removeRiskJavascriptInterface() {
+        //显式移除有风险的 Webview 系统隐藏接口
+        this.removeJavascriptInterface("searchBoxJavaBridge_");
+        this.removeJavascriptInterface("accessibility");
+        this.removeJavascriptInterface("accessibilityTraversal");
+    }
+
+    /**
+     * 使用Chrome DevTools 远程调试WebView
+     */
+    @TargetApi(19)
+    @Override
+    public void setWebChromeDebuggingEnabled() {
+        if (PrimWebUtils.isDebug() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            try {
+                Class<?> clazz = WebView.class;
+                Method method = clazz.getMethod("setWebContentsDebuggingEnabled", boolean.class);
+                method.invoke(null, true);
+            } catch (Throwable e) {
+                if (PrimWebUtils.isDebug()) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     @Override
@@ -104,6 +139,7 @@ public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings
 
     @Override
     public void addJavascriptInterfaceAgent(Object object, String name) {
+        Log.e(TAG, "addJavascriptInterfaceAgent: name --> " + name + "| object --> " + object.getClass().getSimpleName());
         this.addJavascriptInterface(object, name);
     }
 
@@ -164,6 +200,10 @@ public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings
     @Override
     public void destroy() {
         removeAllViewsInLayout();
+        ViewParent parent = getParent();
+        if (parent instanceof ViewGroup) {//从父容器中移除webview
+            ((ViewGroup) parent).removeAllViewsInLayout();
+        }
         super.destroy();
     }
 }

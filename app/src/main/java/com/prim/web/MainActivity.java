@@ -7,8 +7,10 @@ import android.util.Log;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import com.prim.primweb.core.PrimWeb;
+import com.prim.primweb.core.client.MyX5WebChromeClient;
 import com.prim.primweb.core.client.WebViewClient;
 import com.prim.primweb.core.webview.IAgentWebView;
 
@@ -18,22 +20,23 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
+    private PrimWeb primWeb;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         frameLayout = (FrameLayout) findViewById(R.id.fl_web);
-        PrimWeb primWeb = PrimWeb.with(this)
+        primWeb = PrimWeb.with(this)
                 .setWebParent(frameLayout, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
-                .setWebViewType(PrimWeb.WebViewType.Android)
-                .addJavascriptInterface("jsAgent", new MyJavaObject())
+                .setWebViewType(PrimWeb.WebViewType.X5)
                 .setModeType(PrimWeb.ModeType.Normal)
                 .setAgentWebViewClient(new MyWebViewClient(this))
-                .build()
+                .setX5WebChromeClient(new MyX5WebChromeClient())
+                .addJavascriptInterface("nativeBridge", new MyJavaObject())
+                .buildWeb()
                 .ready()
-                .launch("https://blog.csdn.net/yy1300326388/article/details/43965493");
-
-        primWeb.callJsLoader().callJS("jsMethod");
+                .launch("http://front.52yingzheng.com/test/shiluTest/h5-standard/h5-standard.html");
     }
 
     /** 使用代理的WebViewClient */
@@ -53,12 +56,39 @@ public class MainActivity extends AppCompatActivity {
     public class MyJavaObject {
 
         @JavascriptInterface
-        public void login(String data) {
-
+        public void closeWebView(String data) {
+            finish();
         }
 
-        public void medth() {
+        @JavascriptInterface
+        public void signIn(String data) {
+            primWeb.getCallJsLoader().callJS("nativeBridgeCallback['networkRequestCallback']", "'测试调用h5端的Js方法'");
+            Toast.makeText(MainActivity.this, "登录", Toast.LENGTH_LONG).show();
+        }
 
+        @JavascriptInterface
+        public void bindTel(String data) {
+            Toast.makeText(MainActivity.this, "绑定手机号", Toast.LENGTH_LONG).show();
+        }
+
+        @JavascriptInterface
+        public void camera(String data) {
+            Toast.makeText(MainActivity.this, "调取摄像头", Toast.LENGTH_LONG).show();
+        }
+
+        @JavascriptInterface
+        public void photos(String data) {
+            Toast.makeText(MainActivity.this, "调取相册", Toast.LENGTH_LONG).show();
+        }
+
+        @JavascriptInterface
+        public void geographicPosition(String data) {
+            Toast.makeText(MainActivity.this, "获取地理位置", Toast.LENGTH_LONG).show();
+        }
+
+        @JavascriptInterface
+        public void copyText(String data) {
+            Toast.makeText(MainActivity.this, "复制文本", Toast.LENGTH_LONG).show();
         }
 
     }

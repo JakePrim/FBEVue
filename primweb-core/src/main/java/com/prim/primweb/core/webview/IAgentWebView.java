@@ -23,6 +23,16 @@ import java.util.Map;
  */
 public interface IAgentWebView<T, M> {
 
+    /** 移除有风险的 Webview 系统隐藏接口 */
+    void removeRiskJavascriptInterface();
+
+    /**
+     * Android 4.4 KitKat 使用Chrome DevTools 远程调试WebView
+     * WebView.setWebContentsDebuggingEnabled(true);
+     * http://blog.csdn.net/t12x3456/article/details/14225235
+     */
+    void setWebChromeDebuggingEnabled();
+
     /** 获取代理的webview */
     View getAgentWebView();
 

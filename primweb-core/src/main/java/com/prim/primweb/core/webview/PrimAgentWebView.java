@@ -1,28 +1,26 @@
 package com.prim.primweb.core.webview;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
-import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
-import android.webkit.WebResourceError;
-import android.webkit.WebResourceRequest;
-import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-
 import com.prim.primweb.core.client.IAgentWebViewClient;
 import com.prim.primweb.core.client.MyAndroidWebViewClient;
 import com.prim.primweb.core.jsloader.AgentValueCallback;
+import com.prim.primweb.core.utils.PrimWebUtils;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Map;
 
 
@@ -39,6 +37,7 @@ public class PrimAgentWebView extends WebView implements IAgentWebView<WebSettin
 
     private static final String TAG = "PrimAgentWebView";
     public com.prim.primweb.core.listener.OnScrollChangeListener listener;
+    private IAgentWebViewClient webViewClient;
 
     public PrimAgentWebView(Context context) {
         this(context, null);
@@ -62,6 +61,33 @@ public class PrimAgentWebView extends WebView implements IAgentWebView<WebSettin
     }
 
     @Override
+    public void removeRiskJavascriptInterface() {
+        //显式移除有风险的 Webview 系统隐藏接口
+        this.removeJavascriptInterface("searchBoxJavaBridge_");
+        this.removeJavascriptInterface("accessibility");
+        this.removeJavascriptInterface("accessibilityTraversal");
+    }
+
+    /**
+     * 使用Chrome DevTools 远程调试WebView
+     */
+    @TargetApi(19)
+    @Override
+    public void setWebChromeDebuggingEnabled() {
+        if (PrimWebUtils.isDebug() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            try {
+                Class<?> clazz = WebView.class;
+                Method method = clazz.getMethod("setWebContentsDebuggingEnabled", boolean.class);
+                method.invoke(null, true);
+            } catch (Throwable e) {
+                if (PrimWebUtils.isDebug()) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    @Override
     public View getAgentWebView() {
         return this;
     }
@@ -76,7 +102,7 @@ public class PrimAgentWebView extends WebView implements IAgentWebView<WebSettin
         this.loadUrl(js);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     public void loadAgentJs(String js, final AgentValueCallback<String> callback) {
         ValueCallback<String> valueCallback = new ValueCallback<String>() {
@@ -125,12 +151,6 @@ public class PrimAgentWebView extends WebView implements IAgentWebView<WebSettin
         this.loadDataWithBaseURL(baseUrl, data, mimeType, encoding, historyUrl);
     }
 
-    @Override
-    public void addJavascriptInterfaceAgent(Object object, String name) {
-        this.addJavascriptInterface(object, name);
-    }
-
-    private IAgentWebViewClient webViewClient;
 
     @Override
     public void setAgentWebViewClient(IAgentWebViewClient webViewClient) {
@@ -163,12 +183,6 @@ public class PrimAgentWebView extends WebView implements IAgentWebView<WebSettin
 
     }
 
-    @SuppressLint("JavascriptInterface")
-    @Override
-    public void addJavascriptInterface(Object object, String name) {
-        super.addJavascriptInterface(object, name);
-    }
-
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
@@ -177,12 +191,68 @@ public class PrimAgentWebView extends WebView implements IAgentWebView<WebSettin
     @Override
     public void destroy() {
         removeAllViewsInLayout();
+        ViewParent parent = getParent();
+        if (parent instanceof ViewGroup) {//从父容器中移除webview
+            ((ViewGroup) parent).removeAllViewsInLayout();
+        }
+        releaseConfigCallback();
         super.destroy();
     }
 
+    @Override
+    public void clearHistory() {
+        super.clearHistory();
+    }
 
     @Override
     public void setWebViewClient(WebViewClient client) {
         super.setWebViewClient(client);
+    }
+
+    @SuppressLint("JavascriptInterface")
+    @Override
+    public void addJavascriptInterfaceAgent(Object object, String name) {
+        this.addJavascriptInterface(object, name);
+    }
+
+    // 解决WebView内存泄漏问题；参考AgentWeb X5 webview 解决了此问题，具体看x5webview源码
+    private void releaseConfigCallback() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) { // JELLY_BEAN
+            try {
+                Field field = WebView.class.getDeclaredField("mWebViewCore");
+                field = field.getType().getDeclaredField("mBrowserFrame");
+                field = field.getType().getDeclaredField("sConfigCallback");
+                field.setAccessible(true);
+                field.set(null, null);
+            } catch (NoSuchFieldException e) {
+                if (PrimWebUtils.isDebug()) {
+                    e.printStackTrace();
+                }
+            } catch (IllegalAccessException e) {
+                if (PrimWebUtils.isDebug()) {
+                    e.printStackTrace();
+                }
+            }
+        } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) { // KITKAT
+            try {
+                Field sConfigCallback = Class.forName("android.webkit.BrowserFrame").getDeclaredField("sConfigCallback");
+                if (sConfigCallback != null) {
+                    sConfigCallback.setAccessible(true);
+                    sConfigCallback.set(null, null);
+                }
+            } catch (NoSuchFieldException e) {
+                if (PrimWebUtils.isDebug()) {
+                    e.printStackTrace();
+                }
+            } catch (ClassNotFoundException e) {
+                if (PrimWebUtils.isDebug()) {
+                    e.printStackTrace();
+                }
+            } catch (IllegalAccessException e) {
+                if (PrimWebUtils.isDebug()) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }

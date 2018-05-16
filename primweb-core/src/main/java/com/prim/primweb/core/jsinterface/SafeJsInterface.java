@@ -40,10 +40,10 @@ public class SafeJsInterface extends BaseJsInterface {
         for (Map.Entry<String, Object> entry : entries) {
             Object value = entry.getValue();
             boolean checkJsInterface = checkJsInterface(value);
-            Log.e(TAG, "addJavaObjects: modeType --> " + modeType + "| checkJsInterface --> " + checkJsInterface);
             if (!checkJsInterface) {
                 throw new RuntimeException("This object has not offer method javascript to call ,please check addJavascriptInterface annotation was be added");
             } else {
+                Log.e(TAG, "addJavaObjects: object --> " + value.getClass().getSimpleName() + "| name --> " + entry.getKey());
                 webView.addJavascriptInterfaceAgent(value, entry.getKey());
             }
         }
@@ -59,5 +59,43 @@ public class SafeJsInterface extends BaseJsInterface {
             webView.addJavascriptInterfaceAgent(o, name);
         }
         return this;
+    }
+
+    /**
+     * 构建一个“不会重复注入”的js脚本；
+     *
+     * @param key
+     * @param js
+     *
+     * @return
+     */
+    public String buildNotRepeatInjectJS(String key, String js) {
+        String obj = String.format("__injectFlag_%1$s__", key);
+        StringBuilder sb = new StringBuilder();
+        sb.append("javascript:try{(function(){if(window.");
+        sb.append(obj);
+        sb.append("){console.log('");
+        sb.append(obj);
+        sb.append(" has been injected');return;}window.");
+        sb.append(obj);
+        sb.append("=true;");
+        sb.append(js);
+        sb.append("}())}catch(e){console.warn(e)}");
+        return sb.toString();
+    }
+
+    /**
+     * 构建一个“带try catch”的js脚本；
+     *
+     * @param js
+     *
+     * @return
+     */
+    public String buildTryCatchInjectJS(String js) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("javascript:try{");
+        sb.append(js);
+        sb.append("}catch(e){console.warn(e)}");
+        return sb.toString();
     }
 }

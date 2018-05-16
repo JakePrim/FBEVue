@@ -10,6 +10,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
 
+import com.prim.primweb.core.PrimWeb;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,6 +45,11 @@ public class PrimWebUtils {
         }
         return tag;
     }
+
+    public static boolean isDebug() {
+        return PrimWeb.DEBUG;
+    }
+
 
     private static Handler mHandler = new Handler(Looper.getMainLooper());
 

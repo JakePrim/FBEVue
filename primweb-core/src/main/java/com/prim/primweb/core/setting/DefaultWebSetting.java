@@ -27,6 +27,7 @@ public class DefaultWebSetting extends BaseAgentWebSetting<WebSettings> {
     @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void toSetting(WebSettings webSetting) {
+
         webSetting.setJavaScriptEnabled(true);
         webSetting.setJavaScriptCanOpenWindowsAutomatically(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
@@ -42,9 +43,14 @@ public class DefaultWebSetting extends BaseAgentWebSetting<WebSettings> {
         } else {
             webSetting.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
         }
+        //设置自适应屏幕
         webSetting.setUseWideViewPort(true);
+        // 缩放至屏幕的大小
         webSetting.setLoadWithOverviewMode(true);
+        //设置是否支持缩放，false，默认为true。
         webSetting.setSupportZoom(false);
+        //设置是否显示缩放工具，默认为false
+        webSetting.setBuiltInZoomControls(false);
         //异步加载图片
         webSetting.setLoadsImagesAutomatically(true);
         // 是否阻塞加载网络图片  协议http or https
@@ -59,6 +65,7 @@ public class DefaultWebSetting extends BaseAgentWebSetting<WebSettings> {
         webSetting.setAppCachePath(context.getCacheDir().getAbsolutePath() + APP_CACAHE_DIRNAME);
         //设置定位的数据库路径
         webSetting.setGeolocationDatabasePath(context.getCacheDir().getAbsolutePath() + APP_CACAHE_DIRNAME);
+        //false 禁止webview上面控件获取焦点(黄色边框)
         webSetting.setNeedInitialFocus(true);
         webSetting.setDefaultTextEncodingName("utf-8");//设置编码格式
 //        webSetting.setDefaultFontSize(16);

@@ -24,7 +24,8 @@ PrimWeb primWeb = PrimWeb.with(this)
 ### API 详解
 1. 动态切换X5和Android 的webview
 ```
-
+动态的设置webview的父view
+.setWebParent(frameLayout, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
  public enum WebViewType {
         Android, X5
     }

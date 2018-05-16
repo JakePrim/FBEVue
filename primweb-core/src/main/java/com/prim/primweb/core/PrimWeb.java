@@ -43,6 +43,8 @@ public class PrimWeb {
 
     private ICallJsLoader callJsLoader;
 
+    public static boolean DEBUG = false;
+
     private IAgentWebView webView;
     private ViewGroup mViewGroup;
     private ViewGroup.LayoutParams mLayoutParams;
@@ -121,14 +123,15 @@ public class PrimWeb {
 
     /** webview 安全检查 */
     private void doCheckSafe() {
-        if (null == webView) {
+        if (null == webView) {//webview 不能为空
             webView = new PrimAgentWebView(context.get());
             mView = webView.getAgentWebView();
         }
+        webView.removeRiskJavascriptInterface();
     }
 
-    /** 调用js方法 */
-    public ICallJsLoader callJsLoader() {
+    /** 获取调用js方法 */
+    public ICallJsLoader getCallJsLoader() {
         if (null == webView) {
             throw new NullPointerException("webView most not be null,please check your code!");
         }
@@ -138,7 +141,7 @@ public class PrimWeb {
         return callJsLoader;
     }
 
-    /** 注入js脚本 */
+    /** 获取注入js脚本方法 */
     public IJsInterface getJsInterface() {
         if (null == webView) {
             throw new NullPointerException("webView most not be null,please check your code!");
@@ -149,9 +152,32 @@ public class PrimWeb {
         return mJsInterface;
     }
 
+    /** 获取websettings， Object具体的是android webSetting 还是x5 webSetting 自己判断强转*/
+    public Object getWebSettings() {
+        if (null == setting) {
+            if (webViewType == WebViewType.Android) {
+                setting = new DefaultWebSetting(context.get());
+            } else {
+                setting = new X5DefaultWebSetting(context.get());
+            }
+        }
+        return setting.getWebSetting();
+    }
+
+    /** 获取url加载器 加载URL和刷新url操作 */
+    public IUrlLoader getUrlLoader() {
+        if (null == webView) {
+            throw new NullPointerException("webView most not be null,please check your code!");
+        }
+        if (null == urlLoader) {
+            urlLoader = new UrlLoader(webView);
+        }
+        return urlLoader;
+    }
+
     /** 准备阶段 */
     void ready() {
-        // 加载设置
+        // 加载webview设置
         if (null == setting) {
             if (webViewType == WebViewType.Android) {
                 setting = new DefaultWebSetting(context.get());
@@ -164,15 +190,6 @@ public class PrimWeb {
         // 加载url加载器
         if (null == urlLoader) {
             urlLoader = new UrlLoader(webView);
-        }
-
-        // 加载js脚本注入
-        if (null == mJsInterface) {
-            mJsInterface = SafeJsInterface.getInstance(webView, modeType);
-        }
-
-        if (mJavaObject != null && !mJavaObject.isEmpty()) {
-            mJsInterface.addJavaObjects(mJavaObject);
         }
 
         // 加载webViewClient 系统设置的优先
@@ -191,7 +208,7 @@ public class PrimWeb {
             webView.setAgentWebViewClient(agentWebViewClient);
         }
 
-        //加载webChromeClient
+        //加载webChromeClient 系统设置的优先
         if (webChromeClient != null || x5WebChromeClient != null) {
             if (webChromeClient != null) {
                 webView.setAndroidWebChromeClient(webChromeClient);
@@ -199,8 +216,19 @@ public class PrimWeb {
             if (x5WebChromeClient != null) {
                 webView.setX5WebChromeClient(x5WebChromeClient);
             }
+        } else {
+            //加载代理的webChromeClient
+
         }
 
+        // 加载js脚本注入
+        if (null == mJsInterface) {
+            mJsInterface = SafeJsInterface.getInstance(webView, modeType);
+        }
+
+        if (mJavaObject != null && !mJavaObject.isEmpty()) {
+            mJsInterface.addJavaObjects(mJavaObject);
+        }
     }
 
     /** 发起阶段 */
@@ -331,12 +359,6 @@ public class PrimWeb {
             return this;
         }
 
-        /** 注入js */
-        public CommonBuilder addJavascriptInterface(@NonNull String name, @NonNull Object o) {
-            primBuilder.addJavaObject(name, o);
-            return this;
-        }
-
         /** 设置WebView的类型 如果设置了setAgentWebView 此方法最好不要调用 */
         public CommonBuilder setWebViewType(WebViewType webViewType) {
             primBuilder.setWebViewType(webViewType);
@@ -370,10 +392,35 @@ public class PrimWeb {
             return this;
         }
 
+        /** 注入js脚本 */
+        public JsInterfaceBuilder addJavascriptInterface(@NonNull String name, @NonNull Object o) {
+            return new JsInterfaceBuilder(primBuilder).addJavascriptInterface(name, o);
+        }
+
         /** 设置完成开始建造 */
-        public PerBuilder build() {
+        public PerBuilder buildWeb() {
             return primBuilder.build();
         }
+    }
+
+    public static class JsInterfaceBuilder {
+        private PrimBuilder primBuilder;
+
+        public JsInterfaceBuilder(PrimBuilder primBuilder) {
+            this.primBuilder = primBuilder;
+        }
+
+        /** 注入js脚本 */
+        public JsInterfaceBuilder addJavascriptInterface(@NonNull String name, @NonNull Object o) {
+            primBuilder.addJavaObject(name, o);
+            return this;
+        }
+
+        /** 设置完成开始建造 */
+        public PerBuilder buildWeb() {
+            return primBuilder.build();
+        }
+
     }
 
     /** 设置完成准备发射 */
