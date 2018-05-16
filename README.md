@@ -28,8 +28,10 @@ primWeb = PrimWeb.with(this)
 
 1. 第一次提交
 
+
+
 ### API 详解
-1. 动态切换X5和Android 的webview
+1.动态切换X5和Android 的webview
 ```
 动态的设置webview的父view
 .setWebParent(frameLayout, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
@@ -42,7 +44,7 @@ primWeb = PrimWeb.with(this)
 //使用自定义的webview 注意如果使用自定义的view
 .setAgentWebView(new X5AgentWebView(this))
 ```
-2. 动态的注入JS脚本 具体请看 SafeJsInterface
+2.动态的注入JS脚本 具体请看 SafeJsInterface
 ```
 .addJavascriptInterface("jsAgent", new MyJavaObject())
 //设置严格模式或标准模式Strict - 严格的模式：api小于17 禁止注入js,大于 17 注入js的对象所有方法必须都包含JavascriptInterface注解
@@ -64,12 +66,24 @@ public class MyJavaObject {
 
     }
 ```
-3. 方便安全的加载js方法 ，具体请看 SafeCallJsLoaderImpl
+3.方便安全的加载js方法 ，具体请看 SafeCallJsLoaderImpl
 ```
+<<<<<<< HEAD
 primWeb.getCallJsLoader().callJS("jsMethod");
+=======
+primWeb.callJsLoader().callJS("jsMethod");
+
+//可传多个参数，可使用高级的API
+@RequiresApi(Build.VERSION_CODES.KITKAT)
+void callJs(String method, AgentValueCallback<String> callback, String... params);
+@RequiresApi(Build.VERSION_CODES.KITKAT)
+void callJs(String method, AgentValueCallback<String> callback);
+void callJS(String method, String... params);
+void callJS(String method);
+>>>>>>> c707dcee8fdfea252391b5dc840afde7986787a8
 ```
 
-4. 灵活的设置webview WebSetting，如：X5DefaultWebSetting 继承 BaseAgentWebSetting类
+4.灵活的设置webview WebSetting，如：X5DefaultWebSetting 继承 BaseAgentWebSetting类
 ```
 .setAgentWebSetting(new X5DefaultWebSetting(this))
 public class X5DefaultWebSetting extends BaseAgentWebSetting<WebSettings> {
@@ -96,7 +110,7 @@ public class X5DefaultWebSetting extends BaseAgentWebSetting<WebSettings> {
    }
 ```
 
-5. 灵活的设置 setWebViewClient 使用代理的WebViewClient 兼容android webview 和 x5 webview，但是只兼容了一部分的方法，已经适用于项目的使用,无法做到全面兼容
+5.灵活的设置 setWebViewClient 使用代理的WebViewClient 兼容android webview 和 x5 webview，但是只兼容了一部分的方法，已经适用于项目的使用,无法做到全面兼容
 ```
 .setAgentWebViewClient(new MyWebViewClient(this))
 
@@ -113,13 +127,14 @@ public class X5DefaultWebSetting extends BaseAgentWebSetting<WebSettings> {
         }
     }
 ```
-如果不想使用代理的方法，可以使用以下API，但是不兼容android webview 和 x5 webview 需要使用哪个webview 需要自己实现相应的方法
+
+如果不想使用代理的方法，可以使用以下API，调用android和x5 系统自带的类，当然不兼容 android webview 和 x5 webview，只能分开使用
 ```
 .setAndroidWebViewClient(new ...)
 .setX5WebViewClient(new ...)
 ```
 
-6. 代理WebChormeClient 兼容android webview 和 x5 webview, 兼容的部分方法适用于项目开发
+6.代理WebChormeClient 兼容android webview 和 x5 webview, 兼容的部分方法适用于项目开发
 ```
  setAgentWebChromeClient(IAgentWebChromeClient agentWebChromeClient)
 ```
@@ -130,7 +145,8 @@ setAndroidWebChromeClient(new ...)
 setX5WebChromeClient(new ...)
 ```
 
-7. 灵活安全的加载url,具体可以看UrlLoader
+7.灵活安全的加载url,具体可以看UrlLoader
+
 ```
  primWeb.getUrlLoader().loadUrl();
  primWeb.getUrlLoader().reload();
