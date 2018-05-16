@@ -1,7 +1,9 @@
 # PrimWeb
+![下载.png](https://upload-images.jianshu.io/upload_images/2005932-f696f5226030a1f5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-PrimWeb 是一个基于的 Android WebView 和 腾讯 x5 WebView，极度容易使用以及功能强大的库，提供了 WebView 一系列的问题解决方案 ，并且轻量和极度灵活，
-更方便 webview 切换, 库已经默认的实现了webSetting  WebViewClient WebChromeClient,如果没有特殊的项目需求,一下是最简单的调用方式.
+
+PrimWeb 是一个基于的 Android WebView 和 腾讯 x5 WebView，容易、灵活使用以及功能非常强大的库，提供了 WebView 一系列的问题解决方案 ，并且轻量和灵活，
+更方便 webview 的切换, bug 再也不用担心webview出问题了,库已经默认的实现了webSetting  WebViewClient WebChromeClient,如果没有特殊的项目需求,以下是最简单的调用方式.
 ```
 primWeb = PrimWeb.with(this)
                 .setWebParent(frameLayout, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
@@ -34,20 +36,37 @@ primWeb = PrimWeb.with(this)
 
 
 ### API 详解
-1.动态切换X5和Android 的webview
+0.webView经常内存泄漏？以后不会再有内存泄漏了,动态的new webview太麻烦？你只需要一句代码，然后去喝一杯咖啡吧
+```
+.setWebParent(frameLayout, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+
+内存泄漏不用担心，已经在内部处理了
+    @Override
+    public void destroy() {
+        removeAllViewsInLayout();
+        ViewParent parent = getParent();
+        if (parent instanceof ViewGroup) {//从父容器中移除webview
+            ((ViewGroup) parent).removeAllViewsInLayout();
+        }
+        releaseConfigCallback();
+        super.destroy();
+    }
+```
+
+1.现流行的腾讯x5 webview, 很火，但是总会有一些限制，不想用换起来很麻烦？ 一行代码动态切换 X5和Android 的webview
 ```
 动态的设置webview的父view
-.setWebParent(frameLayout, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
  public enum WebViewType {
         Android, X5
     }
 //使用库中默认的webview
 .setWebViewType(PrimWeb.WebViewType.X5)
 
-//使用自定义的webview 注意如果使用自定义的view
+//使用自定义的webview 内部会自动判断使用的是android 或者 x5 的webview
 .setAgentWebView(new X5AgentWebView(this))
 ```
-2.动态的注入JS脚本 具体请看 SafeJsInterface
+
+2.Javascript调Java? 具体请看 SafeJsInterface
 ```
 .addJavascriptInterface("jsAgent", new MyJavaObject())
 //设置严格模式或标准模式Strict - 严格的模式：api小于17 禁止注入js,大于 17 注入js的对象所有方法必须都包含JavascriptInterface注解
@@ -69,7 +88,8 @@ public class MyJavaObject {
 
     }
 ```
-3.方便安全的加载js方法 ，具体请看 SafeCallJsLoaderImpl
+
+3.调用Javascript方法拼接太麻烦？请看方便安全的加载js方法可传多个参数，具体请看 SafeCallJsLoaderImpl
 ```
 primWeb.getCallJsLoader().callJS("jsMethod");
 
@@ -83,9 +103,10 @@ void callJS(String method, String... params);
 void callJS(String method);
 ```
 
-4.灵活的设置webview WebSetting，如：X5DefaultWebSetting 继承 BaseAgentWebSetting类
+4.灵活的设置webview WebSetting，我们可以多个setting 换着来 如：X5DefaultWebSetting 继承 BaseAgentWebSetting类
 ```
 .setAgentWebSetting(new X5DefaultWebSetting(this))
+
 public class X5DefaultWebSetting extends BaseAgentWebSetting<WebSettings> {
     private Context context;
     private static final String APP_CACAHE_DIRNAME = "/webcache";
@@ -110,12 +131,12 @@ public class X5DefaultWebSetting extends BaseAgentWebSetting<WebSettings> {
    }
 ```
 
-5.灵活的设置 setWebViewClient 使用代理的WebViewClient 兼容android webview 和 x5 webview，但是只兼容了一部分的方法，已经适用于项目的使用,无法做到全面兼容
+5.灵活的设置 setWebViewClient 使用代理的WebViewClient 兼容android webview 和 x5 webview，但是只兼容了一部分的方法，多数已经适用于项目的使用,无法做到全面兼容
 ```
 .setAgentWebViewClient(new MyWebViewClient(this))
 
 /** 使用代理的WebViewClient */
-    public class MyWebViewClient extends WebViewClient {
+public class MyWebViewClient extends WebViewClient {
         MyWebViewClient(Context context) {
             super(context);
         }
@@ -128,7 +149,7 @@ public class X5DefaultWebSetting extends BaseAgentWebSetting<WebSettings> {
     }
 ```
 
-如果不想使用代理的方法，可以使用以下API，调用android和x5 系统自带的类，当然不兼容 android webview 和 x5 webview，只能分开使用
+如果不想使用代理的方法? 可以使用以下API，调用android和x5 系统自带的类，当然不兼容 android webview 和 x5 webview，只能分开使用
 ```
 .setAndroidWebViewClient(new ...)
 .setX5WebViewClient(new ...)
@@ -138,7 +159,7 @@ public class X5DefaultWebSetting extends BaseAgentWebSetting<WebSettings> {
 ```
  setAgentWebChromeClient(IAgentWebChromeClient agentWebChromeClient)
 ```
-如果不想使用代理的方法，可以使用以下API，但是不兼容android webview 和 x5 webview 需要使用哪个webview 需要自己实现相应的方法
+如果不想使用代理的方法? 可以使用以下API，但是不兼容android webview 和 x5 webview 需要使用哪个webview 需要自己实现相应的方法
 
 ```
 setAndroidWebChromeClient(new ...)
