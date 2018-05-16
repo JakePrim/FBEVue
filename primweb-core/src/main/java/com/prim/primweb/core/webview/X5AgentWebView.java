@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Build;
+import android.os.Looper;
 import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -195,11 +196,6 @@ public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings
     }
 
     @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-    }
-
-    @Override
     public void destroy() {
         removeAllViewsInLayout();
         ViewParent parent = getParent();
@@ -207,5 +203,44 @@ public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings
             ((ViewGroup) parent).removeAllViewsInLayout();
         }
         super.destroy();
+    }
+
+    @Override
+    public void onAgentResume() {
+        if (Build.VERSION.SDK_INT >= 11) {
+            this.onResume();
+        }
+        this.resumeTimers();
+    }
+
+    @Override
+    public void onAgentPause() {
+        if (Build.VERSION.SDK_INT >= 11) {
+            this.onPause();
+        }
+        this.pauseTimers();
+    }
+
+    @Override
+    public void onAgentDestory() {
+        this.resumeTimers();
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            return;
+        }
+        this.loadUrl("about:blank");
+        this.stopLoading();
+        if (this.getHandler() != null) {
+            this.getHandler().removeCallbacksAndMessages(null);
+        }
+        this.removeAllViews();
+        ViewGroup mViewGroup = null;
+        if ((mViewGroup = ((ViewGroup) this.getParent())) != null) {
+            mViewGroup.removeView(this);
+        }
+        this.setWebChromeClient(null);
+        this.setWebViewClient(null);
+        this.setTag(null);
+        this.clearHistory();
+        this.destroy();
     }
 }

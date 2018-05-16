@@ -82,6 +82,10 @@ public interface IAgentWebView<T> {
 
     void setOnScrollChangeListener(OnScrollChangeListener listener);
 
+    void onAgentResume();
 
+    void onAgentPause();
+
+    void onAgentDestory();
 
 }

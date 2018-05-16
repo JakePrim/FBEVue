@@ -16,6 +16,8 @@ import com.prim.primweb.core.jsinterface.IJsInterface;
 import com.prim.primweb.core.jsinterface.SafeJsInterface;
 import com.prim.primweb.core.jsloader.ICallJsLoader;
 import com.prim.primweb.core.jsloader.SafeCallJsLoaderImpl;
+import com.prim.primweb.core.life.IWebLifeCycle;
+import com.prim.primweb.core.life.WebLifeCycle;
 import com.prim.primweb.core.setting.DefaultWebSetting;
 import com.prim.primweb.core.setting.IAgentWebSetting;
 import com.prim.primweb.core.setting.X5DefaultWebSetting;
@@ -91,6 +93,9 @@ public class PrimWeb {
     private WebChromeClient webChromeClient;
     private com.tencent.smtt.sdk.WebChromeClient x5WebChromeClient;
 
+    //webview的生命周期管理
+    private IWebLifeCycle webLifeCycle;
+
     public static void init(Application application) {
         // X5浏览器实列化
         QbSdk.initX5Environment(application, null);
@@ -116,6 +121,7 @@ public class PrimWeb {
         this.webViewType = builder.webViewType;
         this.agentWebChromeClient = builder.agentWebChromeClient;
         doCheckSafe();
+        webLifeCycle = new WebLifeCycle(webView);
         if (builder.mJavaObject != null && !builder.mJavaObject.isEmpty()) {
             this.mJavaObject.putAll(builder.mJavaObject);
         }
@@ -178,6 +184,21 @@ public class PrimWeb {
             urlLoader = new UrlLoader(webView);
         }
         return urlLoader;
+    }
+
+    /** 设置webview的生命周期 */
+    public IWebLifeCycle webLifeCycle() {
+        if (webLifeCycle == null) {
+            if (webView != null) {
+                webLifeCycle = new WebLifeCycle(webView);
+            }
+        }
+        return webLifeCycle;
+    }
+
+    /** 获取webview */
+    public IAgentWebView getWebView() {
+        return webView;
     }
 
     /** 准备阶段,检查完毕后加载url */

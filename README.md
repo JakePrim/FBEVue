@@ -1,4 +1,5 @@
 # PrimWeb
+
 PrimWeb 是一个基于的 Android WebView 和 腾讯 x5 WebView，极度容易使用以及功能强大的库，提供了 WebView 一系列的问题解决方案 ，并且轻量和极度灵活，
 更方便 webview 切换, 库已经默认的实现了webSetting  WebViewClient WebChromeClient,如果没有特殊的项目需求,一下是最简单的调用方式.
 ```
@@ -11,18 +12,20 @@ primWeb = PrimWeb.with(this)
                 .readyOk()
                 .launch("http://front.52yingzheng.com/test/shiluTest/h5-standard/h5-standard.html");
  ```
+
 ## TODO
-0. webview生命周期管理，及缓存的清理
 1. webview的安全设置，及 webview 安全注入js脚本
 2. webview UI--> 加载和错误UI设置
 3. webview上传文件，及权限设置
 4. webview下载文件
 
 ## FINISH
+
 5/16
 
 1. webview 安全漏洞的问题修复
 2. 代理WebChormeClient 兼容android webview 和 x5 webview
+3. 添加webview的生命周期管理
 
 5/15
 
@@ -151,4 +154,25 @@ setX5WebChromeClient(new ...)
  primWeb.getUrlLoader().loadUrl();
  primWeb.getUrlLoader().reload();
  primWeb.getUrlLoader().stopLoading();
+```
+
+8.控制webview的生命周期
+```
+    @Override
+    protected void onResume() {
+        super.onResume();
+        primWeb.webLifeCycle().onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        primWeb.webLifeCycle().onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        primWeb.webLifeCycle().onDestory();
+    }
 ```
