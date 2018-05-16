@@ -12,7 +12,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
+import com.prim.primweb.core.client.IAgentWebChromeClient;
 import com.prim.primweb.core.client.IAgentWebViewClient;
+import com.prim.primweb.core.client.MyX5WebChromeClient;
 import com.prim.primweb.core.client.MyX5WebViewClient;
 import com.prim.primweb.core.jsloader.AgentValueCallback;
 import com.prim.primweb.core.utils.PrimWebUtils;
@@ -36,7 +38,7 @@ import java.util.Map;
  * 修订历史：
  * ================================================
  */
-public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings, WebChromeClient> {
+public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings> {
     private com.prim.primweb.core.listener.OnScrollChangeListener listener;
 
     private IAgentWebViewClient webViewClient;
@@ -150,8 +152,8 @@ public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings
     }
 
     @Override
-    public void setAgentWebChromeClient(WebChromeClient webChromeClient) {
-        setWebChromeClient(webChromeClient);
+    public void setAgentWebChromeClient(IAgentWebChromeClient webChromeClient) {
+        setWebChromeClient(new MyX5WebChromeClient(webChromeClient));
     }
 
     @Override

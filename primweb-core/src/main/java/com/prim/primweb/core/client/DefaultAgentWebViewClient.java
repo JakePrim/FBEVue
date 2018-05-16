@@ -1,17 +1,8 @@
 package com.prim.primweb.core.client;
 
-import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
-import android.net.Uri;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
-import android.view.View;
 
 import com.prim.primweb.core.webview.IAgentWebView;
 

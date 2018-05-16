@@ -13,6 +13,7 @@ import com.prim.primweb.core.PrimWeb;
 import com.prim.primweb.core.client.MyX5WebChromeClient;
 import com.prim.primweb.core.client.WebViewClient;
 import com.prim.primweb.core.webview.IAgentWebView;
+import com.prim.primweb.core.webview.PrimAgentWebView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,11 +32,9 @@ public class MainActivity extends AppCompatActivity {
                 .setWebParent(frameLayout, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
                 .setWebViewType(PrimWeb.WebViewType.X5)
                 .setModeType(PrimWeb.ModeType.Normal)
-                .setAgentWebViewClient(new MyWebViewClient(this))
-                .setX5WebChromeClient(new MyX5WebChromeClient())
                 .addJavascriptInterface("nativeBridge", new MyJavaObject())
                 .buildWeb()
-                .ready()
+                .readyOk()
                 .launch("http://front.52yingzheng.com/test/shiluTest/h5-standard/h5-standard.html");
     }
 

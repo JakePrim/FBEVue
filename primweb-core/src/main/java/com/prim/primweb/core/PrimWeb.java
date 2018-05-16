@@ -8,7 +8,9 @@ import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
 import android.webkit.WebViewClient;
 
+import com.prim.primweb.core.client.DefaultAgentWebChromeClient;
 import com.prim.primweb.core.client.DefaultAgentWebViewClient;
+import com.prim.primweb.core.client.IAgentWebChromeClient;
 import com.prim.primweb.core.client.IAgentWebViewClient;
 import com.prim.primweb.core.jsinterface.IJsInterface;
 import com.prim.primweb.core.jsinterface.SafeJsInterface;
@@ -78,6 +80,8 @@ public class PrimWeb {
 
     private IAgentWebViewClient agentWebViewClient;
 
+    private IAgentWebChromeClient agentWebChromeClient;
+
     //初始化个数 30 * 0.75 多个左右,考虑到哈希表默认大小只有 4 * 0.75 个
     //而哈希表的缺点是:扩容性能会下降 初始化时提前计算好上限.
     private HashMap<String, Object> mJavaObject = new HashMap<>(30);
@@ -110,6 +114,7 @@ public class PrimWeb {
         this.webChromeClient = builder.webChromeClient;
         this.x5WebChromeClient = builder.x5WebChromeClient;
         this.webViewType = builder.webViewType;
+        this.agentWebChromeClient = builder.agentWebChromeClient;
         doCheckSafe();
         if (builder.mJavaObject != null && !builder.mJavaObject.isEmpty()) {
             this.mJavaObject.putAll(builder.mJavaObject);
@@ -152,7 +157,7 @@ public class PrimWeb {
         return mJsInterface;
     }
 
-    /** 获取websettings， Object具体的是android webSetting 还是x5 webSetting 自己判断强转*/
+    /** 获取websettings， Object具体的是android webSetting 还是x5 webSetting 自己判断强转 */
     public Object getWebSettings() {
         if (null == setting) {
             if (webViewType == WebViewType.Android) {
@@ -175,7 +180,7 @@ public class PrimWeb {
         return urlLoader;
     }
 
-    /** 准备阶段 */
+    /** 准备阶段,检查完毕后加载url */
     void ready() {
         // 加载webview设置
         if (null == setting) {
@@ -218,7 +223,14 @@ public class PrimWeb {
             }
         } else {
             //加载代理的webChromeClient
-
+            if (null == agentWebChromeClient) {
+                if (webViewType == WebViewType.Android) {
+                    agentWebChromeClient = new DefaultAgentWebChromeClient<WebChromeClient.FileChooserParams>(context.get());
+                } else if (webViewType == WebViewType.X5) {
+                    agentWebChromeClient = new DefaultAgentWebChromeClient<com.tencent.smtt.sdk.WebChromeClient.FileChooserParams>(context.get());
+                }
+            }
+            webView.setAgentWebChromeClient(agentWebChromeClient);
         }
 
         // 加载js脚本注入
@@ -231,7 +243,7 @@ public class PrimWeb {
         }
     }
 
-    /** 发起阶段 */
+    /** 发起最终阶段 加载url */
     PrimWeb launch(String url) {
         if (null == headers || headers.isEmpty()) {
             urlLoader.loadUrl(url);
@@ -267,6 +279,7 @@ public class PrimWeb {
         private com.tencent.smtt.sdk.WebViewClient x5WebViewClient;
         private WebChromeClient webChromeClient;
         private com.tencent.smtt.sdk.WebChromeClient x5WebChromeClient;
+        private IAgentWebChromeClient agentWebChromeClient;
 
         PrimBuilder(Context context) {
             this.context = new WeakReference<>(context);
@@ -353,25 +366,32 @@ public class PrimWeb {
             return this;
         }
 
-        /** 设置模式 */
+        /** 设置模式 js脚本的注入模式 */
         public CommonBuilder setModeType(ModeType modeType) {
             primBuilder.modeType = modeType;
             return this;
         }
 
-        /** 设置WebView的类型 如果设置了setAgentWebView 此方法最好不要调用 */
+        /** 设置WebView的类型 如果设置了setAgentWebView 此方法最好不要调用setAgentWebView 会默认判断webview的类型 */
         public CommonBuilder setWebViewType(WebViewType webViewType) {
             primBuilder.setWebViewType(webViewType);
             return this;
         }
 
-        /** 设置WebViewClient */
+        /** 设置代理的WebViewClient 兼容android webview 和 x5 webview */
         public CommonBuilder setAgentWebViewClient(IAgentWebViewClient agentWebViewClient) {
             primBuilder.agentWebViewClient = agentWebViewClient;
             return this;
         }
 
-        /** 如果不想要使用代理的 通过以下方法来调用系统自带的 */
+        /** 设置代理的WebChromeClient 兼容android webview 和 x5 webview */
+        public CommonBuilder setAgentWebChromeClient(IAgentWebChromeClient agentWebChromeClient) {
+            primBuilder.agentWebChromeClient = agentWebChromeClient;
+            return this;
+        }
+
+
+        /** 如果不想要使用代理的 通过以下方法来调用系统自带的 但是兼容android webview 和 x5 webview 需要各自实现 */
         public CommonBuilder setAndroidWebViewClient(WebViewClient webViewClient) {
             primBuilder.webViewClient = webViewClient;
             return this;
@@ -432,7 +452,7 @@ public class PrimWeb {
             this.primWeb = primWeb;
         }
 
-        public PerBuilder ready() {
+        public PerBuilder readyOk() {
             if (!isReady) {
                 primWeb.ready();
                 isReady = true;
@@ -442,7 +462,7 @@ public class PrimWeb {
 
         public PrimWeb launch(@NonNull String url) {
             if (!isReady) {
-                ready();
+                readyOk();
             }
             return primWeb.launch(url);
         }

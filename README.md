@@ -1,18 +1,15 @@
 # PrimWeb
 PrimWeb 是一个基于的 Android WebView 和 腾讯 x5 WebView，极度容易使用以及功能强大的库，提供了 WebView 一系列的问题解决方案 ，并且轻量和极度灵活，
-更方便 webview 切换
+更方便 webview 切换, 库已经默认的实现了webSetting  WebViewClient WebChromeClient,如果没有特殊的项目需求,一下是最简单的调用方式.
 ```
-PrimWeb primWeb = PrimWeb.with(this)
+primWeb = PrimWeb.with(this)
                 .setWebParent(frameLayout, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
-                .setWebViewType(PrimWeb.WebViewType.Android)
-                .addJavascriptInterface("jsAgent", new MyJavaObject())
+                .setWebViewType(PrimWeb.WebViewType.X5)
                 .setModeType(PrimWeb.ModeType.Normal)
-                .setAgentWebViewClient(new MyWebViewClient(this))
-                .build()
-                .ready()
-                .launch("https://blog.csdn.net/yy1300326388/article/details/43965493");
-
-        primWeb.callJsLoader().callJS("jsMethod");
+                .addJavascriptInterface("nativeBridge", new MyJavaObject())
+                .buildWeb()
+                .readyOk()
+                .launch("http://front.52yingzheng.com/test/shiluTest/h5-standard/h5-standard.html");
  ```
 ## TODO
 0. webview生命周期管理，及缓存的清理
@@ -20,6 +17,16 @@ PrimWeb primWeb = PrimWeb.with(this)
 2. webview UI--> 加载和错误UI设置
 3. webview上传文件，及权限设置
 4. webview下载文件
+
+## FINISH
+5/16
+
+1. webview 安全漏洞的问题修复
+2. 代理WebChormeClient 兼容android webview 和 x5 webview
+
+5/15
+
+1. 第一次提交
 
 ### API 详解
 1. 动态切换X5和Android 的webview
@@ -31,7 +38,8 @@ PrimWeb primWeb = PrimWeb.with(this)
     }
 //使用库中默认的webview
 .setWebViewType(PrimWeb.WebViewType.X5)
-//使用自定义的webview
+
+//使用自定义的webview 注意如果使用自定义的view
 .setAgentWebView(new X5AgentWebView(this))
 ```
 2. 动态的注入JS脚本 具体请看 SafeJsInterface
@@ -58,10 +66,10 @@ public class MyJavaObject {
 ```
 3. 方便安全的加载js方法 ，具体请看 SafeCallJsLoaderImpl
 ```
-primWeb.callJsLoader().callJS("jsMethod");
+primWeb.getCallJsLoader().callJS("jsMethod");
 ```
 
-4.灵活的设置webview WebSetting，如：X5DefaultWebSetting 继承 BaseAgentWebSetting类
+4. 灵活的设置webview WebSetting，如：X5DefaultWebSetting 继承 BaseAgentWebSetting类
 ```
 .setAgentWebSetting(new X5DefaultWebSetting(this))
 public class X5DefaultWebSetting extends BaseAgentWebSetting<WebSettings> {
@@ -85,8 +93,10 @@ public class X5DefaultWebSetting extends BaseAgentWebSetting<WebSettings> {
         }
         }
        ......
+   }
 ```
-5.灵活的设置 setWebViewClient 使用代理的WebViewClient 兼容android webview 和 x5 webview，但是只兼容了一部分的方法，无法做到全面兼容
+
+5. 灵活的设置 setWebViewClient 使用代理的WebViewClient 兼容android webview 和 x5 webview，但是只兼容了一部分的方法，已经适用于项目的使用,无法做到全面兼容
 ```
 .setAgentWebViewClient(new MyWebViewClient(this))
 
@@ -103,10 +113,26 @@ public class X5DefaultWebSetting extends BaseAgentWebSetting<WebSettings> {
         }
     }
 ```
-如果不想使用代理的方法，可以使用以下API，当时 不 兼容android webview 和 x5 webview
+如果不想使用代理的方法，可以使用以下API，但是不兼容android webview 和 x5 webview 需要使用哪个webview 需要自己实现相应的方法
 ```
-.setAndroidWebChromeClient()
-.setX5WebChromeClient()
-.setAndroidWebViewClient()
-.setX5WebViewClient()
+.setAndroidWebViewClient(new ...)
+.setX5WebViewClient(new ...)
+```
+
+6. 代理WebChormeClient 兼容android webview 和 x5 webview, 兼容的部分方法适用于项目开发
+```
+ setAgentWebChromeClient(IAgentWebChromeClient agentWebChromeClient)
+```
+如果不想使用代理的方法，可以使用以下API，但是不兼容android webview 和 x5 webview 需要使用哪个webview 需要自己实现相应的方法
+
+```
+setAndroidWebChromeClient(new ...)
+setX5WebChromeClient(new ...)
+```
+
+7. 灵活安全的加载url,具体可以看UrlLoader
+```
+ primWeb.getUrlLoader().loadUrl();
+ primWeb.getUrlLoader().reload();
+ primWeb.getUrlLoader().stopLoading();
 ```

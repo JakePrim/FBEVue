@@ -14,7 +14,9 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.prim.primweb.core.client.IAgentWebChromeClient;
 import com.prim.primweb.core.client.IAgentWebViewClient;
+import com.prim.primweb.core.client.MyAndroidWebChromeClient;
 import com.prim.primweb.core.client.MyAndroidWebViewClient;
 import com.prim.primweb.core.jsloader.AgentValueCallback;
 import com.prim.primweb.core.utils.PrimWebUtils;
@@ -33,11 +35,12 @@ import java.util.Map;
  * 修订历史：1.0.0
  * ================================================
  */
-public class PrimAgentWebView extends WebView implements IAgentWebView<WebSettings, WebChromeClient> {
+public class PrimAgentWebView extends WebView implements IAgentWebView<WebSettings> {
 
     private static final String TAG = "PrimAgentWebView";
     public com.prim.primweb.core.listener.OnScrollChangeListener listener;
     private IAgentWebViewClient webViewClient;
+    WebView.HitTestResult result;
 
     public PrimAgentWebView(Context context) {
         this(context, null);
@@ -45,6 +48,7 @@ public class PrimAgentWebView extends WebView implements IAgentWebView<WebSettin
 
     public PrimAgentWebView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        result = this.getHitTestResult();
     }
 
     @Override
@@ -67,6 +71,14 @@ public class PrimAgentWebView extends WebView implements IAgentWebView<WebSettin
         this.removeJavascriptInterface("accessibility");
         this.removeJavascriptInterface("accessibilityTraversal");
     }
+
+    private View.OnLongClickListener longClickListener = new OnLongClickListener() {
+        @Override
+        public boolean onLongClick(View v) {
+
+            return false;
+        }
+    };
 
     /**
      * 使用Chrome DevTools 远程调试WebView
@@ -159,8 +171,8 @@ public class PrimAgentWebView extends WebView implements IAgentWebView<WebSettin
     }
 
     @Override
-    public void setAgentWebChromeClient(WebChromeClient webChromeClient) {
-        setWebChromeClient(webChromeClient);
+    public void setAgentWebChromeClient(IAgentWebChromeClient webChromeClient) {
+        setWebChromeClient(new MyAndroidWebChromeClient(webChromeClient));
     }
 
     @Override
