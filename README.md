@@ -71,10 +71,8 @@ public class MyJavaObject {
 ```
 3.方便安全的加载js方法 ，具体请看 SafeCallJsLoaderImpl
 ```
-<<<<<<< HEAD
 primWeb.getCallJsLoader().callJS("jsMethod");
-=======
-primWeb.callJsLoader().callJS("jsMethod");
+
 
 //可传多个参数，可使用高级的API
 @RequiresApi(Build.VERSION_CODES.KITKAT)
@@ -83,7 +81,6 @@ void callJs(String method, AgentValueCallback<String> callback, String... params
 void callJs(String method, AgentValueCallback<String> callback);
 void callJS(String method, String... params);
 void callJS(String method);
->>>>>>> c707dcee8fdfea252391b5dc840afde7986787a8
 ```
 
 4.灵活的设置webview WebSetting，如：X5DefaultWebSetting 继承 BaseAgentWebSetting类
