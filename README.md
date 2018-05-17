@@ -23,13 +23,13 @@ primWeb = PrimWeb.with(this)
 
 ## FINISH
 
-5/16
+v1.1.0
 
 1. webview 安全漏洞的问题修复
 2. 代理WebChormeClient 兼容android webview 和 x5 webview
 3. 添加webview的生命周期管理
 
-5/15
+v1.0.0
 
 1. 第一次提交
 

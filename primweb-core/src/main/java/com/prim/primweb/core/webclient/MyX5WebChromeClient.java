@@ -1,4 +1,4 @@
-package com.prim.primweb.core.client;
+package com.prim.primweb.core.webclient;
 
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -11,7 +11,6 @@ import com.tencent.smtt.export.external.interfaces.JsPromptResult;
 import com.tencent.smtt.export.external.interfaces.JsResult;
 import com.tencent.smtt.sdk.ValueCallback;
 import com.tencent.smtt.sdk.WebChromeClient;
-import com.tencent.smtt.sdk.WebStorage;
 import com.tencent.smtt.sdk.WebView;
 
 
@@ -59,14 +58,12 @@ public class MyX5WebChromeClient extends WebChromeClient {
 
     @Override
     public void onGeolocationPermissionsShowPrompt(String s, final GeolocationPermissionsCallback geolocationPermissionsCallback) {
-        com.prim.primweb.core.client.GeolocationPermissionsCallback geolocationPermissionsCallback1 = new com.prim.primweb.core.client.GeolocationPermissionsCallback() {
+        com.prim.primweb.core.webclient.GeolocationPermissionsCallback geolocationPermissionsCallback1 = new com.prim.primweb.core.webclient.GeolocationPermissionsCallback() {
             @Override
             public void invoke(String var1, boolean var2, boolean var3) {
-                Log.e(TAG, "invoke: 执行系统的方法!");
                 geolocationPermissionsCallback.invoke(var1, var2, var3);
             }
         };
-        Log.e(TAG, "onGeolocationPermissionsShowPrompt: 执行");
         agentWebChromeClient.onGeolocationPermissionsShowPrompt(s, geolocationPermissionsCallback1);
         super.onGeolocationPermissionsShowPrompt(s, geolocationPermissionsCallback);
     }

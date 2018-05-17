@@ -2,24 +2,21 @@ package com.prim.primweb.core.webview;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Looper;
 import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
-import com.prim.primweb.core.client.IAgentWebChromeClient;
-import com.prim.primweb.core.client.IAgentWebViewClient;
-import com.prim.primweb.core.client.MyX5WebChromeClient;
-import com.prim.primweb.core.client.MyX5WebViewClient;
+import com.prim.primweb.core.webclient.IAgentWebChromeClient;
+import com.prim.primweb.core.webclient.IAgentWebViewClient;
+import com.prim.primweb.core.webclient.MyX5WebChromeClient;
+import com.prim.primweb.core.webclient.MyX5WebViewClient;
 import com.prim.primweb.core.jsloader.AgentValueCallback;
 import com.prim.primweb.core.utils.PrimWebUtils;
-import com.tencent.smtt.export.external.interfaces.WebResourceResponse;
 import com.tencent.smtt.sdk.ValueCallback;
 import com.tencent.smtt.sdk.WebChromeClient;
 import com.tencent.smtt.sdk.WebSettings;

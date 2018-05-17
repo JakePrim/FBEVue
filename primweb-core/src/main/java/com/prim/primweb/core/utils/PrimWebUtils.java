@@ -6,8 +6,11 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
 
 import com.prim.primweb.core.PrimWeb;
@@ -15,6 +18,8 @@ import com.prim.primweb.core.PrimWeb;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.File;
 
 /**
  * ================================================
@@ -80,5 +85,15 @@ public class PrimWebUtils {
             return scanForActivity(((ContextWrapper) context).getBaseContext());
         }
         return null;
+    }
+
+    public static Uri getUriForFile(Context context, String name, File vFile) {
+        Uri cameraUri;
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            cameraUri = Uri.fromFile(vFile);
+        } else {
+            cameraUri = FileProvider.getUriForFile(context, name, vFile);
+        }
+        return cameraUri;
     }
 }

@@ -1,10 +1,8 @@
 package com.prim.web;
 
 import android.content.Context;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,14 +12,9 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.prim.primweb.core.PrimWeb;
-import com.prim.primweb.core.client.MyX5WebChromeClient;
-import com.prim.primweb.core.client.WebChromeClient;
-import com.prim.primweb.core.client.WebViewClient;
-import com.prim.primweb.core.jsloader.AgentValueCallback;
+import com.prim.primweb.core.webclient.WebChromeClient;
+import com.prim.primweb.core.webclient.WebViewClient;
 import com.prim.primweb.core.webview.IAgentWebView;
-import com.prim.primweb.core.webview.PrimAgentWebView;
-
-import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -38,14 +31,14 @@ public class MainActivity extends AppCompatActivity {
         frameLayout = (FrameLayout) findViewById(R.id.fl_web);
         primWeb = PrimWeb.with(this)
                 .setWebParent(frameLayout, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
-                .setWebViewType(PrimWeb.WebViewType.X5)
-                .setModeType(PrimWeb.ModeType.Normal)
+                .setWebViewType(PrimWeb.WebViewType.Android)
+                .setModeType(PrimWeb.ModeType.Strict)
                 .setAgentWebViewClient(new AgentWebViewClient(this))
                 .setAgentWebChromeClient(new AgentWebChromeClient(this))
                 .addJavascriptInterface("android", new MyJavaObject())
                 .buildWeb()
                 .readyOk()
-                .launch("http://www.jd.com/");
+                .launch("http://front.52yingzheng.com/test/shiluTest/h5-standard/h5-standard.html");
     }
 
     /** 使用代理的WebViewClient */

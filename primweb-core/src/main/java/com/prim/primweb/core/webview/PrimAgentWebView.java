@@ -15,10 +15,10 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.prim.primweb.core.client.IAgentWebChromeClient;
-import com.prim.primweb.core.client.IAgentWebViewClient;
-import com.prim.primweb.core.client.MyAndroidWebChromeClient;
-import com.prim.primweb.core.client.MyAndroidWebViewClient;
+import com.prim.primweb.core.webclient.IAgentWebChromeClient;
+import com.prim.primweb.core.webclient.IAgentWebViewClient;
+import com.prim.primweb.core.webclient.MyAndroidWebChromeClient;
+import com.prim.primweb.core.webclient.MyAndroidWebViewClient;
 import com.prim.primweb.core.jsloader.AgentValueCallback;
 import com.prim.primweb.core.utils.PrimWebUtils;
 

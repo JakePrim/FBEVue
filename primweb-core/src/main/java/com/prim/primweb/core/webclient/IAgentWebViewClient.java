@@ -1,9 +1,7 @@
-package com.prim.primweb.core.client;
+package com.prim.primweb.core.webclient;
 
 import android.graphics.Bitmap;
-import android.net.http.SslError;
 import android.view.KeyEvent;
-import android.view.View;
 
 import com.prim.primweb.core.webview.IAgentWebView;
 

@@ -1,6 +1,4 @@
-package com.prim.primweb.core.setting;
-
-import android.util.Log;
+package com.prim.primweb.core.websetting;
 
 import com.prim.primweb.core.webview.IAgentWebView;
 

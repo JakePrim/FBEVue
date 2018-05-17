@@ -1,4 +1,4 @@
-package com.prim.primweb.core.client;
+package com.prim.primweb.core.webclient;
 
 /**
  * ================================================

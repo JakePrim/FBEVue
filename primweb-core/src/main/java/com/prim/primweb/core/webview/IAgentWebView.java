@@ -4,11 +4,10 @@ import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebViewClient;
 
-import com.prim.primweb.core.client.IAgentWebChromeClient;
-import com.prim.primweb.core.client.IAgentWebViewClient;
+import com.prim.primweb.core.webclient.IAgentWebChromeClient;
+import com.prim.primweb.core.webclient.IAgentWebViewClient;
 import com.prim.primweb.core.jsloader.AgentValueCallback;
 import com.prim.primweb.core.listener.OnScrollChangeListener;
-import com.tencent.smtt.sdk.WebView;
 
 import java.util.Map;
 

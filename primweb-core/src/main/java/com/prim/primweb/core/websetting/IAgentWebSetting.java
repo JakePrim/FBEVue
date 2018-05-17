@@ -1,4 +1,4 @@
-package com.prim.primweb.core.setting;
+package com.prim.primweb.core.websetting;
 
 import com.prim.primweb.core.webview.IAgentWebView;
 

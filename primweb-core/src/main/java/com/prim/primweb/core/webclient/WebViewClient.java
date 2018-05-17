@@ -1,4 +1,4 @@
-package com.prim.primweb.core.client;
+package com.prim.primweb.core.webclient;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
@@ -10,7 +10,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.view.KeyEvent;
-import android.view.View;
 
 import com.prim.primweb.core.webview.IAgentWebView;
 

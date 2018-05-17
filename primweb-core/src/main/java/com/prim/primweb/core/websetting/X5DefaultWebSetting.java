@@ -1,33 +1,32 @@
-package com.prim.primweb.core.setting;
+package com.prim.primweb.core.websetting;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build;
-import android.webkit.WebSettings;
 
 import com.prim.primweb.core.utils.PrimWebUtils;
+import com.tencent.smtt.sdk.WebSettings;
 
 /**
  * ================================================
  * 作    者：linksus
  * 版    本：1.0
  * 创建日期：5/14 0014
- * 描    述：默认的web设置
+ * 描    述：默认的x5 web设置
  * 修订历史：
  * ================================================
  */
-public class DefaultWebSetting extends BaseAgentWebSetting<WebSettings> {
+public class X5DefaultWebSetting extends BaseAgentWebSetting<WebSettings> {
     private Context context;
     private static final String APP_CACAHE_DIRNAME = "/webcache";
 
-    public DefaultWebSetting(Context context) {
+    public X5DefaultWebSetting(Context context) {
         this.context = context;
     }
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void toSetting(WebSettings webSetting) {
-
         webSetting.setJavaScriptEnabled(true);
         webSetting.setJavaScriptCanOpenWindowsAutomatically(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
@@ -43,14 +42,9 @@ public class DefaultWebSetting extends BaseAgentWebSetting<WebSettings> {
         } else {
             webSetting.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
         }
-        //设置自适应屏幕
         webSetting.setUseWideViewPort(true);
-        // 缩放至屏幕的大小
         webSetting.setLoadWithOverviewMode(true);
-        //设置是否支持缩放，false，默认为true。
         webSetting.setSupportZoom(false);
-        //设置是否显示缩放工具，默认为false
-        webSetting.setBuiltInZoomControls(false);
         //异步加载图片
         webSetting.setLoadsImagesAutomatically(true);
         // 是否阻塞加载网络图片  协议http or https
@@ -65,10 +59,9 @@ public class DefaultWebSetting extends BaseAgentWebSetting<WebSettings> {
         webSetting.setAppCachePath(context.getCacheDir().getAbsolutePath() + APP_CACAHE_DIRNAME);
         //设置定位的数据库路径
         webSetting.setGeolocationDatabasePath(context.getCacheDir().getAbsolutePath() + APP_CACAHE_DIRNAME);
-        //false 禁止webview上面控件获取焦点(黄色边框)
         webSetting.setNeedInitialFocus(true);
         webSetting.setDefaultTextEncodingName("utf-8");//设置编码格式
-//        webSetting.setDefaultFontSize(16);
+//        webSetting.setDefaultFontSize(16);//设置 WebView 默认的字体大小
 //        webSetting.setMinimumFontSize(12);//设置 WebView 支持的最小字体大小，默认为 8
         //启用地理定位
         webSetting.setGeolocationEnabled(true);

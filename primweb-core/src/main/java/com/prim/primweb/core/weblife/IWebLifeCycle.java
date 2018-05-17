@@ -1,4 +1,4 @@
-package com.prim.primweb.core.life;
+package com.prim.primweb.core.weblife;
 
 /**
  * ================================================

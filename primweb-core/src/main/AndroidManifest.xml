@@ -4,12 +4,30 @@
     <application>
 
         <activity
-            android:name=".premission.PermissionMiddleActivity"
+            android:name=".permission.PermissionMiddleActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="false"
             android:launchMode="standard"
             android:theme="@style/PermissionActivity"
             android:windowSoftInputMode="stateHidden|stateAlwaysHidden"/>
+
+        <activity
+            android:name=".file.FileValueCallbackActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="false"
+            android:launchMode="standard"
+            android:theme="@style/PermissionActivity"
+            android:windowSoftInputMode="stateHidden|stateAlwaysHidden"/>
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="${applicationId}"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"/>
+        </provider>
     </application>
 
 </manifest>

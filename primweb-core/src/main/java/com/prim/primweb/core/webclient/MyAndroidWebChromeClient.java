@@ -1,4 +1,4 @@
-package com.prim.primweb.core.client;
+package com.prim.primweb.core.webclient;
 
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -141,7 +141,7 @@ public class MyAndroidWebChromeClient extends WebChromeClient {
 
     @Override
     public void onShowCustomView(View view, int requestedOrientation, final CustomViewCallback callback) {
-        com.prim.primweb.core.client.CustomViewCallback customViewCallback = new com.prim.primweb.core.client.CustomViewCallback() {
+        com.prim.primweb.core.webclient.CustomViewCallback customViewCallback = new com.prim.primweb.core.webclient.CustomViewCallback() {
             @Override
             public void onCustomViewHidden() {
                 callback.onCustomViewHidden();

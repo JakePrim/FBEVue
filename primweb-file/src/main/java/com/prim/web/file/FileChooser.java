@@ -1,5 +1,13 @@
 package com.prim.web.file;
 
+import android.content.Context;
+import android.net.Uri;
+import android.webkit.ValueCallback;
+
+import com.prim.primweb.core.permission.FilePermissionWrap;
+
+import java.lang.ref.WeakReference;
+
 /**
  * ================================================
  * 作    者：linksus
@@ -10,4 +18,16 @@ package com.prim.web.file;
  * ================================================
  */
 public class FileChooser {
+    private FilePermissionWrap filePermissionWrap;
+
+    private WeakReference<Context> context;
+
+    public FileChooser(FilePermissionWrap filePermissionWrap, Context context) {
+        this.filePermissionWrap = filePermissionWrap;
+        this.context = new WeakReference<>(context);
+    }
+
+    public void checkPermission(){
+
+    }
 }
