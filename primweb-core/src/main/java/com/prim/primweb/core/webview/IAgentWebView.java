@@ -89,4 +89,6 @@ public interface IAgentWebView<T> {
 
     boolean goBackAgent();
 
+    Object getAgentHitTestResult();
+
 }

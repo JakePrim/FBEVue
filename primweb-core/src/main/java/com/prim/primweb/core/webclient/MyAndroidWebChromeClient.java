@@ -21,7 +21,7 @@ import java.lang.reflect.Method;
  * 作    者：linksus
  * 版    本：1.0
  * 创建日期：5/16 0016
- * 描    述：
+ * 描    述：将WebChromeClient代理出来
  * 修订历史：
  * ================================================
  */
@@ -168,7 +168,7 @@ public class MyAndroidWebChromeClient extends WebChromeClient {
         super.getVisitedHistory(callback);
     }
 
-    public void invokeMethod(WebChromeClient chromeClient, String method, Object[] os, Class... clz) {
+    private void invokeMethod(WebChromeClient chromeClient, String method, Object[] os, Class... clz) {
         if (chromeClient == null) {
             return;
         }

@@ -11,7 +11,7 @@ import com.prim.primweb.core.webview.IAgentWebView;
  * 作    者：linksus
  * 版    本：1.0
  * 创建日期：5/15 0015
- * 描    述：
+ * 描    述：将WebViewClient代理出来
  * 修订历史：
  * ================================================
  */

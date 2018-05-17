@@ -41,7 +41,7 @@ public class PrimAgentWebView extends WebView implements IAgentWebView<WebSettin
     private static final String TAG = "PrimAgentWebView";
     public com.prim.primweb.core.listener.OnScrollChangeListener listener;
     private IAgentWebViewClient webViewClient;
-    WebView.HitTestResult result;
+    private WebView.HitTestResult result;
 
     public PrimAgentWebView(Context context) {
         this(context, null);
@@ -114,20 +114,17 @@ public class PrimAgentWebView extends WebView implements IAgentWebView<WebSettin
     }
 
     @Override
+    public Object getAgentHitTestResult() {
+        return this.getHitTestResult();
+    }
+
+    @Override
     public void removeRiskJavascriptInterface() {
         //显式移除有风险的 Webview 系统隐藏接口
         this.removeJavascriptInterface("searchBoxJavaBridge_");
         this.removeJavascriptInterface("accessibility");
         this.removeJavascriptInterface("accessibilityTraversal");
     }
-
-    private View.OnLongClickListener longClickListener = new OnLongClickListener() {
-        @Override
-        public boolean onLongClick(View v) {
-
-            return false;
-        }
-    };
 
     /**
      * 使用Chrome DevTools 远程调试WebView
@@ -316,4 +313,5 @@ public class PrimAgentWebView extends WebView implements IAgentWebView<WebSettin
             }
         }
     }
+
 }

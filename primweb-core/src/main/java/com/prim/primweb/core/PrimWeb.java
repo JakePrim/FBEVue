@@ -174,6 +174,14 @@ public class PrimWeb {
         return setting.getWebSetting();
     }
 
+    /** 长按图片等会用到 类型自己转换 */
+    public Object getHitTestResult() {
+        if (null == webView) {
+            throw new NullPointerException("webView most not be null,please check your code!");
+        }
+        return webView.getAgentHitTestResult();
+    }
+
     /** 获取url加载器 加载URL和刷新url操作 */
     public IUrlLoader getUrlLoader() {
         if (null == webView) {
@@ -197,11 +205,25 @@ public class PrimWeb {
 
     /** 获取webview */
     public IAgentWebView getWebView() {
+        if (null == webView) {
+            throw new NullPointerException("webView most not be null,please check your code!");
+        }
         return webView;
+    }
+
+    /** 获取真实的webview 类型可以自己强转 */
+    public View getRealWebView() {
+        if (null == webView) {
+            throw new NullPointerException("webView most not be null,please check your code!");
+        }
+        return webView.getAgentWebView();
     }
 
     /** webview 的回退 */
     public boolean back() {
+        if (null == webView) {
+            throw new NullPointerException("webView most not be null,please check your code!");
+        }
         return webView.goBackAgent();
     }
 

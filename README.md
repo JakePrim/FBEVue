@@ -320,3 +320,8 @@ public class MyJavaObject {
         }
     }
 ```
+
+#### 11.回退的处理
+```
+primWeb.back(); 得到一个Boolean
+```

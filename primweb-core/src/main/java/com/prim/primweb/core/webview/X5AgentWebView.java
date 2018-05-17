@@ -43,6 +43,8 @@ public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings
 
     private static final String TAG = "X5AgentWebView";
 
+    private WebView.HitTestResult result;
+
     public X5AgentWebView(Context context) {
         this(context, null);
     }
@@ -57,6 +59,11 @@ public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings
         this.removeJavascriptInterface("searchBoxJavaBridge_");
         this.removeJavascriptInterface("accessibility");
         this.removeJavascriptInterface("accessibilityTraversal");
+    }
+
+    @Override
+    public Object getAgentHitTestResult() {
+        return this.getHitTestResult();
     }
 
     /**

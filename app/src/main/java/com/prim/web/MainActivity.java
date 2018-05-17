@@ -102,7 +102,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            primWeb.getCallJsLoader().checkJsMethod("returnBackHandles");
+            if (!primWeb.back()) {
+                finish();
+            }
+//            primWeb.getCallJsLoader().checkJsMethod("returnBackHandles");
             return true;
         }
         return super.onKeyDown(keyCode, event);
