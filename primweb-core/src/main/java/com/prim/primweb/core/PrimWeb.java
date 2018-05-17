@@ -200,6 +200,11 @@ public class PrimWeb {
         return webView;
     }
 
+    /** webview 的回退 */
+    public boolean back() {
+        return webView.goBackAgent();
+    }
+
     /** 准备阶段,检查完毕后加载url */
     void ready() {
         // 加载webview设置

@@ -22,4 +22,6 @@ public interface ICallJsLoader {
     void callJS(String method, String... params);
 
     void callJS(String method);
+
+    void checkJsMethod(String method);
 }

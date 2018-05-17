@@ -240,4 +240,13 @@ public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings
         this.clearHistory();
         this.destroy();
     }
+
+    @Override
+    public boolean goBackAgent() {
+        if (this.canGoBack()) {
+            this.goBack();
+            return true;
+        }
+        return false;
+    }
 }

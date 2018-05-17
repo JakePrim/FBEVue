@@ -6,6 +6,8 @@ import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 import android.widget.FrameLayout;
@@ -15,6 +17,7 @@ import com.prim.primweb.core.PrimWeb;
 import com.prim.primweb.core.webclient.WebChromeClient;
 import com.prim.primweb.core.webclient.WebViewClient;
 import com.prim.primweb.core.webview.IAgentWebView;
+import com.tencent.smtt.sdk.WebView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,17 +36,25 @@ public class MainActivity extends AppCompatActivity {
                 .setWebParent(frameLayout, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
                 .setWebViewType(PrimWeb.WebViewType.Android)
                 .setModeType(PrimWeb.ModeType.Strict)
-                .setAgentWebViewClient(new AgentWebViewClient(this))
-                .setAgentWebChromeClient(new AgentWebChromeClient(this))
-                .addJavascriptInterface("android", new MyJavaObject())
+                .addJavascriptInterface("checkJsBridge", new MyJavaObject())
+                .addJavascriptInterface("nativeBridge", new JavaObjects())
                 .buildWeb()
                 .readyOk()
                 .launch("http://front.52yingzheng.com/test/shiluTest/h5-standard/h5-standard.html");
+
     }
 
-    /** 使用代理的WebViewClient */
+    public class JavaObjects {
+        @JavascriptInterface
+        public void geographicPosition(String data) {
+            primWeb.getCallJsLoader().callJS("nativeBridgeCallback['networkRequestCallback']", "123");
+        }
+    }
+
+    /** 自定义设置代理的WebViewClient 兼容android和x5 webview */
     public class AgentWebViewClient extends WebViewClient {
-        AgentWebViewClient(Context context) {
+
+        public AgentWebViewClient(Context context) {
             super(context);
         }
 
@@ -51,33 +62,50 @@ public class MainActivity extends AppCompatActivity {
         public boolean shouldOverrideUrlLoading(IAgentWebView view, String url) {
             return super.shouldOverrideUrlLoading(view, url);
         }
-
-        @Override
-        public void onPageFinished(IAgentWebView view, String url) {
-            super.onPageFinished(view, url);
-        }
     }
 
-    public class AgentWebChromeClient extends WebChromeClient<com.tencent.smtt.sdk.WebChromeClient.FileChooserParams> {
+
+    /** 自定义设置代理的WebChromeClient 兼容android和x5 webview */
+    public class AgentWebChromeClient extends WebChromeClient<android.webkit.WebChromeClient.FileChooserParams> {
 
         public AgentWebChromeClient(Context context) {
             super(context);
         }
+
+        @Override
+        public void onProgressChanged(View webView, int i) {
+            super.onProgressChanged(webView, i);
+        }
+    }
+
+    public class AndroidWebViewClient extends android.webkit.WebViewClient{
+
+    }
+
+    public class x5WebViewClient extends com.tencent.smtt.sdk.WebViewClient{
+
     }
 
     /** 注入js脚本 */
     public class MyJavaObject {
         @JavascriptInterface
-        public void callAndroid(final String msg) {
-            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                @Override
-                public void run() {
-                    Log.i("Info", "main Thread:" + Thread.currentThread());
-                    Toast.makeText(MainActivity.this, "" + msg, Toast.LENGTH_LONG).show();
-                }
-            });
-            Log.i("Info", "Thread:" + Thread.currentThread());
+        public void jsFunctionExit() {
+            Log.e(TAG, "jsFunctionExit: JS 方法存在");
         }
+
+        @JavascriptInterface
+        public void jsFunctionNo() {
+            Log.e(TAG, "jsFunctionNo: JS 方法不存在 ");
+        }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            primWeb.getCallJsLoader().checkJsMethod("returnBackHandles");
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     @Override

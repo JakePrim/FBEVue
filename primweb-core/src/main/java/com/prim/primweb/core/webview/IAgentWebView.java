@@ -87,4 +87,6 @@ public interface IAgentWebView<T> {
 
     void onAgentDestory();
 
+    boolean goBackAgent();
+
 }

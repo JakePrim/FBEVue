@@ -105,6 +105,15 @@ public class PrimAgentWebView extends WebView implements IAgentWebView<WebSettin
     }
 
     @Override
+    public boolean goBackAgent() {
+        if (this.canGoBack()) {
+            this.goBack();
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public void removeRiskJavascriptInterface() {
         //显式移除有风险的 Webview 系统隐藏接口
         this.removeJavascriptInterface("searchBoxJavaBridge_");

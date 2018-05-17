@@ -1,6 +1,8 @@
 package com.prim.primweb.core.jsloader;
 
 import android.os.Build;
+import android.util.Log;
+import android.webkit.JavascriptInterface;
 
 import com.prim.primweb.core.webview.IAgentWebView;
 import com.prim.primweb.core.utils.PrimWebUtils;
@@ -83,5 +85,23 @@ public abstract class BaseCallJsLoader implements ICallJsLoader {
             }
         }
         return sb.toString();
+    }
+
+    @Override
+    public void checkJsMethod(String method) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("function checkJsFunction(){ if(typeof ")
+                .append(method)
+                .append(" != \"undefined\" && typeof ")
+                .append(method)
+                .append(" == \"function\")")
+                .append("{console.log(\"")
+                .append(method)
+                .append("\");")
+                .append("checkJsBridge['jsFunctionExit']();")
+                .append("}else{")
+                .append("if(typeof checkJsBridge == \"undefined\") return false;")
+                .append("checkJsBridge['jsFunctionNo']();}}");
+        call("javascript:" + sb.toString() + ";checkJsFunction()", null);
     }
 }

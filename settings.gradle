@@ -1,1 +1,1 @@
-include ':app', ':primweb-core', ':primweb-file'
+include ':app', ':primweb-core'
