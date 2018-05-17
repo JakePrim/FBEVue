@@ -248,3 +248,74 @@ public class MyJavaObject {
         call("javascript:" + sb.toString() + ";checkJsFunction()", null);
     }
 ```
+
+#### 10.webview 上传文件很麻烦? 权限需要判断? 这里已经内部写好了,注意的是：要是用代理的WebChormeClient; 有兴趣的话可以看代理的WebChormeClient
+```
+/** 默认去处理文件请求 */
+    //  Android < 3.0
+    @Override
+    public void openFileChooser(ValueCallback<Uri> valueCallback) {
+        FilePermissionWrap filePermissionWrap = new FilePermissionWrap(valueCallback);
+        fileChooser(filePermissionWrap);
+    }
+
+    //  Android  >= 3.0
+    @Override
+    public void openFileChooser(ValueCallback<Uri> valueCallback, String acceptType) {
+        FilePermissionWrap filePermissionWrap = new FilePermissionWrap(valueCallback, acceptType);
+        fileChooser(filePermissionWrap);
+    }
+
+    // Android  >= 4.1
+    @Override
+    public void openFileChooser(ValueCallback<Uri> valueCallback, String acceptType, String capture) {
+        FilePermissionWrap filePermissionWrap = new FilePermissionWrap(valueCallback, acceptType);
+        fileChooser(filePermissionWrap);
+    }
+
+    @Override
+    public boolean onShowFileChooser(View webView, ValueCallback<Uri[]> valueCallback, T fileChooserParams) {
+        if (fileChooserParams instanceof android.webkit.WebChromeClient.FileChooserParams) {
+            android.webkit.WebChromeClient.FileChooserParams fileChooser = (android.webkit.WebChromeClient.FileChooserParams) fileChooserParams;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                FilePermissionWrap filePermissionWrap = new FilePermissionWrap(null, valueCallback, fileChooser.getAcceptTypes());
+                fileChooser(filePermissionWrap);
+            }
+            return true;
+        } else if (fileChooserParams instanceof com.tencent.smtt.sdk.WebChromeClient.FileChooserParams) {
+            com.tencent.smtt.sdk.WebChromeClient.FileChooserParams x5FileChooser = (com.tencent.smtt.sdk.WebChromeClient.FileChooserParams) fileChooserParams;
+            FilePermissionWrap filePermissionWrap = new FilePermissionWrap(null, valueCallback, x5FileChooser.getAcceptTypes());
+            fileChooser(filePermissionWrap);
+            return true;
+        }
+        return false;
+    }
+
+    /** 设置定位默认开启 */
+    @Override
+    public void onGeolocationPermissionsShowPrompt(final String s, final GeolocationPermissionsCallback geolocationPermissionsCallback) {
+        if (context == null || context.get() == null) {
+            geolocationPermissionsCallback.invoke(s, false, false);
+            return;
+        }
+        PermissionMiddleActivity.setPermissionListener(new PermissionMiddleActivity.PermissionListener() {
+            @Override
+            public void requestPermissionSuccess(String permissionType) {
+                geolocationPermissionsCallback.invoke(s, true, false);
+            }
+
+            @Override
+            public void requestPermissionFailed(String permissionType) {
+                geolocationPermissionsCallback.invoke(s, false, false);
+            }
+        });
+        PermissionMiddleActivity.startCheckPermission((Activity) context.get(), WebPermission.LOCATION_TYPE);
+    }
+
+    /** 选择文件上传 */
+    protected void fileChooser(FilePermissionWrap filePermissionWrap) {
+        if (context != null && context.get() != null) {
+            new FileChooser(filePermissionWrap, context.get()).updateFile();
+        }
+    }
+```
