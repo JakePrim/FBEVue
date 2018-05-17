@@ -57,15 +57,16 @@ v1.0.0
 ```
 
 #### 1.现流行的腾讯x5 webview, 很火，但是总会有一些限制，不想用换起来很麻烦？ 一行代码动态切换 X5和Android 的webview
+如果要是用x5的webview需要在application中调用此方法 PrimWeb.init(this);
 ```
  public enum WebViewType {
         Android, X5
     }
-//使用库中默认的webview
+//使用库中X5的webview
 .setWebViewType(PrimWeb.WebViewType.X5)
 
-//使用自定义的webview 内部会自动判断使用的是android 或者 x5 的webview
-.setAgentWebView(new X5AgentWebView(this))
+//使用库中Android的webview
+.setWebViewType(PrimWeb.WebViewType.Android)
 ```
 
 #### 2.Javascript调Java? 可以addJavascriptInterface 多个,具体请看 SafeJsInterface
