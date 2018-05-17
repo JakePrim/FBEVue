@@ -58,7 +58,6 @@ v1.0.0
 
 #### 1.现流行的腾讯x5 webview, 很火，但是总会有一些限制，不想用换起来很麻烦？ 一行代码动态切换 X5和Android 的webview
 ```
-动态的设置webview的父view
  public enum WebViewType {
         Android, X5
     }
@@ -69,7 +68,7 @@ v1.0.0
 .setAgentWebView(new X5AgentWebView(this))
 ```
 
-#### 2.Javascript调Java? 具体请看 SafeJsInterface
+#### 2.Javascript调Java? 可以addJavascriptInterface 多个,具体请看 SafeJsInterface
 ```
 .addJavascriptInterface("jsAgent", new MyJavaObject())
 //设置严格模式或标准模式Strict - 严格的模式：api小于17 禁止注入js,大于 17 注入js的对象所有方法必须都包含JavascriptInterface注解
