@@ -1,11 +1,15 @@
 package com.prim.primweb.core.jsloader;
 
 import android.os.Build;
+import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
 
 import com.prim.primweb.core.webview.IAgentWebView;
 import com.prim.primweb.core.utils.PrimWebUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * ================================================
@@ -27,6 +31,8 @@ public abstract class BaseCallJsLoader implements ICallJsLoader {
     }
 
     protected void call(String js, AgentValueCallback<String> callback) {
+        Log.e(TAG, "call: js --> " + js);
+//        showLogCompletion(js,300);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             this.evaluateJs(js, callback);
         } else {
@@ -49,9 +55,8 @@ public abstract class BaseCallJsLoader implements ICallJsLoader {
         if (params == null || params.length == 0) {
             sb.append("()");
         } else {
-            sb.append("(").append(splice(params)).append(")");
+            sb.append("(").append(splice(params));
         }
-
         call(sb.toString(), callback);
     }
 
@@ -71,20 +76,53 @@ public abstract class BaseCallJsLoader implements ICallJsLoader {
     }
 
     /** 拼接参数 */
-    private String splice(String... params) {
+    private StringBuilder splice(String... params) {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < params.length; i++) {
-            String param = params[i];
-            if (PrimWebUtils.isJson(param)) {
-                sb.append("\"").append(param).append("\"");
-            } else {
-                sb.append(param);
-            }
-            if (i != sb.length() - 1) {
-                sb.append(" , ");
-            }
+        for (String param : params) {
+//            if (PrimWebUtils.isJson(param)) {
+//                sb.append("'").append(param).append("'");
+//            } else {
+//            }
+            sb.append(param);
+            sb.append(",");
         }
-        return sb.toString();
+        sb.deleteCharAt(sb.length() - 1);
+        sb.append(")");
+        return sb;
+    }
+
+    /** 切割json字符串,append 不能传大量的字符串 */
+    private void CutString(String source, int cutcount, List<String> data) {
+        // 当前字符串长度
+        int size = source.length();
+        // 取出正常部分
+        int count = size / cutcount;
+        for (int j = 0; j < count; j++) {
+            String s = source.substring(j * cutcount, j * cutcount + cutcount);
+            data.add(s);
+        }
+        // 取出尾部
+        int i = size % cutcount;
+        String str = source.substring(size - i, size);
+        if (!TextUtils.isEmpty(str)) {
+            data.add(str);
+        }
+    }
+
+    private void showLogCompletion(String log, int showCount) {
+        if (log.length() > showCount) {
+            String show = log.substring(0, showCount);
+            Log.i("TAG-PRIM", show + "");
+            if ((log.length() - showCount) > showCount) {//剩下的文本还是大于规定长度
+                String partLog = log.substring(showCount, log.length());
+                showLogCompletion(partLog, showCount);
+            } else {
+                String surplusLog = log.substring(showCount, log.length());
+                Log.i("TAG-PRIM", surplusLog + "");
+            }
+        } else {
+            Log.i("TAG-PRIM", log + "");
+        }
     }
 
     @Override
@@ -98,10 +136,15 @@ public abstract class BaseCallJsLoader implements ICallJsLoader {
                 .append("{console.log(\"")
                 .append(method)
                 .append("\");")
-                .append("checkJsBridge['jsFunctionExit']();")
+                .append("checkJsBridge['jsFunctionExit']")
+                .append("('")
+                .append(method)
+                .append("');")
                 .append("}else{")
                 .append("if(typeof checkJsBridge == \"undefined\") return false;")
-                .append("checkJsBridge['jsFunctionNo']();}}");
+                .append("checkJsBridge['jsFunctionNo']('")
+                .append(method)
+                .append("');}}");
         call("javascript:" + sb.toString() + ";checkJsFunction()", null);
     }
 }

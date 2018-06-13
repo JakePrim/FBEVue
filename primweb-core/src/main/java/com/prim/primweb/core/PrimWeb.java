@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
 import android.webkit.WebViewClient;
 
+import com.prim.primweb.core.jsloader.CommonJSListener;
+import com.prim.primweb.core.jsloader.CommonJavaObject;
 import com.prim.primweb.core.webclient.DefaultAgentWebChromeClient;
 import com.prim.primweb.core.webclient.DefaultAgentWebViewClient;
 import com.prim.primweb.core.webclient.IAgentWebChromeClient;
@@ -44,6 +46,8 @@ import java.util.Map;
  * ================================================
  */
 public class PrimWeb {
+
+    public static final String BRIDGECHECK = "checkJsBridge";
 
     private ICallJsLoader callJsLoader;
 
@@ -91,13 +95,23 @@ public class PrimWeb {
     private com.tencent.smtt.sdk.WebViewClient x5WebViewClient;
     private WebChromeClient webChromeClient;
     private com.tencent.smtt.sdk.WebChromeClient x5WebChromeClient;
-
+    private CommonJSListener commonJSListener;
     //webview的生命周期管理
     private IWebLifeCycle webLifeCycle;
 
     public static void init(Application application) {
-        // X5浏览器实列化
-        QbSdk.initX5Environment(application, null);
+        // X5浏览器初始化
+        QbSdk.initX5Environment(application, new QbSdk.PreInitCallback() {
+            @Override
+            public void onCoreInitFinished() {
+
+            }
+
+            @Override
+            public void onViewInitFinished(boolean b) {
+
+            }
+        });
     }
 
     PrimWeb(PrimBuilder builder) {
@@ -119,6 +133,7 @@ public class PrimWeb {
         this.x5WebChromeClient = builder.x5WebChromeClient;
         this.webViewType = builder.webViewType;
         this.agentWebChromeClient = builder.agentWebChromeClient;
+        this.commonJSListener = builder.commonJSListener;
         doCheckSafe();
         webLifeCycle = new WebLifeCycle(webView);
         if (builder.mJavaObject != null && !builder.mJavaObject.isEmpty()) {
@@ -138,6 +153,14 @@ public class PrimWeb {
             mView = webView.getAgentWebView();
         }
         webView.removeRiskJavascriptInterface();
+    }
+
+    /** 获取webview的跟view */
+    public View getRootView() {
+        if (null != mViewGroup) {
+            return mViewGroup;
+        }
+        return null;
     }
 
     /** 获取调用js方法 */
@@ -219,6 +242,13 @@ public class PrimWeb {
         return webView.getAgentWebView();
     }
 
+    /** 设置检查js检查方法监听 */
+    public void setListenerCheckJsFunction(CommonJSListener checkJsFunction) {
+        if (null == commonJSListener) {
+            this.commonJSListener = checkJsFunction;
+        }
+    }
+
     /** webview 的回退 */
     public boolean back() {
         if (null == webView) {
@@ -271,11 +301,7 @@ public class PrimWeb {
         } else {
             //加载代理的webChromeClient
             if (null == agentWebChromeClient) {
-                if (webViewType == WebViewType.Android) {
-                    agentWebChromeClient = new DefaultAgentWebChromeClient<WebChromeClient.FileChooserParams>(context.get());
-                } else if (webViewType == WebViewType.X5) {
-                    agentWebChromeClient = new DefaultAgentWebChromeClient<com.tencent.smtt.sdk.WebChromeClient.FileChooserParams>(context.get());
-                }
+                agentWebChromeClient = new DefaultAgentWebChromeClient(context.get());
             }
             webView.setAgentWebChromeClient(agentWebChromeClient);
         }
@@ -284,6 +310,9 @@ public class PrimWeb {
         if (null == mJsInterface) {
             mJsInterface = SafeJsInterface.getInstance(webView, modeType);
         }
+
+        // 注入通用的js脚本
+        mJavaObject.put(BRIDGECHECK, new CommonJavaObject(commonJSListener));
 
         if (mJavaObject != null && !mJavaObject.isEmpty()) {
             mJsInterface.addJavaObjects(mJavaObject);
@@ -327,6 +356,7 @@ public class PrimWeb {
         private WebChromeClient webChromeClient;
         private com.tencent.smtt.sdk.WebChromeClient x5WebChromeClient;
         private IAgentWebChromeClient agentWebChromeClient;
+        private CommonJSListener commonJSListener;
 
         PrimBuilder(Context context) {
             this.context = new WeakReference<>(context);
@@ -438,7 +468,7 @@ public class PrimWeb {
         }
 
 
-        /** 如果不想要使用代理的 通过以下方法来调用系统自带的 但是兼容android webview 和 x5 webview 需要各自实现 */
+        /** 如果不想要使用代理的 通过以下方法来调用系统自带的 但是不兼容android webview 和 x5 webview 需要各自实现 */
         public CommonBuilder setAndroidWebViewClient(WebViewClient webViewClient) {
             primBuilder.webViewClient = webViewClient;
             return this;
@@ -456,6 +486,12 @@ public class PrimWeb {
 
         public CommonBuilder setX5WebChromeClient(com.tencent.smtt.sdk.WebChromeClient webChromeClient) {
             primBuilder.x5WebChromeClient = webChromeClient;
+            return this;
+        }
+
+        /** 检查js方法是否存在 */
+        public CommonBuilder setListenerCheckJsFunction(CommonJSListener commonJSListener) {
+            primBuilder.commonJSListener = commonJSListener;
             return this;
         }
 

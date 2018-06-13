@@ -39,12 +39,16 @@ public class SafeJsInterface extends BaseJsInterface {
         Set<Map.Entry<String, Object>> entries = maps.entrySet();
         for (Map.Entry<String, Object> entry : entries) {
             Object value = entry.getValue();
-            boolean checkJsInterface = checkJsInterface(value);
-            if (!checkJsInterface) {
-                throw new RuntimeException("This object has not offer method javascript to call ,please check addJavascriptInterface annotation was be added");
-            } else {
-                Log.e(TAG, "addJavaObjects: object --> " + value.getClass().getSimpleName() + "| name --> " + entry.getKey());
+//            boolean checkJsInterface = checkJsInterface(value);
+//            if (!checkJsInterface) {
+//                throw new RuntimeException("This object has not offer method javascript to call ,please check addJavascriptInterface annotation was be added");
+//            } else {
+//                Log.e(TAG, "addJavaObjects: object --> " + value.getClass().getSimpleName() + "| name --> " + entry.getKey());
+//            }
+            try {
                 webView.addJavascriptInterfaceAgent(value, entry.getKey());
+            } catch (Exception e) {
+
             }
         }
         return this;
@@ -52,12 +56,17 @@ public class SafeJsInterface extends BaseJsInterface {
 
     @Override
     public IJsInterface addJavaObject(Object o, String name) {
-        boolean checkJsInterface = checkJsInterface(o);
-        if (!checkJsInterface) {
-            throw new RuntimeException("This object has not offer method javascript to call ,please check addJavascriptInterface annotation was be added");
-        } else {
+//        boolean checkJsInterface = checkJsInterface(o);
+//        if (!checkJsInterface) {
+//            throw new RuntimeException("This object has not offer method javascript to call ,please check addJavascriptInterface annotation was be added");
+//        } else {
+//        }
+        try {
             webView.addJavascriptInterfaceAgent(o, name);
+        } catch (Exception e) {
+
         }
+
         return this;
     }
 

@@ -91,4 +91,14 @@ public interface IAgentWebView<T> {
 
     Object getAgentHitTestResult();
 
+    int getAgentHeight();
+
+    int getAgentContentHeight();
+
+    float getAgentScale();
+
+    void agentScrollTo(int x, int y);
+
+    void agentScrollBy(int x, int y);
+
 }

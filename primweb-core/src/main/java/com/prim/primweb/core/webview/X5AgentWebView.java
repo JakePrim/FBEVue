@@ -66,6 +66,31 @@ public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings
         return this.getHitTestResult();
     }
 
+    @Override
+    public int getAgentHeight() {
+        return getView().getHeight();
+    }
+
+    @Override
+    public int getAgentContentHeight() {
+        return getContentHeight();
+    }
+
+    @Override
+    public float getAgentScale() {
+        return getScale();
+    }
+
+    @Override
+    public void agentScrollTo(int x, int y) {
+        getView().scrollTo(x, y);
+    }
+
+    @Override
+    public void agentScrollBy(int x, int y) {
+        getView().scrollBy(x, y);
+    }
+
     /**
      * 使用Chrome DevTools 远程调试WebView
      */

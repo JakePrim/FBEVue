@@ -12,7 +12,7 @@
             android:windowSoftInputMode="stateHidden|stateAlwaysHidden"/>
 
         <activity
-            android:name=".file.FileValueCallbackActivity"
+            android:name=".file.FileValueCallbackMiddleActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="false"
             android:launchMode="standard"

@@ -1,14 +1,19 @@
 package com.prim.primweb.core.file;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.ClipData;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
 import android.webkit.ValueCallback;
 
 import com.prim.primweb.core.permission.FilePermissionWrap;
 import com.prim.primweb.core.permission.PermissionMiddleActivity;
 import com.prim.primweb.core.permission.WebPermission;
+import com.prim.primweb.core.utils.ImageHandlerUtil;
 
 import java.lang.ref.WeakReference;
 
@@ -21,7 +26,7 @@ import java.lang.ref.WeakReference;
  * 修订历史：
  * ================================================
  */
-public class FileChooser implements PermissionMiddleActivity.PermissionListener, FileValueCallbackActivity.ChooserFileListener {
+public class FileChooser implements PermissionMiddleActivity.PermissionListener, FileValueCallbackMiddleActivity.ChooserFileListener {
     private FilePermissionWrap filePermissionWrap;
 
     private WeakReference<Context> context;
@@ -52,6 +57,16 @@ public class FileChooser implements PermissionMiddleActivity.PermissionListener,
         }
     }
 
+    public interface UploadFileListener {
+        void requestPermissionFile();
+    }
+
+    public static WeakReference<UploadFileListener> mUploadListener;
+
+    public static void setUploadListener(UploadFileListener uploadFileListener) {
+        mUploadListener = new WeakReference<UploadFileListener>(uploadFileListener);
+    }
+
     public void updateFile() {
         PermissionMiddleActivity.setPermissionListener(this);
         //检查权限的中间件
@@ -60,26 +75,32 @@ public class FileChooser implements PermissionMiddleActivity.PermissionListener,
 
     @Override
     public void requestPermissionSuccess(String permissionType) {
-        Log.e(TAG, "requestPermissionSuccess: 权限类型 --> " + permissionType);
         if (permissionType.equals(WebPermission.CAMERA_TYPE)) {//权限请求成功获取要打开的类型
             fileValueCallback();
         }
     }
 
     private void fileValueCallback() {
+        Log.e(TAG, "fileValueCallback: " + acceptType.toString());
         if (acceptType != null) {
             //上传文件的类型
             String type = acceptType[0];
-            Log.e(TAG, "fileValueCallback: type --> " + type);
-            FileValueCallbackActivity.setChooserFileListener(this);
-            FileValueCallbackActivity.getFileValueCallback((Activity) context.get(), type);
+            FileValueCallbackMiddleActivity.setChooserFileListener(this);
+            FileValueCallbackMiddleActivity.getFileValueCallback((Activity) context.get(), type);
+        } else {
+            FileValueCallbackMiddleActivity.setChooserFileListener(this);
+            FileValueCallbackMiddleActivity.getFileValueCallback((Activity) context.get(), "file");
         }
     }
 
     @Override
     public void requestPermissionFailed(String permissionType) {
-        Log.e(TAG, "requestPermissionFailed: 权限类型 --> " + permissionType);
         cancelFilePathCallback();
+        //交由第三方处理
+        if (mUploadListener != null && mUploadListener.get() != null) {
+            mUploadListener.get().requestPermissionFile();
+        }
+        mUploadListener = null;
     }
 
     /**
@@ -108,12 +129,48 @@ public class FileChooser implements PermissionMiddleActivity.PermissionListener,
     }
 
     @Override
-    public void updateCancle() {
-        if (valueCallback != null) {
-            valueCallback.onReceiveValue(null);
+    public void updateFile(Intent data, int requestCode, int resultCode) {
+        Uri result = null;
+        if (data != null) {
+            result = data.getData();
+        }
+        if (valueCallbacks != null) {
+            onActivityResultAboveL(requestCode, resultCode, data);
+        } else if (valueCallback != null) {
+            result = ImageHandlerUtil.geturi(data, context.get());
+            if (result == null) {
+                return;
+            }
+            valueCallback.onReceiveValue(result);
             valueCallback = null;
-        } else if (valueCallbacks != null) {
-            valueCallbacks.onReceiveValue(null);
+        }
+    }
+
+    @Override
+    public void updateCancle() {
+        cancelFilePathCallback();
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void onActivityResultAboveL(int requestCode, int resultCode, Intent intent) {
+        if (valueCallbacks != null) {
+            Uri[] results = null;
+            if (resultCode == Activity.RESULT_OK) {
+                if (intent != null) {
+                    String dataString = intent.getDataString();
+                    ClipData clipData = intent.getClipData();
+                    if (clipData != null) {
+                        results = new Uri[clipData.getItemCount()];
+                        for (int i = 0; i < clipData.getItemCount(); i++) {
+                            ClipData.Item item = clipData.getItemAt(i);
+                            results[i] = item.getUri();
+                        }
+                    }
+                    if (dataString != null)
+                        results = new Uri[]{Uri.parse(dataString)};
+                }
+            }
+            valueCallbacks.onReceiveValue(results);
             valueCallbacks = null;
         }
     }

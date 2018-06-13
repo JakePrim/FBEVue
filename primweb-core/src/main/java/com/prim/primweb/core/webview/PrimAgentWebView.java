@@ -119,6 +119,31 @@ public class PrimAgentWebView extends WebView implements IAgentWebView<WebSettin
     }
 
     @Override
+    public int getAgentHeight() {
+        return getHeight();
+    }
+
+    @Override
+    public int getAgentContentHeight() {
+        return getContentHeight();
+    }
+
+    @Override
+    public float getAgentScale() {
+        return getScale();
+    }
+
+    @Override
+    public void agentScrollTo(int x, int y) {
+        this.scrollTo(x, y);
+    }
+
+    @Override
+    public void agentScrollBy(int x, int y) {
+        this.scrollTo(x, y);
+    }
+
+    @Override
     public void removeRiskJavascriptInterface() {
         //显式移除有风险的 Webview 系统隐藏接口
         this.removeJavascriptInterface("searchBoxJavaBridge_");

@@ -3,7 +3,8 @@ package com.prim.primweb.core.webclient;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.view.View;
-import android.webkit.ValueCallback;
+import android.webkit.*;
+import android.webkit.WebChromeClient;
 
 /**
  * ================================================
@@ -14,7 +15,7 @@ import android.webkit.ValueCallback;
  * 修订历史：
  * ================================================
  */
-public interface IAgentWebChromeClient<T> {
+public interface IAgentWebChromeClient {
     void onReceivedTitle(View webView, String s);
 
     void onReceivedIcon(View webView, Bitmap bitmap);
@@ -31,7 +32,11 @@ public interface IAgentWebChromeClient<T> {
 
     void openFileChooser(ValueCallback<Uri> valueCallback, String acceptType, String capture);
 
-    boolean onShowFileChooser(View webView, ValueCallback<Uri[]> valueCallback, T fileChooserParams);
+//    boolean onShowFileChooser(View webView, ValueCallback<Uri[]> valueCallback, T fileChooserParams);
+
+    boolean onShowFileChooser(View webView, ValueCallback<Uri[]> valueCallback, WebChromeClient.FileChooserParams fileChooserParams);
+
+    boolean onShowFileChooser(View webView, ValueCallback<Uri[]> valueCallback, com.tencent.smtt.sdk.WebChromeClient.FileChooserParams fileChooserParams);
 
     void onProgressChanged(View webView, int i);
 

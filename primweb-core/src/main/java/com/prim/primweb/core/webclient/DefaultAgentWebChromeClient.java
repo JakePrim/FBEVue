@@ -14,7 +14,7 @@ import android.webkit.ValueCallback;
  * 修订历史：
  * ================================================
  */
-public class DefaultAgentWebChromeClient<T> extends WebChromeClient<T> {
+public class DefaultAgentWebChromeClient extends WebChromeClient {
     private static final String TAG = "DefaultAgentWebChromeCl";
 
     public DefaultAgentWebChromeClient(Context context) {
@@ -47,7 +47,12 @@ public class DefaultAgentWebChromeClient<T> extends WebChromeClient<T> {
     }
 
     @Override
-    public boolean onShowFileChooser(View webView, ValueCallback<Uri[]> valueCallback, T fileChooserParams) {
+    public boolean onShowFileChooser(View webView, ValueCallback<Uri[]> valueCallback, android.webkit.WebChromeClient.FileChooserParams fileChooserParams) {
+        return super.onShowFileChooser(webView, valueCallback, fileChooserParams);
+    }
+
+    @Override
+    public boolean onShowFileChooser(View webView, ValueCallback<Uri[]> valueCallback, com.tencent.smtt.sdk.WebChromeClient.FileChooserParams fileChooserParams) {
         return super.onShowFileChooser(webView, valueCallback, fileChooserParams);
     }
 }

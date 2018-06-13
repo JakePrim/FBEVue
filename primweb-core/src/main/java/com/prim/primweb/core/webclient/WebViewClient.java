@@ -108,7 +108,9 @@ public abstract class WebViewClient implements IAgentWebViewClient {
             return true;
         }
 
-        return false;
+        view.loadAgentUrl(url);
+
+        return true;
     }
 
     @Override

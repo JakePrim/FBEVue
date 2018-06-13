@@ -36,12 +36,10 @@ public class MainActivity extends AppCompatActivity {
                 .setWebParent(frameLayout, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
                 .setWebViewType(PrimWeb.WebViewType.Android)
                 .setModeType(PrimWeb.ModeType.Strict)
-                .addJavascriptInterface("checkJsBridge", new MyJavaObject())
                 .addJavascriptInterface("nativeBridge", new JavaObjects())
                 .buildWeb()
                 .readyOk()
                 .launch("http://front.52yingzheng.com/test/shiluTest/h5-standard/h5-standard.html");
-
     }
 
     public class JavaObjects {
@@ -66,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     /** 自定义设置代理的WebChromeClient 兼容android和x5 webview */
-    public class AgentWebChromeClient extends WebChromeClient<android.webkit.WebChromeClient.FileChooserParams> {
+    public class AgentWebChromeClient extends WebChromeClient {
 
         public AgentWebChromeClient(Context context) {
             super(context);

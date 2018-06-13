@@ -35,6 +35,13 @@ public class PermissionMiddleActivity extends Activity {
         activity.startActivity(intent);
     }
 
+    public static void startCheckPermission(Activity activity, String permissionType, PermissionListener permissionListener) {
+        mPermissionListener = new WeakReference<>(permissionListener);
+        Intent intent = new Intent(activity, PermissionMiddleActivity.class);
+        intent.putExtra(KEY, permissionType);
+        activity.startActivity(intent);
+    }
+
     /** 权限请求失败的监听 */
     public interface PermissionListener {
         void requestPermissionSuccess(String permissionType);
@@ -45,7 +52,7 @@ public class PermissionMiddleActivity extends Activity {
     private static WeakReference<PermissionListener> mPermissionListener;
 
     public static void setPermissionListener(PermissionListener permissionListener) {
-        mPermissionListener = new WeakReference<PermissionListener>(permissionListener);
+        mPermissionListener = new WeakReference<>(permissionListener);
     }
 
     private String permissionType;
@@ -69,53 +76,47 @@ public class PermissionMiddleActivity extends Activity {
     }
 
     private void requestPermission(String permissionType) {
-        checkCameraPermission(permissionType);
+        checkPermission(permissionType);
     }
 
     /** 检查相机的权限 */
-    private void checkCameraPermission(String permissionType) {
+    private void checkPermission(String permissionType) {
         if (permissionType.equals(WebPermission.CAMERA_TYPE)) {// 注意这里必须要文件的权限
-            if (Build.VERSION.SDK_INT < 23) {
-                if (PermissionCheckUtil.checkOp(this, 26)) {
-                    if (null != mPermissionListener) {
-                        mPermissionListener.get().requestPermissionSuccess(permissionType);
-                    }
-                    mPermissionListener = null;
-                    finish();
-                } else {
-                    if (null != mPermissionListener) {
-                        mPermissionListener.get().requestPermissionFailed(permissionType);
-                    }
-                    mPermissionListener = null;
-                    finish();
-                }
-            } else {
-                MPermissions.requestPermissions(this, WebPermission.PERMISSION_CAMERA_MARK, WebPermission.CAMERA);
-            }
+            checkRealPermission(permissionType, 26, WebPermission.PERMISSION_CAMERA_MARK, WebPermission.CAMERA);
         } else if (permissionType.equals(WebPermission.LOCATION_TYPE)) {
-            if (Build.VERSION.SDK_INT < 23) {
-                if (PermissionCheckUtil.checkOp(this, 0)) {
-                    if (null != mPermissionListener) {
-                        mPermissionListener.get().requestPermissionSuccess(permissionType);
-                    }
-                    mPermissionListener = null;
-                    finish();
-                } else {
-                    if (null != mPermissionListener) {
-                        mPermissionListener.get().requestPermissionFailed(permissionType);
-                    }
-                    mPermissionListener = null;
-                    finish();
-                }
-            } else {
-                MPermissions.requestPermissions(this, WebPermission.PERMISSIONS_LOCATION_MARK, WebPermission.LOCATION);
+            checkRealPermission(permissionType, 0, WebPermission.PERMISSIONS_LOCATION_MARK, WebPermission.LOCATION);
+        } else if (permissionType.equals(WebPermission.RECORD_AUDIO_TYPE)) {
+            checkRealPermission(permissionType, 27, WebPermission.PERMISSION_RECORD_AUDIO_MARK, WebPermission.RECORD_AUDIO);
+        }
+    }
+
+    private void checkRealPermission(String permissionType, int op, int permissionRecordAudioMark, String[] recordAudio) {
+        if (Build.VERSION.SDK_INT < 23) {
+            checkOp(permissionType, op);
+        } else {
+            MPermissions.requestPermissions(this, permissionRecordAudioMark, recordAudio);
+        }
+    }
+
+    private void checkOp(String permissionType, int op) {
+        if (PermissionCheckUtil.checkOp(this, op)) {
+            if (null != mPermissionListener && mPermissionListener.get() != null) {
+                mPermissionListener.get().requestPermissionSuccess(permissionType);
             }
+            mPermissionListener = null;
+            finish();
+        } else {
+            if (null != mPermissionListener && mPermissionListener.get() != null) {
+                mPermissionListener.get().requestPermissionFailed(permissionType);
+            }
+            mPermissionListener = null;
+            finish();
         }
     }
 
     @PermissionGrant(WebPermission.PERMISSIONS_LOCATION_MARK)
     public void requestLocationSuccess() {
-        if (null != mPermissionListener) {
+        if (null != mPermissionListener && mPermissionListener.get() != null) {
             mPermissionListener.get().requestPermissionSuccess(permissionType);
         }
         mPermissionListener = null;
@@ -124,7 +125,7 @@ public class PermissionMiddleActivity extends Activity {
 
     @PermissionDenied(WebPermission.PERMISSIONS_LOCATION_MARK)
     public void requestLocationFailed() {
-        if (null != mPermissionListener) {
+        if (null != mPermissionListener && mPermissionListener.get() != null) {
             mPermissionListener.get().requestPermissionFailed(permissionType);
         }
         mPermissionListener = null;
@@ -133,7 +134,7 @@ public class PermissionMiddleActivity extends Activity {
 
     @PermissionGrant(WebPermission.PERMISSION_CAMERA_MARK)
     public void requestCameraSuccess() {
-        if (null != mPermissionListener) {
+        if (null != mPermissionListener && mPermissionListener.get() != null) {
             mPermissionListener.get().requestPermissionSuccess(permissionType);
         }
         mPermissionListener = null;
@@ -143,7 +144,25 @@ public class PermissionMiddleActivity extends Activity {
 
     @PermissionDenied(WebPermission.PERMISSION_CAMERA_MARK)
     public void requestCameraFailed() {
-        if (null != mPermissionListener) {
+        if (null != mPermissionListener && mPermissionListener.get() != null) {
+            mPermissionListener.get().requestPermissionFailed(permissionType);
+        }
+        mPermissionListener = null;
+        finish();
+    }
+
+    @PermissionGrant(WebPermission.PERMISSION_RECORD_AUDIO_MARK)
+    public void requestRecordSuccess() {
+        if (null != mPermissionListener && mPermissionListener.get() != null) {
+            mPermissionListener.get().requestPermissionSuccess(permissionType);
+        }
+        mPermissionListener = null;
+        finish();
+    }
+
+    @PermissionDenied(WebPermission.PERMISSION_RECORD_AUDIO_MARK)
+    public void requestRecordFailed() {
+        if (null != mPermissionListener && mPermissionListener.get() != null) {
             mPermissionListener.get().requestPermissionFailed(permissionType);
         }
         mPermissionListener = null;

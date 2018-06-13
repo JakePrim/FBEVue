@@ -24,7 +24,7 @@ import java.lang.ref.WeakReference;
  * 修订历史：
  * ================================================
  */
-public abstract class WebChromeClient<T> implements IAgentWebChromeClient<T> {
+public abstract class WebChromeClient implements IAgentWebChromeClient {
     private WeakReference<Context> context;
 
     public WebChromeClient(Context context) {
@@ -134,21 +134,19 @@ public abstract class WebChromeClient<T> implements IAgentWebChromeClient<T> {
     }
 
     @Override
-    public boolean onShowFileChooser(View webView, ValueCallback<Uri[]> valueCallback, T fileChooserParams) {
-        if (fileChooserParams instanceof android.webkit.WebChromeClient.FileChooserParams) {
-            android.webkit.WebChromeClient.FileChooserParams fileChooser = (android.webkit.WebChromeClient.FileChooserParams) fileChooserParams;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                FilePermissionWrap filePermissionWrap = new FilePermissionWrap(null, valueCallback, fileChooser.getAcceptTypes());
-                fileChooser(filePermissionWrap);
-            }
-            return true;
-        } else if (fileChooserParams instanceof com.tencent.smtt.sdk.WebChromeClient.FileChooserParams) {
-            com.tencent.smtt.sdk.WebChromeClient.FileChooserParams x5FileChooser = (com.tencent.smtt.sdk.WebChromeClient.FileChooserParams) fileChooserParams;
-            FilePermissionWrap filePermissionWrap = new FilePermissionWrap(null, valueCallback, x5FileChooser.getAcceptTypes());
+    public boolean onShowFileChooser(View webView, ValueCallback<Uri[]> valueCallback, android.webkit.WebChromeClient.FileChooserParams fileChooserParams) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            FilePermissionWrap filePermissionWrap = new FilePermissionWrap(null, valueCallback, fileChooserParams.getAcceptTypes());
             fileChooser(filePermissionWrap);
-            return true;
         }
-        return false;
+        return true;
+    }
+
+    @Override
+    public boolean onShowFileChooser(View webView, ValueCallback<Uri[]> valueCallback, com.tencent.smtt.sdk.WebChromeClient.FileChooserParams fileChooserParams) {
+        FilePermissionWrap filePermissionWrap = new FilePermissionWrap(null, valueCallback, fileChooserParams.getAcceptTypes());
+        fileChooser(filePermissionWrap);
+        return true;
     }
 
     /** 设置定位默认开启 */

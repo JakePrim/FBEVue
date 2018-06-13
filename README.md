@@ -1,9 +1,29 @@
 # PrimWeb
 ![下载.png](https://upload-images.jianshu.io/upload_images/2005932-f696f5226030a1f5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
+## PrimWeb is What?
 
-PrimWeb 是一个基于的 Android WebView 和 腾讯 x5 WebView，容易、灵活使用以及功能非常强大的库，提供了 WebView 一系列的问题解决方案 ，并且轻量和灵活，
-更方便 webview 的切换, bug 再也不用担心webview出问题了,库已经默认的实现了webSetting  WebViewClient WebChromeClient,如果没有特殊的项目需求,以下是最简单的调用方式.
+PrimWeb 是一个代理的WebView基于的 Android WebView 和 腾讯 x5 WebView，容易、灵活使用以及功能非常强大的库，提供了 WebView 一系列的问题解决方案 ，并且轻量和灵活，
+更方便 webview 的切换, 再也不用担心webview出问题了.
+
+## Support
+
+1. 动态添加WebView
+2. 支持X5WebView 和 原生的WebView切换
+3. 安全灵活的Js 调用 Java
+4. 安全灵活的Java 调用 Js方法
+5. 灵活的设置WebSetting
+6. 代理WebViewClient 兼容 X5 WebView和android WebView
+7. 代理WebChormeClient 兼容 android webview 和 x5 webview
+8. 支持判断js方法是否存在
+9. 支持文件上传到H5
+10. 支持回退及生命周期的处理
+11. 灵活加载url
+12. webview 安全漏洞的问题修复
+13. 支持权限管理，常用的定位、相册的权限
+
+## How Do I Use?
+
 ```
 primWeb = PrimWeb.with(this)
                 .setWebParent(frameLayout, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
@@ -15,30 +35,21 @@ primWeb = PrimWeb.with(this)
                 .launch("http://front.52yingzheng.com/test/shiluTest/h5-standard/h5-standard.html");
  ```
 
+## Update Log
+
+- v1.0.0 完善功能
+
 ## TODO
+
 1. webview UI--> 进度、加载和错误UI设置
 2. webview下载文件
 
-## FINISH
-v2.0.0
-1. 添加权限管理，常用的定位、相册的权限
-2. 可以上传文件
-3. 添加回退键的处理
-4. 判断js方法是否在H5页面存在,处理特殊的情况
+## Thinks
 
-v1.1.0
-
-1. webview 安全漏洞的问题修复
-2. 代理WebChormeClient 兼容android webview 和 x5 webview
-3. 添加webview的生命周期管理
-
-v1.0.0
-
-1. 第一次提交
-
-
+[AgentWeb](https://github.com/JakePrim/AgentWeb) SourceCode
 
 ### API 详解
+
 #### 0.webView经常内存泄漏？以后不会再有内存泄漏了,动态的new webview太麻烦？你只需要一句代码，然后去喝一杯咖啡吧
 ```
 .setWebParent(frameLayout, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
@@ -56,17 +67,18 @@ v1.0.0
     }
 ```
 
-#### 1.现流行的腾讯x5 webview, 很火，但是总会有一些限制，不想用换起来很麻烦？ 一行代码动态切换 X5和Android 的webview
-如果要是用x5的webview需要在application中调用此方法 PrimWeb.init(this);
+#### 1.现流行的腾讯x5 webview, 很火，不想用了换起来很麻烦？ 一行代码动态切换 X5和Android 的webview
+如果要是用x5的webview需要在application中调用此方法 PrimWeb.init(this); 初始化x5
 ```
- public enum WebViewType {
-        Android, X5
-    }
 //使用库中X5的webview
 .setWebViewType(PrimWeb.WebViewType.X5)
 
 //使用库中Android的webview
 .setWebViewType(PrimWeb.WebViewType.Android)
+
+public enum WebViewType {
+       Android, X5
+}
 ```
 
 #### 2.Javascript调Java? 可以addJavascriptInterface 多个,具体请看 SafeJsInterface
@@ -324,4 +336,24 @@ public class MyJavaObject {
 #### 11.回退的处理
 ```
 primWeb.back(); 得到一个Boolean
+```
+
+## 关于我
+Android开发爱好者，喜欢钻研技术，目前位于北京工作，如果你有任何问题或工作机会请联系Email:sufululove@gmail.com
+
+## License
+```
+Copyright (C)  JakePrim(https://github.com/JakePrim/PrimWeb)
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 ```

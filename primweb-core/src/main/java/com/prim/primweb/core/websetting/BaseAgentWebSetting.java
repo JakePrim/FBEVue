@@ -24,8 +24,12 @@ public abstract class BaseAgentWebSetting<T> implements IAgentWebSetting<T> {
 
     @Override
     public IAgentWebSetting setSetting(IAgentWebView webView) {
-        mSettings = (T) webView.getWebSetting();
-        toSetting(mSettings);
+        try {
+            mSettings = (T) webView.getWebSetting();
+            toSetting(mSettings);
+        } catch (Exception e) {
+
+        }
         return this;
     }
 
