@@ -3,11 +3,15 @@ package com.prim.primweb.core;
 import android.app.Application;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
 import android.webkit.WebViewClient;
 
+import com.prim.primweb.core.handler.IKeyEvent;
+import com.prim.primweb.core.handler.IKeyEventInterceptor;
+import com.prim.primweb.core.handler.KeyEventHandler;
 import com.prim.primweb.core.jsloader.CommonJSListener;
 import com.prim.primweb.core.jsloader.CommonJavaObject;
 import com.prim.primweb.core.webclient.DefaultAgentWebChromeClient;
@@ -64,9 +68,9 @@ public class PrimWeb {
     private View mView;
 
     /**
-     * 设置webview的模式 分为
-     * Strict - 严格的模式：api小于17 禁止注入js,大于 17 注入js的对象所有方法必须都包含JavascriptInterface注解
-     * Normal - 为正常模式
+     * 设置webview的模式:
+     * Strict - 严格模式
+     * Normal - 正常模式
      */
     public enum ModeType {
         Strict, Normal
@@ -92,12 +96,20 @@ public class PrimWeb {
     //而哈希表的缺点是:扩容性能会下降 初始化时提前计算好上限.
     private HashMap<String, Object> mJavaObject = new HashMap<>(30);
     private WebViewClient webViewClient;
-    private com.tencent.smtt.sdk.WebViewClient x5WebViewClient;
     private WebChromeClient webChromeClient;
+    private com.tencent.smtt.sdk.WebViewClient x5WebViewClient;
     private com.tencent.smtt.sdk.WebChromeClient x5WebChromeClient;
+
     private CommonJSListener commonJSListener;
+
     //webview的生命周期管理
     private IWebLifeCycle webLifeCycle;
+
+    //返回键的处理类
+    private IKeyEvent keyEvent;
+
+    // 返回键拦截，有特殊处理的可以实现此接口
+    private IKeyEventInterceptor keyEventInterceptor;
 
     public static void init(Application application) {
         // X5浏览器初始化
@@ -165,9 +177,7 @@ public class PrimWeb {
 
     /** 获取调用js方法 */
     public ICallJsLoader getCallJsLoader() {
-        if (null == webView) {
-            throw new NullPointerException("webView most not be null,please check your code!");
-        }
+        checkWebView();
         if (callJsLoader == null) {
             callJsLoader = SafeCallJsLoaderImpl.getInstance(webView);
         }
@@ -176,9 +186,7 @@ public class PrimWeb {
 
     /** 获取注入js脚本方法 */
     public IJsInterface getJsInterface() {
-        if (null == webView) {
-            throw new NullPointerException("webView most not be null,please check your code!");
-        }
+        checkWebView();
         if (mJsInterface == null) {
             mJsInterface = SafeJsInterface.getInstance(webView, modeType);
         }
@@ -199,17 +207,13 @@ public class PrimWeb {
 
     /** 长按图片等会用到 类型自己转换 */
     public Object getHitTestResult() {
-        if (null == webView) {
-            throw new NullPointerException("webView most not be null,please check your code!");
-        }
+        checkWebView();
         return webView.getAgentHitTestResult();
     }
 
     /** 获取url加载器 加载URL和刷新url操作 */
     public IUrlLoader getUrlLoader() {
-        if (null == webView) {
-            throw new NullPointerException("webView most not be null,please check your code!");
-        }
+        checkWebView();
         if (null == urlLoader) {
             urlLoader = new UrlLoader(webView);
         }
@@ -228,33 +232,61 @@ public class PrimWeb {
 
     /** 获取webview */
     public IAgentWebView getWebView() {
-        if (null == webView) {
-            throw new NullPointerException("webView most not be null,please check your code!");
-        }
+        checkWebView();
         return webView;
     }
 
     /** 获取真实的webview 类型可以自己强转 */
     public View getRealWebView() {
-        if (null == webView) {
-            throw new NullPointerException("webView most not be null,please check your code!");
-        }
+        checkWebView();
         return webView.getAgentWebView();
     }
 
-    /** 设置检查js检查方法监听 */
+    /**
+     * Check for the presence of a JS method
+     * @param checkJsFunction CommonJSListener
+     */
     public void setListenerCheckJsFunction(CommonJSListener checkJsFunction) {
         if (null == commonJSListener) {
             this.commonJSListener = checkJsFunction;
         }
     }
 
-    /** webview 的回退 */
-    public boolean back() {
+    /**
+     * handler back button
+     * @return true handler ;false no handler
+     */
+    public boolean handlerBack() {
+        checkWebView();
+        if (keyEvent == null) {
+            keyEvent = KeyEventHandler.getInstance(webView, keyEventInterceptor);
+        }
+        return keyEvent.back();
+    }
+
+    /**
+     * handler onKeyDown
+     *
+     * @param keyCode keyCode
+     * @param event KeyEvent
+     *
+     * @return true handler;false no handler
+     */
+    public boolean handlerKeyEvent(int keyCode, KeyEvent event) {
+        checkWebView();
+        if (keyEvent == null) {
+            keyEvent = KeyEventHandler.getInstance(webView, keyEventInterceptor);
+        }
+        return keyEvent.onKeyDown(keyCode, event);
+    }
+
+    /**
+     * check webView not null
+     */
+    private void checkWebView() {
         if (null == webView) {
             throw new NullPointerException("webView most not be null,please check your code!");
         }
-        return webView.goBackAgent();
     }
 
     /** 准备阶段,检查完毕后加载url */
@@ -467,7 +499,6 @@ public class PrimWeb {
             return this;
         }
 
-
         /** 如果不想要使用代理的 通过以下方法来调用系统自带的 但是不兼容android webview 和 x5 webview 需要各自实现 */
         public CommonBuilder setAndroidWebViewClient(WebViewClient webViewClient) {
             primBuilder.webViewClient = webViewClient;
@@ -535,7 +566,7 @@ public class PrimWeb {
             this.primWeb = primWeb;
         }
 
-        public PerBuilder readyOk() {
+        public PerBuilder lastGo() {
             if (!isReady) {
                 primWeb.ready();
                 isReady = true;
@@ -545,7 +576,7 @@ public class PrimWeb {
 
         public PrimWeb launch(@NonNull String url) {
             if (!isReady) {
-                readyOk();
+                lastGo();
             }
             return primWeb.launch(url);
         }

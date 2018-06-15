@@ -8,19 +8,19 @@ PrimWeb 是一个代理的WebView基于的 Android WebView 和 腾讯 x5 WebView
 
 ## Support
 
-1. 动态添加WebView
+1. 支持动态添加WebView
 2. 支持X5WebView 和 原生的WebView切换
-3. 安全灵活的Js 调用 Java
-4. 安全灵活的Java 调用 Js方法
-5. 灵活的设置WebSetting
-6. 代理WebViewClient 兼容 X5 WebView和android WebView
-7. 代理WebChormeClient 兼容 android webview 和 x5 webview
-8. 支持判断js方法是否存在
-9. 支持文件上传到H5
-10. 支持回退及生命周期的处理
-11. 灵活加载url
-12. webview 安全漏洞的问题修复
-13. 支持权限管理，常用的定位、相册的权限
+3. 简化Js通信
+4. 灵活的设置WebSetting
+5. 代理WebViewClient 兼容 X5 WebView和android WebView
+6. 代理WebChormeClient 兼容 android webview 和 x5 webview
+7. 支持判断js方法是否存在
+8. 支持input标签文件上传
+9. 简化回退及返回键的处理
+10. 灵活加载url
+11. webview 安全漏洞的问题修复,更加安全
+12. 支持权限管理，常用的定位、相册的权限
+13. 支持电话、短信、邮件的跳转
 
 ## How Do I Use?
 
@@ -37,12 +37,21 @@ primWeb = PrimWeb.with(this)
 
 ## Update Log
 
-- v1.0.0 完善功能
+- v1.0.0
+
+        完善功能
+- v1.0.1
+
+        1. 回退和返回键的简化处理
+        2. 添加返回拦截，处理特殊情况
+
 
 ## TODO
 
-1. webview UI--> 进度、加载和错误UI设置
-2. webview下载文件
+1. 实现进度、加载和错误UI设置
+2. 实现刷新回弹功能
+3. 实现JS通信文件上传
+3. webview下载文件
 
 ## Thinks
 
@@ -118,7 +127,7 @@ void callJS(String method, String... params);
 void callJS(String method);
 ```
 
-#### 4.灵活的设置webview WebSetting，我们可以多个setting 换着来 如：X5DefaultWebSetting 继承 BaseAgentWebSetting类
+#### 4.灵活的设置WebSetting，我们可以多个setting 换着来 如：X5DefaultWebSetting 继承 BaseAgentWebSetting类 注意WebSettings 是X5 的 API
 ```
 .setAgentWebSetting(new X5DefaultWebSetting(this))
 
@@ -170,12 +179,11 @@ public class MyWebViewClient extends WebViewClient {
 .setX5WebViewClient(new ...)
 ```
 
-#### 6.代理WebChormeClient 兼容android webview 和 x5 webview, 兼容的部分方法适用于项目开发
-注意代理的WebChromeClient 需要传递一个泛型 FileChooserParams 原因是android 和 x5 是不一样的
+#### 6.代理WebChormeClient 兼容android webview 和 x5 webview, 兼容的部分方法已经适用于项目开发
 ```
  .setAgentWebChromeClient(new AgentWebChromeClient(this))
 
- public class AgentWebChromeClient extends WebChromeClient<android.webkit.WebChromeClient.FileChooserParams> {
+ public class AgentWebChromeClient extends WebChromeClient {
 
         public AgentWebChromeClient(Context context) {
             super(context);
