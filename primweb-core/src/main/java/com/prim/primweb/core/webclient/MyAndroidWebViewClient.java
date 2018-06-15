@@ -31,6 +31,11 @@ public class MyAndroidWebViewClient extends android.webkit.WebViewClient {
     }
 
     @Override
+    public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+        return super.shouldOverrideUrlLoading(view, request);
+    }
+
+    @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
         return webViewClient.shouldOverrideUrlLoading(webView, url);
     }

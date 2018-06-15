@@ -86,6 +86,8 @@ public abstract class WebViewClient implements IAgentWebViewClient {
             return true;
         }
 
+
+
         //电话 邮箱 短信的处理
         if (handleCommonLink(url)) {
             return true;
@@ -97,16 +99,16 @@ public abstract class WebViewClient implements IAgentWebViewClient {
             return true;
         }
 
-        //微信支付
-        if (url.startsWith(WEBCHAT_PAY_SCHEME)) {
-            startActivity(url);
-            return true;
-        }
-
-        //支付宝
-        if (url.startsWith(ALIPAYS_SCHEME) && lookup(url)) {
-            return true;
-        }
+//        //微信支付
+//        if (url.startsWith(WEBCHAT_PAY_SCHEME)) {
+//            startActivity(url);
+//            return true;
+//        }
+//
+//        //支付宝
+//        if (url.startsWith(ALIPAYS_SCHEME) && lookup(url)) {
+//            return true;
+//        }
 
         view.loadAgentUrl(url);
 
