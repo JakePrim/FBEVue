@@ -62,7 +62,34 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
                 startActivity(new Intent(this, WebActivity.class));
                 break;
             case 1:
-                startActivity(new Intent(this, CommonActivity.class));
+                startActivity(new Intent(this, CommonActivity.class).putExtra(CommonActivity.TYPE, "0"));
+                break;
+            case 2:
+                startActivity(new Intent(this, CommonActivity.class).putExtra(CommonActivity.TYPE, "1"));
+                break;
+            case 3:
+                startActivity(new Intent(this, CommonActivity.class).putExtra(CommonActivity.TYPE, "2"));
+                break;
+            case 4:
+                startActivity(new Intent(this, CommonActivity.class).putExtra(CommonActivity.TYPE, "3"));
+                break;
+            case 5:
+                startActivity(new Intent(this, CommonActivity.class).putExtra(CommonActivity.TYPE, "4"));
+                break;
+            case 6:
+                startActivity(new Intent(this, CommonActivity.class).putExtra(CommonActivity.TYPE, "5"));
+                break;
+            case 7:
+                startActivity(new Intent(this, CommonActivity.class).putExtra(CommonActivity.TYPE, "6"));
+                break;
+            case 8:
+                startActivity(new Intent(this, CommonActivity.class).putExtra(CommonActivity.TYPE, "7"));
+                break;
+            case 9:
+                startActivity(new Intent(this, CommonActivity.class).putExtra(CommonActivity.TYPE, "8"));
+                break;
+            case 10:
+                startActivity(new Intent(this, CommonActivity.class).putExtra(CommonActivity.TYPE, "9"));
                 break;
         }
     }

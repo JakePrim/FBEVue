@@ -12,9 +12,7 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 
 import com.prim.primweb.core.webclient.IAgentWebChromeClient;
-import com.prim.primweb.core.webclient.IAgentWebViewClient;
 import com.prim.primweb.core.webclient.MyX5WebChromeClient;
-import com.prim.primweb.core.webclient.MyX5WebViewClient;
 import com.prim.primweb.core.jsloader.AgentValueCallback;
 import com.prim.primweb.core.utils.PrimWebUtils;
 import com.tencent.smtt.sdk.ValueCallback;
@@ -39,7 +37,6 @@ import java.util.Map;
 public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings> {
     private com.prim.primweb.core.listener.OnScrollChangeListener listener;
 
-    private IAgentWebViewClient webViewClient;
 
     private static final String TAG = "X5AgentWebView";
 
@@ -176,24 +173,18 @@ public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings
     }
 
     @Override
-    public void setAgentWebViewClient(IAgentWebViewClient webViewClient) {
-        this.webViewClient = webViewClient;
-        setWebViewClient(new MyX5WebViewClient(this, webViewClient));
+    public void setAgentWebViewClient(android.webkit.WebViewClient webViewClient) {
+
+    }
+
+    @Override
+    public void setAgentWebViewClient(WebViewClient webViewClient) {
+        this.setWebViewClient(webViewClient);
     }
 
     @Override
     public void setAgentWebChromeClient(IAgentWebChromeClient webChromeClient) {
         setWebChromeClient(new MyX5WebChromeClient(webChromeClient));
-    }
-
-    @Override
-    public void setAndroidWebViewClient(android.webkit.WebViewClient webViewClient) {
-
-    }
-
-    @Override
-    public void setX5WebViewClient(WebViewClient webViewClient) {
-        setWebViewClient(webViewClient);
     }
 
     @Override

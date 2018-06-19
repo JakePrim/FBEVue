@@ -24,6 +24,7 @@ import com.prim.primweb.core.webview.IAgentWebView;
  * 版    本：1.0
  * 创建日期：6/15 0015
  * 描    述：作为WebView的基类
+ * 可使用原声的WebViewClient 也可以使用具有兼容性代理的AgentWebViewClient
  * 修订历史：
  * ================================================
  */
@@ -45,7 +46,6 @@ public abstract class BaseAndroidWebClient extends WebViewClient {
 
 
     @SuppressLint("NewApi")
-    @Deprecated
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
         if (this.webViewClient != null) {

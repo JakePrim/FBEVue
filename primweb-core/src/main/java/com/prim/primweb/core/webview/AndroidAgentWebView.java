@@ -6,6 +6,7 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Looper;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -16,9 +17,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.prim.primweb.core.webclient.IAgentWebChromeClient;
-import com.prim.primweb.core.webclient.IAgentWebViewClient;
 import com.prim.primweb.core.webclient.MyAndroidWebChromeClient;
-import com.prim.primweb.core.webclient.MyAndroidWebViewClient;
 import com.prim.primweb.core.jsloader.AgentValueCallback;
 import com.prim.primweb.core.utils.PrimWebUtils;
 
@@ -36,18 +35,17 @@ import java.util.Map;
  * 修订历史：1.0.0
  * ================================================
  */
-public class PrimAgentWebView extends WebView implements IAgentWebView<WebSettings> {
+public class AndroidAgentWebView extends WebView implements IAgentWebView<WebSettings> {
 
     private static final String TAG = "PrimAgentWebView";
     public com.prim.primweb.core.listener.OnScrollChangeListener listener;
-    private IAgentWebViewClient webViewClient;
     private WebView.HitTestResult result;
 
-    public PrimAgentWebView(Context context) {
+    public AndroidAgentWebView(Context context) {
         this(context, null);
     }
 
-    public PrimAgentWebView(Context context, AttributeSet attrs) {
+    public AndroidAgentWebView(Context context, AttributeSet attrs) {
         super(context, attrs);
         result = this.getHitTestResult();
     }
@@ -106,6 +104,7 @@ public class PrimAgentWebView extends WebView implements IAgentWebView<WebSettin
 
     @Override
     public boolean goBackAgent() {
+        Log.e(TAG, "goBackAgent: " + this.canGoBack());
         if (this.canGoBack()) {
             this.goBack();
             return true;
@@ -234,26 +233,19 @@ public class PrimAgentWebView extends WebView implements IAgentWebView<WebSettin
         this.loadDataWithBaseURL(baseUrl, data, mimeType, encoding, historyUrl);
     }
 
+    @Override
+    public void setAgentWebViewClient(WebViewClient webViewClient) {
+        this.setWebViewClient(webViewClient);
+    }
 
     @Override
-    public void setAgentWebViewClient(IAgentWebViewClient webViewClient) {
-        this.webViewClient = webViewClient;
-        setWebViewClient(new MyAndroidWebViewClient(this, webViewClient));
+    public void setAgentWebViewClient(com.tencent.smtt.sdk.WebViewClient webViewClient) {
+
     }
 
     @Override
     public void setAgentWebChromeClient(IAgentWebChromeClient webChromeClient) {
         setWebChromeClient(new MyAndroidWebChromeClient(webChromeClient));
-    }
-
-    @Override
-    public void setAndroidWebViewClient(WebViewClient webViewClient) {
-        setWebViewClient(webViewClient);
-    }
-
-    @Override
-    public void setX5WebViewClient(com.tencent.smtt.sdk.WebViewClient webViewClient) {
-
     }
 
     @Override

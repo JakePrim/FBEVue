@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-import com.prim.primweb.core.PrimWeb;
 import com.prim.primweb.core.utils.PrimWebUtils;
 
 /**
@@ -107,7 +106,7 @@ public class WebViewManager implements IWebViewManager {
         if (this.mWebView != null) {
             webView = mWebView;
         } else {
-            webView = new PrimAgentWebView(context);
+            webView = new AndroidAgentWebView(context);
         }
         return webView;
     }

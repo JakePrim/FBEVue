@@ -5,7 +5,6 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebViewClient;
 
 import com.prim.primweb.core.webclient.IAgentWebChromeClient;
-import com.prim.primweb.core.webclient.IAgentWebViewClient;
 import com.prim.primweb.core.jsloader.AgentValueCallback;
 import com.prim.primweb.core.listener.OnScrollChangeListener;
 
@@ -65,15 +64,12 @@ public interface IAgentWebView<T> {
     void addJavascriptInterfaceAgent(Object object, String name);
 
     /** 设置代理的WebViewClient */
-    void setAgentWebViewClient(IAgentWebViewClient webViewClient);
+    void setAgentWebViewClient(WebViewClient webViewClient);
+
+    void setAgentWebViewClient(com.tencent.smtt.sdk.WebViewClient webViewClient);
 
     /** 设置代理的WebChromeClient */
     void setAgentWebChromeClient(IAgentWebChromeClient webChromeClient);
-
-    /** 如果不想要使用代理的 通过以下方法来调用系统自带的 */
-    void setAndroidWebViewClient(WebViewClient webViewClient);
-
-    void setX5WebViewClient(com.tencent.smtt.sdk.WebViewClient webViewClient);
 
     void setAndroidWebChromeClient(WebChromeClient webChromeClient);
 
