@@ -71,6 +71,8 @@ public class WebViewManager implements IWebViewManager {
 
     private IBaseIndicatorView baseIndicatorView;
 
+    private AbsWebUIController absWebUIController;
+
     public WebViewManager(Builder builder) {
         this.agentWebView = builder.agentWebView;
         this.mViewGroup = builder.mViewGroup;
@@ -88,6 +90,7 @@ public class WebViewManager implements IWebViewManager {
         this.needTopIndicator = builder.needTopProgress;
         this.customTopIndicator = builder.customTopIndicator;
         this.mIndicatorView = builder.mIndicatorView;
+        this.absWebUIController = builder.absWebUIController;
         if (agentWebView != null) {
             this.mWebView = agentWebView.getAgentWebView();
         }
@@ -119,6 +122,12 @@ public class WebViewManager implements IWebViewManager {
         int loadLayout;
         private boolean customTopIndicator;
         private BaseIndicatorView mIndicatorView;
+        private AbsWebUIController absWebUIController;
+
+        public Builder setAbsWebUIController(AbsWebUIController absWebUIController) {
+            this.absWebUIController = absWebUIController;
+            return this;
+        }
 
         public Builder setIndicatorView(BaseIndicatorView mIndicatorView) {
             this.mIndicatorView = mIndicatorView;
@@ -236,6 +245,7 @@ public class WebViewManager implements IWebViewManager {
 
     private FrameLayout createLayout() {
         WebParentLayout webParentLayout = new WebParentLayout(mActivity.get());
+        webParentLayout.bindUIControll(absWebUIController);
         webParentLayout.setBackgroundColor(Color.WHITE);
         webParentLayout.setId(R.id.web_parent_layout);
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(-1, -1);

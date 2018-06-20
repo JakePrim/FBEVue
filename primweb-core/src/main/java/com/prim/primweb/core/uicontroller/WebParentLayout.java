@@ -69,6 +69,10 @@ public class WebParentLayout extends FrameLayout {
         }
     }
 
+    public void bindUIControll(AbsWebUIController absWebUIController) {
+        absWebUIController.setWebParentLayout(this);
+    }
+
     private void createErrorView() {
         FrameLayout mFrameLayout = new FrameLayout(getContext());
         if (errorView == null) {

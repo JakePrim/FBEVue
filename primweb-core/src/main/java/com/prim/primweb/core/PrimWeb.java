@@ -18,9 +18,12 @@ import com.prim.primweb.core.handler.IKeyEventInterceptor;
 import com.prim.primweb.core.handler.KeyEventHandler;
 import com.prim.primweb.core.jsloader.CommonJSListener;
 import com.prim.primweb.core.jsloader.CommonJavaObject;
+import com.prim.primweb.core.uicontroller.AbsWebUIController;
 import com.prim.primweb.core.uicontroller.BaseIndicatorView;
+import com.prim.primweb.core.uicontroller.DefaultWebUIController;
 import com.prim.primweb.core.uicontroller.IndicatorController;
 import com.prim.primweb.core.uicontroller.IndicatorHandler;
+import com.prim.primweb.core.uicontroller.WebParentLayout;
 import com.prim.primweb.core.uicontroller.WebViewManager;
 import com.prim.primweb.core.webclient.DefaultAgentWebChromeClient;
 import com.prim.primweb.core.webclient.IAgentWebChromeClient;
@@ -124,6 +127,19 @@ public class PrimWeb {
 
     private WebViewManager webViewManager;
 
+    private AbsWebUIController absWebUIController;
+
+    PrimWeb(PrimBuilder builder) {
+        doCheckSafe(builder);
+
+        createLayout(builder);
+
+        webLifeCycle = new WebLifeCycle(webView);
+        if (builder.mJavaObject != null && !builder.mJavaObject.isEmpty()) {
+            this.mJavaObject.putAll(builder.mJavaObject);
+        }
+    }
+
     public static void init(Application application) {
         // X5浏览器初始化
         QbSdk.initX5Environment(application, new QbSdk.PreInitCallback() {
@@ -139,7 +155,8 @@ public class PrimWeb {
         });
     }
 
-    PrimWeb(PrimBuilder builder) {
+    /** webview 安全检查 */
+    private void doCheckSafe(PrimBuilder builder) {
         this.webView = builder.webView;
         this.mView = builder.mView;
         this.mViewGroup = builder.mViewGroup;
@@ -160,12 +177,15 @@ public class PrimWeb {
         this.agentWebChromeClient = builder.agentWebChromeClient;
         this.commonJSListener = builder.commonJSListener;
         this.alwaysOpenOtherPage = builder.alwaysOpenOtherPage;
-        doCheckSafe();
-        webLifeCycle = new WebLifeCycle(webView);
-        if (builder.mJavaObject != null && !builder.mJavaObject.isEmpty()) {
-            this.mJavaObject.putAll(builder.mJavaObject);
+        this.absWebUIController = builder.absWebUIController;
+        if (null == webView) {//webview 不能为空
+            webView = new AndroidAgentWebView(context.get());
+            mView = webView.getAgentWebView();
         }
-        createLayout(builder);
+        webView.removeRiskJavascriptInterface();
+        if (this.absWebUIController == null) {
+            this.absWebUIController = new DefaultWebUIController(context.get());
+        }
     }
 
     private void createLayout(PrimBuilder builder) {
@@ -186,17 +206,10 @@ public class PrimWeb {
                 .setHeight(builder.height)
                 .setIndicatorView(builder.mIndicatorView)
                 .setLoadLayout(builder.loadLayout)
+                .setAbsWebUIController(absWebUIController)
                 .build();
     }
 
-    /** webview 安全检查 */
-    private void doCheckSafe() {
-        if (null == webView) {//webview 不能为空
-            webView = new AndroidAgentWebView(context.get());
-            mView = webView.getAgentWebView();
-        }
-        webView.removeRiskJavascriptInterface();
-    }
 
     public WebViewType getWebViewType() {
         return webViewType;
@@ -391,6 +404,7 @@ public class PrimWeb {
                 .setWebViewClient(webViewClient)
                 .setWebViewClient(agentWebViewClient)
                 .setAlwaysOpenOtherPage(alwaysOpenOtherPage)
+                .setAbsWebUIController(absWebUIController)
                 .build();
     }
 
@@ -433,6 +447,7 @@ public class PrimWeb {
         private IAgentWebChromeClient agentWebChromeClient;
         private CommonJSListener commonJSListener;
         private boolean alwaysOpenOtherPage;
+        private AbsWebUIController absWebUIController;
         //UI Controller
         private boolean needTopIndicator;
         private boolean customTopIndicator;
@@ -679,6 +694,11 @@ public class PrimWeb {
 
         public CommonBuilder alwaysOpenOtherPage(boolean alwaysOpenOtherPage) {
             primBuilder.alwaysOpenOtherPage = alwaysOpenOtherPage;
+            return this;
+        }
+
+        public CommonBuilder setWebUIController(AbsWebUIController absWebUIController) {
+            primBuilder.absWebUIController = absWebUIController;
             return this;
         }
 

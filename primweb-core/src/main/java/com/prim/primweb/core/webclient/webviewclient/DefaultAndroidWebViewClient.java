@@ -16,6 +16,7 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.prim.primweb.core.uicontroller.AbsWebUIController;
 import com.prim.primweb.core.webclient.PrimWebClient;
 import com.prim.primweb.core.webclient.base.BaseAndroidWebClient;
 import com.prim.primweb.core.webview.IAgentWebView;
@@ -53,12 +54,12 @@ public class DefaultAndroidWebViewClient extends BaseAndroidWebClient {
      */
     private boolean alwaysOpenOtherPage = true;
 
-    private PrimWebClient.Builder builder;
+    private WeakReference<AbsWebUIController> mAbsWebUIController;
 
     public DefaultAndroidWebViewClient(Activity activity, PrimWebClient.Builder builder) {
         weakReference = new WeakReference<>(activity);
-        this.builder = builder;
         alwaysOpenOtherPage = builder.alwaysOpenOtherPage;
+        mAbsWebUIController = new WeakReference<>(builder.absWebUIController);
     }
 
     /**
@@ -137,17 +138,29 @@ public class DefaultAndroidWebViewClient extends BaseAndroidWebClient {
 
     @Override
     public void onPageFinished(WebView view, String url) {
+        if (mAbsWebUIController != null && mAbsWebUIController.get() != null) {
+            mAbsWebUIController.get().onHideErrorPage();
+        }
         super.onPageFinished(view, url);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+        webError(error.getErrorCode(), error.getDescription().toString(), request.getUrl().toString());
         super.onReceivedError(view, request, error);
     }
 
     @Override
     public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+        webError(errorCode, description, failingUrl);
         super.onReceivedError(view, errorCode, description, failingUrl);
+    }
+
+    private void webError(int errorCode, String description, String failingUrl) {
+        if (mAbsWebUIController != null && mAbsWebUIController.get() != null) {
+            mAbsWebUIController.get().onShowErrorPage(errorCode, description, failingUrl);
+        }
     }
 
     private int queryActivitysNum(String url) {

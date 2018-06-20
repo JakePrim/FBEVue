@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.webkit.WebViewClient;
 
 import com.prim.primweb.core.PrimWeb;
+import com.prim.primweb.core.uicontroller.AbsWebUIController;
 import com.prim.primweb.core.webclient.webviewclient.AgentWebViewClient;
 import com.prim.primweb.core.webclient.webviewclient.DefaultAndroidWebViewClient;
 import com.prim.primweb.core.webclient.webviewclient.DefaultX5WebViewClient;
@@ -41,7 +42,7 @@ public class PrimWebClient {
     private boolean alwaysOpenOtherPage;
 
     public PrimWebClient(Builder builder) {
-        mActivity = new WeakReference<Activity>(builder.activity);
+        mActivity = new WeakReference<>(builder.activity);
         this.andWebViewClient = builder.andWebViewClient;
         this.x5WebViewClient = builder.x5WebViewClient;
         this.agentWebViewClient = builder.agentWebViewClient;
@@ -87,6 +88,13 @@ public class PrimWebClient {
         public PrimWeb.WebViewType type;
 
         public boolean alwaysOpenOtherPage;
+
+        public AbsWebUIController absWebUIController;
+
+        public Builder setAbsWebUIController(AbsWebUIController absWebUIController) {
+            this.absWebUIController = absWebUIController;
+            return this;
+        }
 
         public Builder setActivity(Activity activity) {
             this.activity = activity;
