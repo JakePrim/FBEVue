@@ -12,6 +12,8 @@ import com.prim.primweb.core.file.FileChooser;
 import com.prim.primweb.core.permission.FilePermissionWrap;
 import com.prim.primweb.core.permission.PermissionMiddleActivity;
 import com.prim.primweb.core.permission.WebPermission;
+import com.prim.primweb.core.webclient.callback.CustomViewCallback;
+import com.prim.primweb.core.webclient.callback.GeolocationPermissionsCallback;
 
 import java.lang.ref.WeakReference;
 

@@ -2,9 +2,9 @@ package com.prim.primweb.core.webclient;
 
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.util.Log;
 import android.view.View;
 
+import com.prim.primweb.core.webclient.callback.CustomViewCallback;
 import com.tencent.smtt.export.external.interfaces.GeolocationPermissionsCallback;
 import com.tencent.smtt.export.external.interfaces.IX5WebChromeClient;
 import com.tencent.smtt.export.external.interfaces.JsPromptResult;
@@ -58,7 +58,7 @@ public class MyX5WebChromeClient extends WebChromeClient {
 
     @Override
     public void onGeolocationPermissionsShowPrompt(String s, final GeolocationPermissionsCallback geolocationPermissionsCallback) {
-        com.prim.primweb.core.webclient.GeolocationPermissionsCallback geolocationPermissionsCallback1 = new com.prim.primweb.core.webclient.GeolocationPermissionsCallback() {
+        com.prim.primweb.core.webclient.callback.GeolocationPermissionsCallback geolocationPermissionsCallback1 = new com.prim.primweb.core.webclient.callback.GeolocationPermissionsCallback() {
             @Override
             public void invoke(String var1, boolean var2, boolean var3) {
                 geolocationPermissionsCallback.invoke(var1, var2, var3);

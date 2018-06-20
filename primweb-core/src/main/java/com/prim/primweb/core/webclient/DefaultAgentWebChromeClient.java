@@ -2,8 +2,12 @@ package com.prim.primweb.core.webclient;
 
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 import android.view.View;
 import android.webkit.ValueCallback;
+
+import com.prim.primweb.core.uicontroller.IndicatorController;
+import com.prim.primweb.core.webclient.callback.GeolocationPermissionsCallback;
 
 /**
  * ================================================
@@ -17,13 +21,25 @@ import android.webkit.ValueCallback;
 public class DefaultAgentWebChromeClient extends WebChromeClient {
     private static final String TAG = "DefaultAgentWebChromeCl";
 
-    public DefaultAgentWebChromeClient(Context context) {
+    IndicatorController indicatorController;
+
+    public DefaultAgentWebChromeClient(Context context, IndicatorController indicatorController) {
         super(context);
+        this.indicatorController = indicatorController;
     }
 
     @Override
     public void onReceivedTitle(View webView, String s) {
         super.onReceivedTitle(webView, s);
+    }
+
+    @Override
+    public void onProgressChanged(View webView, int i) {
+        super.onProgressChanged(webView, i);
+        Log.e(TAG, "onProgressChanged: " + i);
+        if (indicatorController != null) {
+            indicatorController.progress(i);
+        }
     }
 
     @Override

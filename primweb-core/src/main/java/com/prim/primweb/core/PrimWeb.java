@@ -2,18 +2,26 @@ package com.prim.primweb.core;
 
 import android.app.Activity;
 import android.app.Application;
+import android.support.annotation.ColorInt;
+import android.support.annotation.IdRes;
+import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
 import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
 
 import com.prim.primweb.core.handler.IKeyEvent;
 import com.prim.primweb.core.handler.IKeyEventInterceptor;
 import com.prim.primweb.core.handler.KeyEventHandler;
 import com.prim.primweb.core.jsloader.CommonJSListener;
 import com.prim.primweb.core.jsloader.CommonJavaObject;
+import com.prim.primweb.core.uicontroller.BaseIndicatorView;
+import com.prim.primweb.core.uicontroller.IndicatorController;
+import com.prim.primweb.core.uicontroller.IndicatorHandler;
+import com.prim.primweb.core.uicontroller.WebViewManager;
 import com.prim.primweb.core.webclient.DefaultAgentWebChromeClient;
 import com.prim.primweb.core.webclient.IAgentWebChromeClient;
 import com.prim.primweb.core.jsinterface.IJsInterface;
@@ -111,6 +119,11 @@ public class PrimWeb {
     // 返回键拦截，有特殊处理的可以实现此接口
     private IKeyEventInterceptor keyEventInterceptor;
 
+    //是否允许网页打开其他应用
+    private boolean alwaysOpenOtherPage;
+
+    private WebViewManager webViewManager;
+
     public static void init(Application application) {
         // X5浏览器初始化
         QbSdk.initX5Environment(application, new QbSdk.PreInitCallback() {
@@ -146,16 +159,34 @@ public class PrimWeb {
         this.webViewType = builder.webViewType;
         this.agentWebChromeClient = builder.agentWebChromeClient;
         this.commonJSListener = builder.commonJSListener;
+        this.alwaysOpenOtherPage = builder.alwaysOpenOtherPage;
         doCheckSafe();
         webLifeCycle = new WebLifeCycle(webView);
         if (builder.mJavaObject != null && !builder.mJavaObject.isEmpty()) {
             this.mJavaObject.putAll(builder.mJavaObject);
         }
-        if (mViewGroup != null) {
-            mViewGroup.addView(mView, mIndex, mLayoutParams);
-        } else {//考虑到极端的情况
-            PrimWebUtils.scanForActivity(context.get()).setContentView(mView);
-        }
+        createLayout(builder);
+    }
+
+    private void createLayout(PrimBuilder builder) {
+        webViewManager = WebViewManager.createWebView()
+                .setActivity(context.get())
+                .setViewGroup(mViewGroup)
+                .setAgentWebView(webView)
+                .setLp(mLayoutParams)
+                .setCustomTopIndicator(builder.customTopIndicator)
+                .setNeedTopProgress(builder.needTopIndicator)
+                .setColor(builder.mColor)
+                .setIndex(mIndex)
+                .setColorPaser(builder.colorPaser)
+                .setErrorClickId(builder.errorClickId)
+                .setErrorLayout(builder.errorLayout)
+                .setErrorView(builder.errorView)
+                .setLoadView(builder.loadView)
+                .setHeight(builder.height)
+                .setIndicatorView(builder.mIndicatorView)
+                .setLoadLayout(builder.loadLayout)
+                .build();
     }
 
     /** webview 安全检查 */
@@ -171,10 +202,10 @@ public class PrimWeb {
         return webViewType;
     }
 
-    /** 获取webview的跟view */
-    public View getRootView() {
-        if (null != mViewGroup) {
-            return mViewGroup;
+    /** 获取webview的父view */
+    public FrameLayout getRootView() {
+        if (null != webViewManager) {
+            return webViewManager.getWebParentView();
         }
         return null;
     }
@@ -301,14 +332,7 @@ public class PrimWeb {
     /** 准备阶段,检查完毕后加载url */
     void ready() {
         // 加载 webView设置
-        if (null == setting) {
-            if (webViewType == WebViewType.Android) {
-                setting = new DefaultWebSetting(context.get());
-            } else {
-                setting = new X5DefaultWebSetting(context.get());
-            }
-        }
-        setting.setSetting(webView);
+        createSetting();
 
         // 加载 url加载器
         if (null == urlLoader) {
@@ -316,32 +340,16 @@ public class PrimWeb {
         }
 
         // 加载 webViewClient
-        PrimWebClient.createClientBuilder()
-                .setActivity(context.get())
-                .setType(webViewType)
-                .setWebView(webView)
-                .setWebViewClient(x5WebViewClient)
-                .setWebViewClient(webViewClient)
-                .setWebViewClient(agentWebViewClient)
-                .build();
+        createWebViewClient();
 
         //加载webChromeClient 系统设置的优先
-        if (webChromeClient != null || x5WebChromeClient != null) {
-            if (webChromeClient != null) {
-                webView.setAndroidWebChromeClient(webChromeClient);
-            }
-            if (x5WebChromeClient != null) {
-                webView.setX5WebChromeClient(x5WebChromeClient);
-            }
-        } else {
-            //加载代理的webChromeClient
-            if (null == agentWebChromeClient) {
-                agentWebChromeClient = new DefaultAgentWebChromeClient(context.get());
-            }
-            webView.setAgentWebChromeClient(agentWebChromeClient);
-        }
+        createWebChromeClient();
 
         // 加载js脚本注入
+        createJsInterface();
+    }
+
+    private void createJsInterface() {
         if (null == mJsInterface) {
             mJsInterface = SafeJsInterface.getInstance(webView, modeType);
         }
@@ -352,6 +360,38 @@ public class PrimWeb {
         if (mJavaObject != null && !mJavaObject.isEmpty()) {
             mJsInterface.addJavaObjects(mJavaObject);
         }
+    }
+
+    private void createSetting() {
+        if (null == setting) {
+            if (webViewType == WebViewType.Android) {
+                setting = new DefaultWebSetting(context.get());
+            } else {
+                setting = new X5DefaultWebSetting(context.get());
+            }
+        }
+        setting.setSetting(webView);
+    }
+
+    private void createWebChromeClient() {
+        IndicatorController indicatorController = IndicatorHandler.getInstance().setIndicator(webViewManager.getIndicator());
+        //加载代理的webChromeClient
+        if (null == agentWebChromeClient) {
+            agentWebChromeClient = new DefaultAgentWebChromeClient(context.get(), indicatorController);
+        }
+        webView.setAgentWebChromeClient(agentWebChromeClient);
+    }
+
+    private void createWebViewClient() {
+        PrimWebClient.createClientBuilder()
+                .setActivity(context.get())
+                .setType(webViewType)
+                .setWebView(webView)
+                .setWebViewClient(x5WebViewClient)
+                .setWebViewClient(webViewClient)
+                .setWebViewClient(agentWebViewClient)
+                .setAlwaysOpenOtherPage(alwaysOpenOtherPage)
+                .build();
     }
 
     /** 发起最终阶段 加载url */
@@ -392,23 +432,40 @@ public class PrimWeb {
         private com.tencent.smtt.sdk.WebChromeClient x5WebChromeClient;
         private IAgentWebChromeClient agentWebChromeClient;
         private CommonJSListener commonJSListener;
+        private boolean alwaysOpenOtherPage;
+        //UI Controller
+        private boolean needTopIndicator;
+        private boolean customTopIndicator;
+        private View errorView;
+        private View loadView;
+        private BaseIndicatorView mIndicatorView;
+        private @ColorInt
+        int mColor = -1;
+        private String colorPaser;
+        private int height = 0;
+        private @LayoutRes
+        int errorLayout = 0;
+        private @IdRes
+        int errorClickId = 0;
+        private @LayoutRes
+        int loadLayout = 0;
 
         PrimBuilder(Activity context) {
             this.context = new WeakReference<>(context);
         }
 
         /** 设置webview的父类 */
-        public CommonBuilder setWebParent(@NonNull ViewGroup v, @NonNull ViewGroup.LayoutParams lp) {
+        public UIControllerBuilder setWebParent(@NonNull ViewGroup v, @NonNull ViewGroup.LayoutParams lp) {
             this.mViewGroup = v;
             this.mLayoutParams = lp;
-            return new CommonBuilder(this);
+            return new UIControllerBuilder(this);
         }
 
-        public CommonBuilder setWebParent(@NonNull ViewGroup v, @NonNull ViewGroup.LayoutParams lp, int index) {
+        public UIControllerBuilder setWebParent(@NonNull ViewGroup v, @NonNull ViewGroup.LayoutParams lp, int index) {
             this.mViewGroup = v;
             this.mLayoutParams = lp;
             this.mIndex = index;
-            return new CommonBuilder(this);
+            return new UIControllerBuilder(this);
         }
 
         /** 所有设置完成 */
@@ -441,6 +498,93 @@ public class PrimWeb {
         }
     }
 
+    /**
+     * webview的UI控制器设置
+     */
+    public static class UIControllerBuilder {
+        private PrimBuilder primBuilder;
+
+        public UIControllerBuilder(PrimBuilder primBuilder) {
+            this.primBuilder = primBuilder;
+        }
+
+        public IndicatorBuilder useDefaultUI() {
+            return new IndicatorBuilder(primBuilder);
+        }
+
+        public IndicatorBuilder useCustomUI(@LayoutRes int errorLayout, @LayoutRes int loadLayout, @IdRes int errorClickId) {
+            this.primBuilder.errorLayout = errorLayout;
+            this.primBuilder.loadLayout = loadLayout;
+            this.primBuilder.errorClickId = errorClickId;
+            return new IndicatorBuilder(primBuilder);
+        }
+
+        public IndicatorBuilder useCustomUI(@NonNull View errorView, @NonNull View loadView) {
+            this.primBuilder.errorView = errorView;
+            this.primBuilder.loadView = loadView;
+            return new IndicatorBuilder(primBuilder);
+        }
+    }
+
+    /**
+     * webView 指示器设置
+     */
+    public static class IndicatorBuilder {
+        private PrimBuilder primBuilder;
+
+        public IndicatorBuilder(PrimBuilder primBuilder) {
+            this.primBuilder = primBuilder;
+        }
+
+        public CommonBuilder useDefaultTopIndicator() {
+            this.primBuilder.needTopIndicator = true;
+            return new CommonBuilder(primBuilder);
+        }
+
+        public CommonBuilder useDefaultTopIndicator(@ColorInt int color) {
+            this.primBuilder.needTopIndicator = true;
+            this.primBuilder.mColor = color;
+            return new CommonBuilder(primBuilder);
+        }
+
+        public CommonBuilder useDefaultTopIndicator(@ColorInt int color, int height) {
+            this.primBuilder.needTopIndicator = true;
+            this.primBuilder.mColor = color;
+            this.primBuilder.height = height;
+            return new CommonBuilder(primBuilder);
+        }
+
+        public CommonBuilder useDefaultTopIndicator(@NonNull String color) {
+            this.primBuilder.needTopIndicator = true;
+            this.primBuilder.colorPaser = color;
+            return new CommonBuilder(primBuilder);
+        }
+
+        public CommonBuilder useDefaultTopIndicator(@NonNull String color, int height) {
+            this.primBuilder.height = height;
+            this.primBuilder.needTopIndicator = true;
+            this.primBuilder.colorPaser = color;
+            return new CommonBuilder(primBuilder);
+        }
+
+        public CommonBuilder useCustomIndicator(@NonNull BaseIndicatorView indicatorView) {
+            this.primBuilder.mIndicatorView = indicatorView;
+            this.primBuilder.needTopIndicator = true;
+            this.primBuilder.customTopIndicator = true;
+            return new CommonBuilder(primBuilder);
+        }
+
+        public CommonBuilder colseTopIndicator() {
+            this.primBuilder.needTopIndicator = false;
+            this.primBuilder.customTopIndicator = false;
+            this.primBuilder.height = 0;
+            return new CommonBuilder(primBuilder);
+        }
+    }
+
+    /**
+     * webView的通用设置
+     */
     public static class CommonBuilder {
         private PrimBuilder primBuilder;
 
@@ -531,6 +675,11 @@ public class PrimWeb {
         /** 注入js脚本 */
         public JsInterfaceBuilder addJavascriptInterface(@NonNull String name, @NonNull Object o) {
             return new JsInterfaceBuilder(primBuilder).addJavascriptInterface(name, o);
+        }
+
+        public CommonBuilder alwaysOpenOtherPage(boolean alwaysOpenOtherPage) {
+            primBuilder.alwaysOpenOtherPage = alwaysOpenOtherPage;
+            return this;
         }
 
         /** 设置完成开始建造 */

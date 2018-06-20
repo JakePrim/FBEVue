@@ -6,6 +6,9 @@ import android.view.View;
 import android.webkit.*;
 import android.webkit.WebChromeClient;
 
+import com.prim.primweb.core.webclient.callback.CustomViewCallback;
+import com.prim.primweb.core.webclient.callback.GeolocationPermissionsCallback;
+
 /**
  * ================================================
  * 作    者：linksus

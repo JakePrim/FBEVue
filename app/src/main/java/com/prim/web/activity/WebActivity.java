@@ -41,8 +41,9 @@ public class WebActivity extends AppCompatActivity {
         rl_web = (RelativeLayout) findViewById(R.id.rl_web);
         primWeb = PrimWeb.with(this)
                 .setWebParent(rl_web, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
-                .setWebViewClient(viewClient)
-                .setAgentWebChromeClient(webChromeClient)
+                .useDefaultUI()
+                .useDefaultTopIndicator(getResources().getColor(R.color.colorAccent))
+                .setWebViewClient(webViewClient)
                 .setWebViewType(PrimWeb.WebViewType.Android)
                 .buildWeb()
                 .lastGo()
@@ -77,18 +78,15 @@ public class WebActivity extends AppCompatActivity {
             Log.e(TAG, "shouldOverrideUrlLoading: " + url);
             return super.shouldOverrideUrlLoading(view, url);
         }
-    };
 
-    WebChromeClient webChromeClient = new WebChromeClient(this) {
+        @SuppressLint("NewApi")
         @Override
-        public void onReceivedTitle(View webView, String s) {
-            super.onReceivedTitle(webView, s);
-            ActionBar supportActionBar = getSupportActionBar();
-            if (supportActionBar != null) {
-                supportActionBar.setTitle(s);
-            }
+        public boolean shouldOverrideUrlLoading(IAgentWebView view, WebResourceRequest request) {
+            Log.e(TAG, "shouldOverrideUrlLoading: " + request.getUrl().toString());
+            return super.shouldOverrideUrlLoading(view, request);
         }
     };
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

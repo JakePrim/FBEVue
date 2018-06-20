@@ -82,6 +82,8 @@ public class WebFragment extends Fragment {
         webParent = (FrameLayout) view.findViewById(R.id.webParent);
         PrimWeb.with(getActivity())
                 .setWebParent(webParent, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+                .useDefaultUI()
+                .useDefaultTopIndicator()
                 .setWebViewType(PrimWeb.WebViewType.Android)
                 .buildWeb()
                 .lastGo()

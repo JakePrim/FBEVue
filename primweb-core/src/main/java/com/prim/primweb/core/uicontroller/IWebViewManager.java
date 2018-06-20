@@ -1,7 +1,9 @@
-package com.prim.primweb.core.webview;
+package com.prim.primweb.core.uicontroller;
 
 import android.view.View;
 import android.widget.FrameLayout;
+
+import com.prim.primweb.core.webview.IAgentWebView;
 
 /**
  * ================================================
@@ -20,4 +22,6 @@ public interface IWebViewManager {
     IWebViewManager create();
 
     IAgentWebView getAgentWeb();
+
+    IBaseIndicatorView getIndicator();
 }

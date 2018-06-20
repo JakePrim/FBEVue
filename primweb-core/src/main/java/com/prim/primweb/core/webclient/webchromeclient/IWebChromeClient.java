@@ -1,14 +1,13 @@
-package com.prim.primweb.core.webclient;
+package com.prim.primweb.core.webclient.webchromeclient;
 
 /**
  * ================================================
  * 作    者：linksus
  * 版    本：1.0
- * 创建日期：5/16 0016
+ * 创建日期：6/19 0019
  * 描    述：
  * 修订历史：
  * ================================================
  */
-public interface GeolocationPermissionsCallback {
-    void invoke(String var1, boolean var2, boolean var3);
+public interface IWebChromeClient {
 }

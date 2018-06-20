@@ -118,8 +118,9 @@ public class PrimWebClient {
             return this;
         }
 
-        public void setAlwaysOpenOtherPage(boolean alwaysOpenOtherPage) {
+        public Builder setAlwaysOpenOtherPage(boolean alwaysOpenOtherPage) {
             this.alwaysOpenOtherPage = alwaysOpenOtherPage;
+            return this;
         }
 
         public PrimWebClient build() {

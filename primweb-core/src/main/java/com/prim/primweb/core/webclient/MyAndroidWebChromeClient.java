@@ -12,6 +12,8 @@ import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 
+import com.prim.primweb.core.webclient.callback.GeolocationPermissionsCallback;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -141,7 +143,7 @@ public class MyAndroidWebChromeClient extends WebChromeClient {
 
     @Override
     public void onShowCustomView(View view, int requestedOrientation, final CustomViewCallback callback) {
-        com.prim.primweb.core.webclient.CustomViewCallback customViewCallback = new com.prim.primweb.core.webclient.CustomViewCallback() {
+        com.prim.primweb.core.webclient.callback.CustomViewCallback customViewCallback = new com.prim.primweb.core.webclient.callback.CustomViewCallback() {
             @Override
             public void onCustomViewHidden() {
                 callback.onCustomViewHidden();
