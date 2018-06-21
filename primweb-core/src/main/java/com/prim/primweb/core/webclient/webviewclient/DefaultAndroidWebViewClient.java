@@ -23,7 +23,9 @@ import com.prim.primweb.core.webview.IAgentWebView;
 
 import java.lang.ref.WeakReference;
 import java.net.URISyntaxException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.prim.primweb.core.webclient.ClientConstance.INTENT_SCHEME;
 import static com.prim.primweb.core.webclient.ClientConstance.SCHEME_SMS;
@@ -45,16 +47,15 @@ public class DefaultAndroidWebViewClient extends BaseAndroidWebClient {
     private static final String TAG = "DefaultAndroidWebViewCl";
 
     /**
-     * 拦截不知道的url
-     */
-    private boolean interceptUnkownUrl = true;
-
-    /**
      * 是否允许打开其他界面 默认为允许
      */
     private boolean alwaysOpenOtherPage = true;
 
     private WeakReference<AbsWebUIController> mAbsWebUIController;
+
+    private Set<String> mErrorUrl = new HashSet<>();
+
+    private Set<String> mWaitLoadUrl = new HashSet<>();
 
     public DefaultAndroidWebViewClient(Activity activity, PrimWebClient.Builder builder) {
         weakReference = new WeakReference<>(activity);
@@ -133,13 +134,24 @@ public class DefaultAndroidWebViewClient extends BaseAndroidWebClient {
 
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
+        if (!mWaitLoadUrl.contains(url)) {
+            mWaitLoadUrl.add(url);
+        }
         super.onPageStarted(view, url, favicon);
     }
 
     @Override
     public void onPageFinished(WebView view, String url) {
-        if (mAbsWebUIController != null && mAbsWebUIController.get() != null) {
-            mAbsWebUIController.get().onHideErrorPage();
+        if (!mErrorUrl.contains(url) && mWaitLoadUrl.contains(url)) {
+            if (mAbsWebUIController != null && mAbsWebUIController.get() != null) {
+                mAbsWebUIController.get().onHideErrorPage();
+            }
+        }
+        if (mWaitLoadUrl.contains(url)) {
+            mWaitLoadUrl.remove(url);
+        }
+        if (!mErrorUrl.isEmpty()) {
+            mErrorUrl.clear();
         }
         super.onPageFinished(view, url);
     }
@@ -147,7 +159,9 @@ public class DefaultAndroidWebViewClient extends BaseAndroidWebClient {
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
-        webError(error.getErrorCode(), error.getDescription().toString(), request.getUrl().toString());
+        if (request.isForMainFrame()) {
+            webError(error.getErrorCode(), error.getDescription().toString(), request.getUrl().toString());
+        }
         super.onReceivedError(view, request, error);
     }
 
@@ -157,7 +171,9 @@ public class DefaultAndroidWebViewClient extends BaseAndroidWebClient {
         super.onReceivedError(view, errorCode, description, failingUrl);
     }
 
+    // 显示加载错误的view
     private void webError(int errorCode, String description, String failingUrl) {
+        mErrorUrl.add(failingUrl);
         if (mAbsWebUIController != null && mAbsWebUIController.get() != null) {
             mAbsWebUIController.get().onShowErrorPage(errorCode, description, failingUrl);
         }

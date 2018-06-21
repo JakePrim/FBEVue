@@ -30,15 +30,16 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
     private static final String[] data = new String[]{
             "Activity 使用PrimWeb",
             "Fragment 使用PrimWeb",
+            "识别电话、邮件、短信",
+            "自定义错误页面",
             "Java 调用 Js通信",
             "Js 调用 Java通信",
             "input标签文件上传",
             "自定义进度条",
-            "识别电话、邮件、短信",
             "自定义WebSetting设置",
             "下拉回弹(仿微信的效果)",
             "下拉刷新",
-            "感谢 AgentWeb 开源项目提供的思路"
+            "非常感谢 AgentWeb 开源项目提供的思路,参考了部分代码"
     };
 
     @Override

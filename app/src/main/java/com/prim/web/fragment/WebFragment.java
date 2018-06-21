@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +22,7 @@ import com.prim.web.R;
  * Use the {@link WebFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class WebFragment extends Fragment {
+public class WebFragment extends Fragment implements ItemSelected, FragmentKeyDown {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -76,11 +77,13 @@ public class WebFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_web, container, false);
     }
 
+    private PrimWeb primWeb;
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         webParent = (FrameLayout) view.findViewById(R.id.webParent);
-        PrimWeb.with(getActivity())
+        primWeb = PrimWeb.with(getActivity())
                 .setWebParent(webParent, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
                 .useDefaultUI()
                 .useDefaultTopIndicator()
@@ -112,6 +115,79 @@ public class WebFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        primWeb.webLifeCycle().onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        primWeb.webLifeCycle().onResume();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        primWeb.webLifeCycle().onDestory();
+    }
+
+    @Override
+    public void handlerBack() {
+        if (!primWeb.handlerBack()) {
+            getActivity().finish();
+        }
+    }
+
+    @Override
+    public void refresh() {
+        if (primWeb != null) {
+            primWeb.getUrlLoader().reload();
+        }
+    }
+
+    @Override
+    public void copy() {
+        if (primWeb != null) {
+            primWeb.copyUrl();
+        }
+    }
+
+    @Override
+    public void openBrowser() {
+        if (primWeb != null) {
+            primWeb.openBrowser(primWeb.getUrl());
+        }
+    }
+
+    @Override
+    public void clearWebViewCache() {
+        if (primWeb != null) {
+            primWeb.clearWebViewCache();
+        }
+    }
+
+    @Override
+    public void errorPage() {
+        if (primWeb != null) {
+            primWeb.getUrlLoader().loadUrl("http://www.unkownwebsiteblog.me");
+        }
+    }
+
+    @Override
+    public void enterPage() {
+        if (primWeb != null) {
+            primWeb.getUrlLoader().loadUrl("https://m.jd.com/");
+        }
+    }
+
+    @Override
+    public boolean handlerKeyEvent(int keyCode, KeyEvent event) {
+        if (primWeb == null) return false;
+        return primWeb.handlerKeyEvent(keyCode, event);
     }
 
     /**

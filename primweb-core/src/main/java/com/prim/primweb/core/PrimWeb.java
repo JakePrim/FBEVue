@@ -2,16 +2,23 @@ package com.prim.primweb.core;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.ColorInt;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import com.prim.primweb.core.handler.IKeyEvent;
 import com.prim.primweb.core.handler.IKeyEventInterceptor;
@@ -129,15 +136,11 @@ public class PrimWeb {
 
     private AbsWebUIController absWebUIController;
 
-    PrimWeb(PrimBuilder builder) {
-        doCheckSafe(builder);
-
-        createLayout(builder);
-
-        webLifeCycle = new WebLifeCycle(webView);
-        if (builder.mJavaObject != null && !builder.mJavaObject.isEmpty()) {
-            this.mJavaObject.putAll(builder.mJavaObject);
+    public static PrimBuilder with(Activity context) {
+        if (context == null) {
+            throw new NullPointerException("context can not be null");
         }
+        return new PrimBuilder(context);
     }
 
     public static void init(Application application) {
@@ -155,7 +158,26 @@ public class PrimWeb {
         });
     }
 
-    /** webview 安全检查 */
+
+    /**
+     * 飞船建造阶段 -- 初始化各种配置设定
+     *
+     * @param builder
+     *         飞船设定系统
+     */
+    PrimWeb(PrimBuilder builder) {
+        doCheckSafe(builder);
+
+        createLayout(builder);
+
+        webLifeCycle = new WebLifeCycle(webView);
+        if (builder.mJavaObject != null && !builder.mJavaObject.isEmpty()) {
+            this.mJavaObject.putAll(builder.mJavaObject);
+        }
+    }
+
+
+    /** webView 安全检查 --- 检查飞船的各种设定是否安全 */
     private void doCheckSafe(PrimBuilder builder) {
         this.webView = builder.webView;
         this.mView = builder.mView;
@@ -188,6 +210,12 @@ public class PrimWeb {
         }
     }
 
+    /**
+     * 创建WebView的layout --- 创建飞船整体,飞船建造完毕
+     *
+     * @param builder
+     *         PrimBuilder
+     */
     private void createLayout(PrimBuilder builder) {
         webViewManager = WebViewManager.createWebView()
                 .setActivity(context.get())
@@ -210,139 +238,7 @@ public class PrimWeb {
                 .build();
     }
 
-
-    public WebViewType getWebViewType() {
-        return webViewType;
-    }
-
-    /** 获取webview的父view */
-    public FrameLayout getRootView() {
-        if (null != webViewManager) {
-            return webViewManager.getWebParentView();
-        }
-        return null;
-    }
-
-    /** 获取调用js方法 */
-    public ICallJsLoader getCallJsLoader() {
-        checkWebView();
-        if (callJsLoader == null) {
-            callJsLoader = SafeCallJsLoaderImpl.getInstance(webView);
-        }
-        return callJsLoader;
-    }
-
-    /** 获取注入js脚本方法 */
-    public IJsInterface getJsInterface() {
-        checkWebView();
-        if (mJsInterface == null) {
-            mJsInterface = SafeJsInterface.getInstance(webView, modeType);
-        }
-        return mJsInterface;
-    }
-
-    /** 获取websettings， Object具体的是android webSetting 还是x5 webSetting 自己判断强转 */
-    public Object getWebSettings() {
-        if (null == setting) {
-            if (webViewType == WebViewType.Android) {
-                setting = new DefaultWebSetting(context.get());
-            } else {
-                setting = new X5DefaultWebSetting(context.get());
-            }
-        }
-        return setting.getWebSetting();
-    }
-
-    /** 长按图片等会用到 类型自己转换 */
-    public Object getHitTestResult() {
-        checkWebView();
-        return webView.getAgentHitTestResult();
-    }
-
-    /** 获取url加载器 加载URL和刷新url操作 */
-    public IUrlLoader getUrlLoader() {
-        checkWebView();
-        if (null == urlLoader) {
-            urlLoader = new UrlLoader(webView);
-        }
-        return urlLoader;
-    }
-
-    /** 设置webview的生命周期 */
-    public IWebLifeCycle webLifeCycle() {
-        if (webLifeCycle == null) {
-            if (webView != null) {
-                webLifeCycle = new WebLifeCycle(webView);
-            }
-        }
-        return webLifeCycle;
-    }
-
-    /** 获取webview */
-    public IAgentWebView getWebView() {
-        checkWebView();
-        return webView;
-    }
-
-    /** 获取真实的webview 类型可以自己强转 */
-    public View getRealWebView() {
-        checkWebView();
-        return webView.getAgentWebView();
-    }
-
-    /**
-     * Check for the presence of a JS method
-     *
-     * @param checkJsFunction
-     *         CommonJSListener
-     */
-    public void setListenerCheckJsFunction(CommonJSListener checkJsFunction) {
-        if (null == commonJSListener) {
-            this.commonJSListener = checkJsFunction;
-        }
-    }
-
-    /**
-     * handler back button
-     *
-     * @return true handler ;false no handler
-     */
-    public boolean handlerBack() {
-        checkWebView();
-        if (keyEvent == null) {
-            keyEvent = KeyEventHandler.getInstance(webView, keyEventInterceptor);
-        }
-        return keyEvent.back();
-    }
-
-    /**
-     * handler onKeyDown
-     *
-     * @param keyCode
-     *         keyCode
-     * @param event
-     *         KeyEvent
-     *
-     * @return true handler;false no handler
-     */
-    public boolean handlerKeyEvent(int keyCode, KeyEvent event) {
-        checkWebView();
-        if (keyEvent == null) {
-            keyEvent = KeyEventHandler.getInstance(webView, keyEventInterceptor);
-        }
-        return keyEvent.onKeyDown(keyCode, event);
-    }
-
-    /**
-     * check webView not null
-     */
-    private void checkWebView() {
-        if (null == webView) {
-            throw new NullPointerException("webView most not be null,please check your code!");
-        }
-    }
-
-    /** 准备阶段,检查完毕后加载url */
+    /** 飞船建造完毕进入 -- 准备阶段,检查所有引擎是否正常工作 */
     void ready() {
         // 加载 webView设置
         createSetting();
@@ -408,7 +304,7 @@ public class PrimWeb {
                 .build();
     }
 
-    /** 发起最终阶段 加载url */
+    /** 准备完毕 发起最终阶段 加载url -------> 飞船发射 */
     PrimWeb launch(String url) {
         if (null == headers || headers.isEmpty()) {
             urlLoader.loadUrl(url);
@@ -416,13 +312,6 @@ public class PrimWeb {
             urlLoader.loadUrl(url, headers);
         }
         return this;
-    }
-
-    public static PrimBuilder with(Activity context) {
-        if (context == null) {
-            throw new NullPointerException("context can not be null");
-        }
-        return new PrimBuilder(context);
     }
 
     public static class PrimBuilder {
@@ -515,6 +404,7 @@ public class PrimWeb {
 
     /**
      * webview的UI控制器设置
+     * 包括错误页面的设置和加载页面的设置
      */
     public static class UIControllerBuilder {
         private PrimBuilder primBuilder;
@@ -750,6 +640,164 @@ public class PrimWeb {
                 lastGo();
             }
             return primWeb.launch(url);
+        }
+    }
+
+
+    public WebViewType getWebViewType() {
+        return webViewType;
+    }
+
+    /** 获取webview的父view */
+    public FrameLayout getRootView() {
+        if (null != webViewManager) {
+            return webViewManager.getWebParentView();
+        }
+        return null;
+    }
+
+    /** 获取调用js方法 */
+    public ICallJsLoader getCallJsLoader() {
+        checkWebView();
+        if (callJsLoader == null) {
+            callJsLoader = SafeCallJsLoaderImpl.getInstance(webView);
+        }
+        return callJsLoader;
+    }
+
+    /** 获取注入js脚本方法 */
+    public IJsInterface getJsInterface() {
+        checkWebView();
+        if (mJsInterface == null) {
+            mJsInterface = SafeJsInterface.getInstance(webView, modeType);
+        }
+        return mJsInterface;
+    }
+
+    /** 获取websettings， Object具体的是android webSetting 还是x5 webSetting 自己判断强转 */
+    public Object getWebSettings() {
+        if (null == setting) {
+            if (webViewType == WebViewType.Android) {
+                setting = new DefaultWebSetting(context.get());
+            } else {
+                setting = new X5DefaultWebSetting(context.get());
+            }
+        }
+        return setting.getWebSetting();
+    }
+
+    /** 长按图片等会用到 类型自己转换 */
+    public Object getHitTestResult() {
+        checkWebView();
+        return webView.getAgentHitTestResult();
+    }
+
+    /** 获取url加载器 加载URL和刷新url操作 */
+    public IUrlLoader getUrlLoader() {
+        checkWebView();
+        if (null == urlLoader) {
+            urlLoader = new UrlLoader(webView);
+        }
+        return urlLoader;
+    }
+
+    /** 设置webview的生命周期 */
+    public IWebLifeCycle webLifeCycle() {
+        if (webLifeCycle == null) {
+            if (webView != null) {
+                webLifeCycle = new WebLifeCycle(webView);
+            }
+        }
+        return webLifeCycle;
+    }
+
+    /** 获取webview */
+    public IAgentWebView getWebView() {
+        checkWebView();
+        return webView;
+    }
+
+    /** 获取真实的webview 类型可以自己强转 */
+    public View getRealWebView() {
+        checkWebView();
+        return webView.getAgentWebView();
+    }
+
+    /**
+     * Check for the presence of a JS method
+     *
+     * @param checkJsFunction
+     *         CommonJSListener
+     */
+    public void setListenerCheckJsFunction(CommonJSListener checkJsFunction) {
+        if (null == commonJSListener) {
+            this.commonJSListener = checkJsFunction;
+        }
+    }
+
+    /**
+     * handler back button
+     *
+     * @return true handler ;false no handler
+     */
+    public boolean handlerBack() {
+        checkWebView();
+        if (keyEvent == null) {
+            keyEvent = KeyEventHandler.getInstance(webView, keyEventInterceptor);
+        }
+        return keyEvent.back();
+    }
+
+    /**
+     * handler onKeyDown
+     *
+     * @param keyCode
+     *         keyCode
+     * @param event
+     *         KeyEvent
+     *
+     * @return true handler;false no handler
+     */
+    public boolean handlerKeyEvent(int keyCode, KeyEvent event) {
+        checkWebView();
+        if (keyEvent == null) {
+            keyEvent = KeyEventHandler.getInstance(webView, keyEventInterceptor);
+        }
+        return keyEvent.onKeyDown(keyCode, event);
+    }
+
+    public String getUrl() {
+        checkWebView();
+        return webView.getAgentUrl();
+    }
+
+    public void copyUrl() {
+        ClipboardManager mClipboardManager = (ClipboardManager) context.get().getSystemService(Context.CLIPBOARD_SERVICE);
+        mClipboardManager.setPrimaryClip(ClipData.newPlainText(null, getUrl()));
+    }
+
+    public void openBrowser(String targetUrl) {
+        if (TextUtils.isEmpty(targetUrl) || targetUrl.startsWith("file://")) {
+            Toast.makeText(context.get(), targetUrl + "无效的链接无法使用浏览器打开", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Intent intent = new Intent();
+        intent.setAction("android.intent.action.VIEW");
+        Uri mUri = Uri.parse(targetUrl);
+        intent.setData(mUri);
+        context.get().startActivity(intent);
+    }
+
+    public void clearWebViewCache() {
+
+    }
+
+    /**
+     * check webView not null
+     */
+    private void checkWebView() {
+        if (null == webView) {
+            throw new NullPointerException("webView most not be null,please check your code!");
         }
     }
 }

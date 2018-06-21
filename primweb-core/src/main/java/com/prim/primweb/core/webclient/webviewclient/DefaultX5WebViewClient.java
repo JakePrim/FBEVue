@@ -5,19 +5,26 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 
+import com.prim.primweb.core.uicontroller.AbsWebUIController;
 import com.prim.primweb.core.webclient.PrimWebClient;
 import com.prim.primweb.core.webclient.base.BaseX5WebViewClient;
 import com.prim.primweb.core.webview.IAgentWebView;
+import com.tencent.smtt.export.external.interfaces.WebResourceError;
 import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
 import com.tencent.smtt.sdk.WebView;
 import com.tencent.smtt.sdk.WebViewClient;
 
 import java.lang.ref.WeakReference;
 import java.net.URISyntaxException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.prim.primweb.core.webclient.ClientConstance.INTENT_SCHEME;
 import static com.prim.primweb.core.webclient.ClientConstance.SCHEME_SMS;
@@ -39,12 +46,16 @@ public class DefaultX5WebViewClient extends BaseX5WebViewClient {
      */
     private boolean alwaysOpenOtherPage = true;
 
-    private PrimWebClient.Builder builder;
+    private WeakReference<AbsWebUIController> mAbsWebUIController;
+
+    private Set<String> mErrorUrl = new HashSet<>();
+
+    private Set<String> mWaitLoadUrl = new HashSet<>();
 
     public DefaultX5WebViewClient(Activity activity, PrimWebClient.Builder builder) {
         weakReference = new WeakReference<>(activity);
-        this.builder = builder;
         alwaysOpenOtherPage = builder.alwaysOpenOtherPage;
+        mAbsWebUIController = new WeakReference<>(builder.absWebUIController);
     }
 
     @Override
@@ -96,6 +107,52 @@ public class DefaultX5WebViewClient extends BaseX5WebViewClient {
             return true;
         }
         return super.shouldOverrideUrlLoading(view, request);
+    }
+
+    @Override
+    public void onPageStarted(WebView view, String url, Bitmap favicon) {
+        if (!mWaitLoadUrl.contains(url)) {
+            mWaitLoadUrl.add(url);
+        }
+        super.onPageStarted(view, url, favicon);
+    }
+
+    @Override
+    public void onPageFinished(WebView view, String url) {
+        if (!mErrorUrl.contains(url) && mWaitLoadUrl.contains(url)) {
+            if (mAbsWebUIController != null && mAbsWebUIController.get() != null) {
+                mAbsWebUIController.get().onHideErrorPage();
+            }
+        }
+        if (mWaitLoadUrl.contains(url)) {
+            mWaitLoadUrl.remove(url);
+        }
+        if (!mErrorUrl.isEmpty()) {
+            mErrorUrl.clear();
+        }
+        super.onPageFinished(view, url);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    @Override
+    public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+        if (request.isForMainFrame()) {
+            webError(error.getErrorCode(), error.getDescription().toString(), request.getUrl().toString());
+        }
+        super.onReceivedError(view, request, error);
+    }
+
+    @Override
+    public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+        webError(errorCode, description, failingUrl);
+        super.onReceivedError(view, errorCode, description, failingUrl);
+    }
+
+    private void webError(int errorCode, String description, String failingUrl) {
+        mErrorUrl.add(failingUrl);
+        if (mAbsWebUIController != null && mAbsWebUIController.get() != null) {
+            mAbsWebUIController.get().onShowErrorPage(errorCode, description, failingUrl);
+        }
     }
 
     private int queryActivitysNum(String url) {

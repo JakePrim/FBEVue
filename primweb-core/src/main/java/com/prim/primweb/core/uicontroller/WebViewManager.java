@@ -255,6 +255,8 @@ public class WebViewManager implements IWebViewManager {
             webParentLayout.setErrorView(errorView);
         }
         webParentLayout.setErrorLayoutRes(errorLayout, errorClickId);
+        webParentLayout.createErrorView();
+        webParentLayout.hideErrorPage();
         if (loadView != null) {
             webParentLayout.setLoadView(loadView);
         }

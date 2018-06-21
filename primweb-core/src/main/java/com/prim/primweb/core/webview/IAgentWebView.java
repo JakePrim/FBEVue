@@ -97,4 +97,6 @@ public interface IAgentWebView<T> {
 
     void agentScrollBy(int x, int y);
 
+    String getAgentUrl();
+
 }

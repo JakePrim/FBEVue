@@ -73,7 +73,7 @@ public class WebParentLayout extends FrameLayout {
         absWebUIController.setWebParentLayout(this);
     }
 
-    private void createErrorView() {
+    public void createErrorView() {
         FrameLayout mFrameLayout = new FrameLayout(getContext());
         if (errorView == null) {
             LayoutInflater.from(getContext()).inflate(errorLayoutRes, mFrameLayout, true);
@@ -82,9 +82,9 @@ public class WebParentLayout extends FrameLayout {
         }
         final ViewGroup.LayoutParams layoutParams = getLayoutParams();
         if (layoutParams != null) {
-            this.addView(this.mErrorLayout = mFrameLayout, 2, layoutParams);
+            this.addView(this.mErrorLayout = mFrameLayout, layoutParams);
         } else {
-            this.addView(this.mErrorLayout = mFrameLayout, 2);
+            this.addView(this.mErrorLayout = mFrameLayout);
         }
         mFrameLayout.setVisibility(VISIBLE);
         if (clickId != -1) {
@@ -141,18 +141,18 @@ public class WebParentLayout extends FrameLayout {
         }
     }
 
-    private void createLoadView() {
+    public void createLoadView() {
         FrameLayout mFrameLayout = new FrameLayout(getContext());
         if (loadView == null) {
             LayoutInflater.from(getContext()).inflate(loadLayoutRes, mFrameLayout, true);
         } else {
-            mFrameLayout.addView(loadView, 3);
+            mFrameLayout.addView(loadView);
         }
         final ViewGroup.LayoutParams layoutParams = getLayoutParams();
         if (layoutParams != null) {
-            this.addView(this.mLoadLayout = mFrameLayout, 3, layoutParams);
+            this.addView(this.mLoadLayout = mFrameLayout, layoutParams);
         } else {
-            this.addView(this.mLoadLayout = mFrameLayout, 3);
+            this.addView(this.mLoadLayout = mFrameLayout);
         }
     }
 

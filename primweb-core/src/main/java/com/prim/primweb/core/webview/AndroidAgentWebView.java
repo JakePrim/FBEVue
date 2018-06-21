@@ -143,6 +143,11 @@ public class AndroidAgentWebView extends WebView implements IAgentWebView<WebSet
     }
 
     @Override
+    public String getAgentUrl() {
+        return this.getUrl();
+    }
+
+    @Override
     public void removeRiskJavascriptInterface() {
         //显式移除有风险的 Webview 系统隐藏接口
         this.removeJavascriptInterface("searchBoxJavaBridge_");
