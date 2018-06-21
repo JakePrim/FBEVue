@@ -60,6 +60,7 @@ public class WebParentLayout extends FrameLayout {
     public WebParentLayout(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         errorLayoutRes = R.layout.lib_web_error_page;
+        loadLayoutRes = R.layout.lib_web_load_page;
     }
 
     public void showErrorPage() {
@@ -141,18 +142,13 @@ public class WebParentLayout extends FrameLayout {
 
     public void createLoadView() {
         FrameLayout mFrameLayout = new FrameLayout(getContext());
-
         if (loadView == null) {
             LayoutInflater.from(getContext()).inflate(loadLayoutRes, mFrameLayout, true);
         } else {
             mFrameLayout.addView(loadView);
         }
-        final ViewGroup.LayoutParams layoutParams = getLayoutParams();
-        if (layoutParams != null) {
-            this.addView(this.mLoadLayout = mFrameLayout, layoutParams);
-        } else {
-            this.addView(this.mLoadLayout = mFrameLayout);
-        }
+        FrameLayout.LayoutParams lp = new LayoutParams(-1, -1);
+        this.addView(this.mLoadLayout = mFrameLayout, lp);
     }
 
     public void hideLoading() {
@@ -167,6 +163,9 @@ public class WebParentLayout extends FrameLayout {
 
     public void setLoadLayoutRes(@LayoutRes int layoutRes) {
         this.loadLayoutRes = layoutRes;
+        if (layoutRes <= 0) {
+            this.loadLayoutRes = R.layout.lib_web_load_page;
+        }
     }
 
     public void bindWebView(IAgentWebView agentWebView) {

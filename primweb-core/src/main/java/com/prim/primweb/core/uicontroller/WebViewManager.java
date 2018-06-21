@@ -261,6 +261,8 @@ public class WebViewManager implements IWebViewManager {
             webParentLayout.setLoadView(loadView);
         }
         webParentLayout.setLoadLayoutRes(loadLayout);
+        webParentLayout.createLoadView();
+        webParentLayout.hideLoading();
         if (needTopIndicator) {//设置显示顶部指示器
             if (!customTopIndicator) {//使用默认的指示器
                 FrameLayout.LayoutParams layoutParams2 = null;

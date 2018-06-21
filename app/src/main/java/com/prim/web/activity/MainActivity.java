@@ -35,11 +35,13 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
             "Java 调用 Js通信",
             "Js 调用 Java通信",
             "input标签文件上传",
-            "自定义进度条",
+            "Js通信文件上传",
+            "文件下载",
             "自定义WebSetting设置",
+            "自定义进度条",
             "下拉回弹(仿微信的效果)",
             "下拉刷新",
-            "非常感谢 AgentWeb 开源项目提供的思路,参考了部分代码"
+            "非常感谢AgentWeb开源项目提供的思路,参考了部分代码"
     };
 
     @Override

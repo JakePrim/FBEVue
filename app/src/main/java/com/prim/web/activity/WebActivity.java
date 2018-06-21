@@ -1,15 +1,9 @@
 package com.prim.web.activity;
 
-import android.annotation.SuppressLint;
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
-import android.graphics.Bitmap;
+import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.PopupMenu;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,11 +11,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebResourceRequest;
-import android.webkit.WebView;
 import android.widget.RelativeLayout;
 
 import com.prim.primweb.core.PrimWeb;
-import com.prim.primweb.core.webclient.WebChromeClient;
 import com.prim.primweb.core.webclient.webviewclient.AgentWebViewClient;
 import com.prim.primweb.core.webview.IAgentWebView;
 import com.prim.web.R;

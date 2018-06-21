@@ -430,6 +430,11 @@ public class PrimWeb {
             return new IndicatorBuilder(primBuilder);
         }
 
+        public IndicatorBuilder useCustomUI(@LayoutRes int errorLayout) {
+            this.primBuilder.errorLayout = errorLayout;
+            return new IndicatorBuilder(primBuilder);
+        }
+
         public IndicatorBuilder useCustomUI(@NonNull View errorView, @NonNull View loadView) {
             this.primBuilder.errorView = errorView;
             this.primBuilder.loadView = loadView;
@@ -483,13 +488,26 @@ public class PrimWeb {
             return new CommonBuilder(primBuilder);
         }
 
-        public CommonBuilder useCustomIndicator(@NonNull BaseIndicatorView indicatorView) {
+        /**
+         * 使用自定义的进度指示器 注意需要继承{@link BaseIndicatorView}
+         *
+         * @param indicatorView
+         *         自定义的指示器view
+         *
+         * @return CommonBuilder
+         */
+        public CommonBuilder useCustomTopIndicator(@NonNull BaseIndicatorView indicatorView) {
             this.primBuilder.mIndicatorView = indicatorView;
             this.primBuilder.needTopIndicator = true;
             this.primBuilder.customTopIndicator = true;
             return new CommonBuilder(primBuilder);
         }
 
+        /**
+         * 关闭进度指示器
+         *
+         * @return CommonBuilder
+         */
         public CommonBuilder colseTopIndicator() {
             this.primBuilder.needTopIndicator = false;
             this.primBuilder.customTopIndicator = false;
@@ -526,13 +544,13 @@ public class PrimWeb {
             return this;
         }
 
-        /** 设置url加载器 */
+        /** 设置自定义的url加载器 */
         public CommonBuilder setUrlLoader(IUrlLoader urlLoader) {
             primBuilder.urlLoader = urlLoader;
             return this;
         }
 
-        /** 设置js 方法加载器 */
+        /** 设置自定义js 方法加载器 */
         public CommonBuilder setCallJsLoader(ICallJsLoader callJsLoader) {
             primBuilder.callJsLoader = callJsLoader;
             return this;
@@ -589,15 +607,18 @@ public class PrimWeb {
         }
 
         /** 注入js脚本 */
-        public JsInterfaceBuilder addJavascriptInterface(@NonNull String name, @NonNull Object o) {
-            return new JsInterfaceBuilder(primBuilder).addJavascriptInterface(name, o);
+        public CommonBuilder addJavascriptInterface(@NonNull String name, @NonNull Object o) {
+            primBuilder.addJavaObject(name, o);
+            return this;
         }
 
+        /** 是否允许打开其他应用 */
         public CommonBuilder alwaysOpenOtherPage(boolean alwaysOpenOtherPage) {
             primBuilder.alwaysOpenOtherPage = alwaysOpenOtherPage;
             return this;
         }
 
+        /** 设置自定义的UI控制器 */
         public CommonBuilder setWebUIController(AbsWebUIController absWebUIController) {
             primBuilder.absWebUIController = absWebUIController;
             return this;
@@ -609,25 +630,25 @@ public class PrimWeb {
         }
     }
 
-    public static class JsInterfaceBuilder {
-        private PrimBuilder primBuilder;
-
-        public JsInterfaceBuilder(PrimBuilder primBuilder) {
-            this.primBuilder = primBuilder;
-        }
-
-        /** 注入js脚本 */
-        public JsInterfaceBuilder addJavascriptInterface(@NonNull String name, @NonNull Object o) {
-            primBuilder.addJavaObject(name, o);
-            return this;
-        }
-
-        /** 设置完成开始建造 */
-        public PerBuilder buildWeb() {
-            return primBuilder.build();
-        }
-
-    }
+//    public static class JsInterfaceBuilder {
+//        private PrimBuilder primBuilder;
+//
+//        public JsInterfaceBuilder(PrimBuilder primBuilder) {
+//            this.primBuilder = primBuilder;
+//        }
+//
+//        /** 注入js脚本 */
+//        public JsInterfaceBuilder addJavascriptInterface(@NonNull String name, @NonNull Object o) {
+//            primBuilder.addJavaObject(name, o);
+//            return this;
+//        }
+//
+//        /** 设置完成开始建造 */
+//        public PerBuilder buildWeb() {
+//            return primBuilder.build();
+//        }
+//
+//    }
 
     /** 设置完成准备发射 */
     public static class PerBuilder {
