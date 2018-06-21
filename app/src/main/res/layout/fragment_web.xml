@@ -1,12 +1,59 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             tools:context="com.prim.web.fragment.WebFragment">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context="com.prim.web.fragment.WebFragment">
 
     <FrameLayout
         android:id="@+id/webParent"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:layout_below="@+id/ll_JS"/>
 
-</FrameLayout>
+    <LinearLayout
+        android:id="@+id/ll_JS"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="20dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <Button
+            android:id="@+id/jsClick1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Java调用JS无参数方法"/>
+
+        <Button
+            android:id="@+id/jsClick2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Java调用JS一个参数方法"/>
+
+        <Button
+            android:id="@+id/jsClick3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Java调用JS多个参数方法"/>
+
+        <Button
+            android:id="@+id/jsClick4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Java调用JS方法 --> JS调用Java方法"/>
+
+        <Button
+            android:id="@+id/jsClick6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="检查当前页面JS方法不存在"/>
+
+        <Button
+            android:id="@+id/jsClick5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="检查当前页面JS方法存在"/>
+    </LinearLayout>
+</RelativeLayout>

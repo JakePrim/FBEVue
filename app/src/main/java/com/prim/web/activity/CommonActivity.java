@@ -66,6 +66,8 @@ public class CommonActivity extends AppCompatActivity implements WebFragment.OnF
                 fragmentTransaction.add(R.id.frame_layout, webFragment = WebFragment.newInstance(url, "CustomErrorPage"), WebFragment.class.getSimpleName());
                 break;
             case "3":
+                url = "file:///android_asset/js_interaction/hello.html";
+                fragmentTransaction.add(R.id.frame_layout, webFragment = WebFragment.newInstance(url, "JS"), WebFragment.class.getSimpleName());
                 break;
             case "4":
                 break;

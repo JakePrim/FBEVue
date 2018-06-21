@@ -61,8 +61,8 @@ public class X5DefaultWebSetting extends BaseAgentWebSetting<WebSettings> {
         webSetting.setGeolocationDatabasePath(context.getCacheDir().getAbsolutePath() + APP_CACAHE_DIRNAME);
         webSetting.setNeedInitialFocus(true);
         webSetting.setDefaultTextEncodingName("utf-8");//设置编码格式
-//        webSetting.setDefaultFontSize(16);//设置 WebView 默认的字体大小
-//        webSetting.setMinimumFontSize(12);//设置 WebView 支持的最小字体大小，默认为 8
+        webSetting.setDefaultFontSize(16);//设置 WebView 默认的字体大小
+        webSetting.setMinimumFontSize(12);//设置 WebView 支持的最小字体大小，默认为 8
         //启用地理定位
         webSetting.setGeolocationEnabled(true);
         //设置可以使用localStorage

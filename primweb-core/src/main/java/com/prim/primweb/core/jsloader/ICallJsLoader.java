@@ -14,12 +14,12 @@ import android.support.annotation.RequiresApi;
  */
 public interface ICallJsLoader {
     @RequiresApi(Build.VERSION_CODES.KITKAT)
-    void callJs(String method, AgentValueCallback<String> callback, String... params);
+    void callJs(String method, AgentValueCallback<String> callback, Object... params);
 
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     void callJs(String method, AgentValueCallback<String> callback);
 
-    void callJS(String method, String... params);
+    void callJS(String method, Object... params);
 
     void callJS(String method);
 

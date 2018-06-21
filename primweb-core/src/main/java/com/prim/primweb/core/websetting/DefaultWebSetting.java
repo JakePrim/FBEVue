@@ -68,8 +68,8 @@ public class DefaultWebSetting extends BaseAgentWebSetting<WebSettings> {
         //false 禁止webview上面控件获取焦点(黄色边框)
         webSetting.setNeedInitialFocus(true);
         webSetting.setDefaultTextEncodingName("utf-8");//设置编码格式
-//        webSetting.setDefaultFontSize(16);
-//        webSetting.setMinimumFontSize(12);//设置 WebView 支持的最小字体大小，默认为 8
+        webSetting.setDefaultFontSize(16);
+        webSetting.setMinimumFontSize(12);//设置 WebView 支持的最小字体大小，默认为 8
         //启用地理定位
         webSetting.setGeolocationEnabled(true);
         //设置可以使用localStorage

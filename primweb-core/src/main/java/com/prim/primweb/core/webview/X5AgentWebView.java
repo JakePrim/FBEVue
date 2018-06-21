@@ -45,7 +45,11 @@ public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings
     }
 
     public X5AgentWebView(Context context, AttributeSet attributeSet) {
-        super(context, attributeSet);
+        this(context, attributeSet,-1);
+    }
+
+    public X5AgentWebView(Context context, AttributeSet attributeSet, int i) {
+        super(context, attributeSet, i);
     }
 
     @Override

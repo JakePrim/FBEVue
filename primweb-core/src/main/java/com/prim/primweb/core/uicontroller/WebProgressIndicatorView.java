@@ -85,7 +85,6 @@ public class WebProgressIndicatorView extends BaseIndicatorView implements IBase
 
     public WebProgressIndicatorView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        Log.e(TAGS, "WebProgressIndicatorView: ");
         init(context, attrs);
     }
 
@@ -131,8 +130,7 @@ public class WebProgressIndicatorView extends BaseIndicatorView implements IBase
 
     @Override
     protected void dispatchDraw(Canvas canvas) {
-//        canvas.drawRect(0, 0, getWidth(), getHeight(), mSecondPaint);//绘制底部背景进度
-        Log.e(TAGS, "dispatchDraw: getHeight --> " + getHeight() + " | getWidth --> " + getWidth());
+        canvas.drawRect(0, 0, getWidth(), getHeight(), mSecondPaint);//绘制底部背景进度
         canvas.drawRect(0, 0, mCurrentProgress / 100 * Float.valueOf(this.getWidth()), this.getHeight(), mPaint);
     }
 
@@ -174,7 +172,6 @@ public class WebProgressIndicatorView extends BaseIndicatorView implements IBase
         if (getVisibility() == GONE) {
             this.setVisibility(VISIBLE);
             mCurrentProgress = 0f;
-            Log.e(TAGS, "show: ");
             startAnim(false);
         }
     }

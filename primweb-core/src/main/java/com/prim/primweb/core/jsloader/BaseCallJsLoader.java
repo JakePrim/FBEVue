@@ -49,7 +49,7 @@ public abstract class BaseCallJsLoader implements ICallJsLoader {
     }
 
     @Override
-    public void callJs(String method, AgentValueCallback<String> callback, String... params) {
+    public void callJs(String method, AgentValueCallback<String> callback, Object... params) {
         StringBuilder sb = new StringBuilder();
         sb.append("javascript:").append(method);
         if (params == null || params.length == 0) {
@@ -62,28 +62,28 @@ public abstract class BaseCallJsLoader implements ICallJsLoader {
 
     @Override
     public void callJs(String method, AgentValueCallback<String> callback) {
-        this.callJs(method, callback, (String[]) null);
+        this.callJs(method, callback, (Object[]) null);
     }
 
     @Override
-    public void callJS(String method, String... params) {
+    public void callJS(String method, Object... params) {
         this.callJs(method, null, params);
     }
 
     @Override
     public void callJS(String method) {
-        this.callJS(method, (String[]) null);
+        this.callJS(method, (Object[]) null);
     }
 
     /** 拼接参数 */
-    private StringBuilder splice(String... params) {
+    private StringBuilder splice(Object... params) {
         StringBuilder sb = new StringBuilder();
-        for (String param : params) {
-//            if (PrimWebUtils.isJson(param)) {
-//                sb.append("'").append(param).append("'");
-//            } else {
-//            }
-            sb.append(param);
+        for (Object param : params) {
+            if (param instanceof String) {
+                sb.append("'").append(param).append("'");
+            } else {
+                sb.append(param);
+            }
             sb.append(",");
         }
         sb.deleteCharAt(sb.length() - 1);

@@ -13,6 +13,8 @@
         margin:0;
     }
 
+
+
     </style>
     <link rel="stylesheet" type="text/css" href="./button.css">
     <script type="text/javascript">
@@ -42,8 +44,8 @@
   }
   function callByAndroidMoreParams(objs,msg2,msg3){
      
-     alert("Js收到消息："+"id:"+objs.id.toString()+" name:"+objs.name+" age:"+objs.age.toString()+msg2+msg3);
-    showElement("Js收到消息-->方法callByAndroidMoreParam被调用 , 参数1:"+objs+"  参数2:"+msg2+"  参数3:"+msg3);
+     alert("Js收到消息："+"objs:"+objs+" | "+msg2+" --> say: "+msg3);
+     showElement("Js收到消息-->方法callByAndroidMoreParam被调用 , 参数1:"+objs+"  参数2:"+msg2+"  参数3:"+msg3);
      return "ok";
   }
 
@@ -55,23 +57,25 @@
 
   }
 
-
   function showElement(msg){
       var div   =document.getElementById("div_box");  //获取div
-      var ele=document.createElement('h6');    //创建h2元素节点
+      var ele=document.createElement('h2');    //创建h2元素节点
       ele.innerHTML=msg;                //设置h2节点的内容
       div.appendChild(ele);                    //添加子节点ele
+  }
 
 
-}
+
+
+
 
 
     </script>
 </head>
 <body style="width: 100%;height: 100%;padding: 0px">
-
+<h2>1234</h2>
 <div id="div_box"
-     style="width: 100%;min-height: 100%;position: absolute;background: #0ff;margin-top: -50px;margin: 0px">
+     style="width: 100%;min-height: 100%;position: absolute;background: #fff;margin-top: -50px;margin: 0px">
 
 
 </div>
