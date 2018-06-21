@@ -1,6 +1,7 @@
 package com.prim.primweb.core.uicontroller;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
@@ -75,17 +76,14 @@ public class WebParentLayout extends FrameLayout {
 
     public void createErrorView() {
         FrameLayout mFrameLayout = new FrameLayout(getContext());
+        mFrameLayout.setBackgroundColor(Color.parseColor("#ffffff"));
         if (errorView == null) {
             LayoutInflater.from(getContext()).inflate(errorLayoutRes, mFrameLayout, true);
         } else {
             mFrameLayout.addView(errorView);
         }
-        final ViewGroup.LayoutParams layoutParams = getLayoutParams();
-        if (layoutParams != null) {
-            this.addView(this.mErrorLayout = mFrameLayout, layoutParams);
-        } else {
-            this.addView(this.mErrorLayout = mFrameLayout);
-        }
+        FrameLayout.LayoutParams lp = new LayoutParams(-1, -1);
+        this.addView(this.mErrorLayout = mFrameLayout, lp);
         mFrameLayout.setVisibility(VISIBLE);
         if (clickId != -1) {
             View clickView = mFrameLayout.findViewById(clickId);
@@ -143,6 +141,7 @@ public class WebParentLayout extends FrameLayout {
 
     public void createLoadView() {
         FrameLayout mFrameLayout = new FrameLayout(getContext());
+
         if (loadView == null) {
             LayoutInflater.from(getContext()).inflate(loadLayoutRes, mFrameLayout, true);
         } else {

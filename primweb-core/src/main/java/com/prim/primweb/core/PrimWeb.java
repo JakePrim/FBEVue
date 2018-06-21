@@ -424,9 +424,20 @@ public class PrimWeb {
             return new IndicatorBuilder(primBuilder);
         }
 
+        public IndicatorBuilder useCustomUI(@LayoutRes int errorLayout, @IdRes int errorClickId) {
+            this.primBuilder.errorLayout = errorLayout;
+            this.primBuilder.errorClickId = errorClickId;
+            return new IndicatorBuilder(primBuilder);
+        }
+
         public IndicatorBuilder useCustomUI(@NonNull View errorView, @NonNull View loadView) {
             this.primBuilder.errorView = errorView;
             this.primBuilder.loadView = loadView;
+            return new IndicatorBuilder(primBuilder);
+        }
+
+        public IndicatorBuilder useCustomUI(@NonNull View errorView) {
+            this.primBuilder.errorView = errorView;
             return new IndicatorBuilder(primBuilder);
         }
     }

@@ -83,14 +83,26 @@ public class WebFragment extends Fragment implements ItemSelected, FragmentKeyDo
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         webParent = (FrameLayout) view.findViewById(R.id.webParent);
-        primWeb = PrimWeb.with(getActivity())
-                .setWebParent(webParent, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
-                .useDefaultUI()
-                .useDefaultTopIndicator()
-                .setWebViewType(PrimWeb.WebViewType.Android)
-                .buildWeb()
-                .lastGo()
-                .launch(mParam1);
+        if (mParam2.equals("CustomErrorPage")) {
+            primWeb = PrimWeb.with(getActivity())
+                    .setWebParent(webParent, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+                    .useCustomUI(R.layout.custom_error_page, R.id.click_refush)
+                    .useDefaultTopIndicator()
+                    .setWebViewType(PrimWeb.WebViewType.Android)
+                    .buildWeb()
+                    .lastGo()
+                    .launch(mParam1);
+        } else {
+            primWeb = PrimWeb.with(getActivity())
+                    .setWebParent(webParent, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+                    .useDefaultUI()
+                    .useDefaultTopIndicator()
+                    .setWebViewType(PrimWeb.WebViewType.Android)
+                    .buildWeb()
+                    .lastGo()
+                    .launch(mParam1);
+        }
+
     }
 
     // TODO: Rename method, update argument and hook method into UI event
