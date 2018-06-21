@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.Toast;
 
 import com.prim.primweb.core.R;
 import com.prim.primweb.core.utils.ImageHandlerUtil;
@@ -79,9 +80,11 @@ public class FileValueCallbackMiddleActivity extends Activity implements View.On
         Intent intent = getIntent();
         String type = intent.getStringExtra(KEY_TYPE);
         if (TextUtils.isEmpty(type)) {
+            Toast.makeText(this, "请设定要上传的文件类型", Toast.LENGTH_SHORT).show();
             finish();
+        } else {
+            getFile(type);
         }
-        getFile(type);
     }
 
     private void clear() {
@@ -292,7 +295,7 @@ public class FileValueCallbackMiddleActivity extends Activity implements View.On
 
     @Override
     protected void onDestroy() {
-        if (commentDialog != null || commentDialog.isShowing()) {
+        if (commentDialog != null) {
             commentDialog.dismiss();
             commentDialog = null;
         }

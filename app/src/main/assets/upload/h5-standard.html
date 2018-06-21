@@ -1,0 +1,44 @@
+<!DOCTYPE html>  
+<html>  
+<head>  
+<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+  <meta name="format-detection"content="telephone=no, email=no" />
+<title>客户端页面</title>  
+</head>  
+<style>
+  html, body{width: 100%; height: 100%;}
+  body {margin: 0;}
+  .button-wrapper {padding:0 20px 20px;}
+  .button-wrapper button {padding: 0; border: none; width: 100%; background-color: #face19; border: 1px solid #f8ae11; height: 46px; border-radius: 4px; font-size: 16px; color: #000; font-weight: bold;margin-top: 20px; position: relative;overflow: hidden;}
+  .img-show {width:100%;height:200px;display:block;object-fit: contain;object-position: center center;background-color: #000;margin-top: 20px;}
+  .video_control {position: relative; background-color:#000; overflow: hidden; padding-bottom: 56.25%; width: 100%; margin-top: 20px;}
+  .video_control video {position: absolute; left:0; top:0; bottom:0; width: 100%; height: 100%; z-index: 0; margin-bottom: -6px; overflow: hidden; object-fit: contain; object-position: center center;}
+  .upload-btn {position:absolute;right:0;top:0;width:200%;height:100%;cursor:pointer;opacity: 0;filter:alpha(opacity=0);font-size:250%;-webkit-tap-highlight-color: transparent;}
+</style>
+<body>
+<section class="button-wrapper">
+  
+  <img class="img-show" src="" id="img"/>
+  <button>H5上传图片文件<input type="file" accept="image/*" class="upload-btn" id='upload_btn3' enctype="multipart/form-data" name='m_file1'/></button>
+  <section class="video_control">
+    <video id="player" controls src="" preload="metadata" type="video/mp4"></video>
+  </section>
+  <button>H5上传视频文件<input type="file" accept="video/*" class="upload-btn" id='upload_btn4' enctype="multipart/form-data" name='m_file3'/></button>
+  
+  <!-- <img class="img-show" src="" id="img-app"/>
+  <button>客户端上传图片文件<input type="file" accept="image/*" class="upload-btn" id='upload_btn1' enctype="multipart/form-data" name='m_file2'/></button>
+  <section class="video_control">
+    <video id="player-app" controls src="" preload webkit-playsinline x-webkit-airplay="true"  playsinline="true" x5-video-player-type="h5" x5-video-player-fullscreen="true"></video>
+  </section>
+  <button>客户端上传视频文件<input type="file" accept="video/*" class="upload-btn" id='upload_btn2' enctype="multipart/form-data" name='m_file3'/></button>
+ -->
+
+  <!-- <audio id="J-audio" src="" controls="" loop="">HTML5 audio not supported</audio> -->
+  <!-- <button id="J-audio-3">系统音频文件/录音<input type="file" accept="audio/*" class="upload-btn" id='upload_btn4' enctype="multipart/form-data" name='m_file4'/></button> -->
+
+</section>
+<script type="text/javascript" src="js/jquery-1.8.2.min.js"></script>
+<script type="text/javascript" src="js/h5-standard.js"></script>
+</body>  
+</html>  

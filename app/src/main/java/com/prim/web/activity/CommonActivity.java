@@ -70,16 +70,18 @@ public class CommonActivity extends AppCompatActivity implements WebFragment.OnF
                 fragmentTransaction.add(R.id.frame_layout, webFragment = WebFragment.newInstance(url, "JS"), WebFragment.class.getSimpleName());
                 break;
             case "4":
+                url = "file:///android_asset/upload/h5-standard.html";
+                fragmentTransaction.add(R.id.frame_layout, webFragment = WebFragment.newInstance(url, "Upload"), WebFragment.class.getSimpleName());
                 break;
             case "5":
+                url = "file:///android_asset/upload_file/jsuploadfile.html";
+                fragmentTransaction.add(R.id.frame_layout, webFragment = WebFragment.newInstance(url, "JS - Upload"), WebFragment.class.getSimpleName());
                 break;
             case "6":
                 break;
             case "7":
                 break;
             case "8":
-                break;
-            case "9":
                 break;
         }
         fragmentTransaction.commit();
