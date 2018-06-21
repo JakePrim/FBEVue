@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
-import android.util.Log;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
@@ -18,7 +17,6 @@ import android.webkit.WebViewClient;
 
 import com.prim.primweb.core.uicontroller.AbsWebUIController;
 import com.prim.primweb.core.webclient.PrimWebClient;
-import com.prim.primweb.core.webclient.base.BaseAndroidWebClient;
 import com.prim.primweb.core.webview.IAgentWebView;
 
 import java.lang.ref.WeakReference;

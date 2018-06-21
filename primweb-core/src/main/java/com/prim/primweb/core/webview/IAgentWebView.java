@@ -4,7 +4,6 @@ import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebViewClient;
 
-import com.prim.primweb.core.webclient.IAgentWebChromeClient;
 import com.prim.primweb.core.jsloader.AgentValueCallback;
 import com.prim.primweb.core.listener.OnScrollChangeListener;
 
@@ -69,11 +68,9 @@ public interface IAgentWebView<T> {
     void setAgentWebViewClient(com.tencent.smtt.sdk.WebViewClient webViewClient);
 
     /** 设置代理的WebChromeClient */
-    void setAgentWebChromeClient(IAgentWebChromeClient webChromeClient);
+    void setAgentWebChromeClient(WebChromeClient webChromeClient);
 
-    void setAndroidWebChromeClient(WebChromeClient webChromeClient);
-
-    void setX5WebChromeClient(com.tencent.smtt.sdk.WebChromeClient webChromeClient);
+    void setAgentWebChromeClient(com.tencent.smtt.sdk.WebChromeClient webChromeClient);
 
     void setOnScrollChangeListener(OnScrollChangeListener listener);
 

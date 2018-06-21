@@ -1,14 +1,17 @@
 package com.prim.primweb.core.webclient.webviewclient;
 
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.net.http.SslError;
 import android.os.Message;
+import android.view.InputEvent;
 import android.view.KeyEvent;
 import android.webkit.ClientCertRequest;
 import android.webkit.HttpAuthHandler;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceResponse;
+import android.webkit.WebView;
 
 import com.prim.primweb.core.webview.IAgentWebView;
 import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
@@ -41,17 +44,19 @@ public abstract class AgentWebViewClient implements IWebViewClient {
 
     @Override
     public boolean shouldOverrideUrlLoading(IAgentWebView view, WebResourceRequest request) {
-        return false;
+        return shouldOverrideUrlLoading(view, request.getUrl().toString());
     }
 
+    @SuppressLint("NewApi")
     @Override
     public boolean shouldOverrideUrlLoading(IAgentWebView view, android.webkit.WebResourceRequest request) {
-        return false;
+        return shouldOverrideUrlLoading(view, request.getUrl().toString());
     }
 
+    @SuppressLint("NewApi")
     @Override
     public WebResourceResponse shouldInterceptRequest(IAgentWebView view, android.webkit.WebResourceRequest request) {
-        return null;
+        return shouldInterceptRequest(view, request.getUrl().toString());
     }
 
     @Override
@@ -76,12 +81,12 @@ public abstract class AgentWebViewClient implements IWebViewClient {
 
     @Override
     public void onReceivedSslError(IAgentWebView view, SslErrorHandler handler, SslError error) {
-
+        handler.cancel();
     }
 
     @Override
     public void onReceivedSslError(IAgentWebView view, com.tencent.smtt.export.external.interfaces.SslErrorHandler handler, com.tencent.smtt.export.external.interfaces.SslError error) {
-
+        handler.cancel();
     }
 
     @Override
@@ -94,24 +99,25 @@ public abstract class AgentWebViewClient implements IWebViewClient {
 
     }
 
+    @SuppressLint("NewApi")
     @Override
     public void onReceivedClientCertRequest(IAgentWebView view, ClientCertRequest request) {
-
+        request.cancel();
     }
 
     @Override
     public void onReceivedClientCertRequest(IAgentWebView view, com.tencent.smtt.export.external.interfaces.ClientCertRequest request) {
-
+        request.cancel();
     }
 
     @Override
     public void onReceivedHttpAuthRequest(IAgentWebView view, HttpAuthHandler handler, String host, String realm) {
-
+        handler.cancel();
     }
 
     @Override
     public void onReceivedHttpAuthRequest(IAgentWebView view, com.tencent.smtt.export.external.interfaces.HttpAuthHandler handler, String host, String realm) {
-
+        handler.cancel();
     }
 
     @Override
@@ -129,9 +135,14 @@ public abstract class AgentWebViewClient implements IWebViewClient {
 
     }
 
+    @SuppressLint("NewApi")
     @Override
     public void onReceivedError(IAgentWebView view, android.webkit.WebResourceRequest request, WebResourceError error) {
-
+        if (request.isForMainFrame()) {
+            onReceivedError(view,
+                    error.getErrorCode(), error.getDescription().toString(),
+                    request.getUrl().toString());
+        }
     }
 
     @Override
@@ -142,17 +153,17 @@ public abstract class AgentWebViewClient implements IWebViewClient {
 
     @Override
     public void onUnhandledKeyEvent(IAgentWebView webView, KeyEvent keyEvent) {
-
     }
+
 
     @Override
     public void onFormResubmission(IAgentWebView view, Message dontResend, Message resend) {
-
+        dontResend.sendToTarget();
     }
 
     @Override
     public void onTooManyRedirects(IAgentWebView view, Message cancelMsg, Message continueMsg) {
-
+        cancelMsg.sendToTarget();
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.prim.primweb.core.webclient.base;
+package com.prim.primweb.core.webclient.webviewclient;
 
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
@@ -72,10 +72,12 @@ public abstract class BaseAndroidWebClient extends WebViewClient {
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
         if (this.webViewClient != null) {
             this.webViewClient.onPageStarted(view, url, favicon);
+            return;
         }
 
         if (this.agentWebViewClient != null) {
             this.agentWebViewClient.onPageStarted(agentWebView, url, favicon);
+            return;
         }
         super.onPageStarted(view, url, favicon);
     }
@@ -84,10 +86,12 @@ public abstract class BaseAndroidWebClient extends WebViewClient {
     public void onPageFinished(WebView view, String url) {
         if (this.webViewClient != null) {
             this.webViewClient.onPageFinished(view, url);
+            return;
         }
 
         if (this.agentWebViewClient != null) {
             this.agentWebViewClient.onPageFinished(agentWebView, url);
+            return;
         }
         super.onPageFinished(view, url);
     }
@@ -97,10 +101,12 @@ public abstract class BaseAndroidWebClient extends WebViewClient {
     public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
         if (this.webViewClient != null) {
             this.webViewClient.onReceivedError(view, request, error);
+            return;
         }
 
         if (this.agentWebViewClient != null) {
             this.agentWebViewClient.onReceivedError(agentWebView, request, error);
+            return;
         }
         super.onReceivedError(view, request, error);
     }
@@ -109,10 +115,12 @@ public abstract class BaseAndroidWebClient extends WebViewClient {
     public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
         if (this.webViewClient != null) {
             this.webViewClient.onReceivedError(view, errorCode, description, failingUrl);
+            return;
         }
 
         if (this.agentWebViewClient != null) {
             this.agentWebViewClient.onReceivedError(agentWebView, errorCode, description, failingUrl);
+            return;
         }
         super.onReceivedError(view, errorCode, description, failingUrl);
     }
@@ -122,10 +130,12 @@ public abstract class BaseAndroidWebClient extends WebViewClient {
     public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse errorResponse) {
         if (this.webViewClient != null) {
             this.webViewClient.onReceivedHttpError(view, request, errorResponse);
+            return;
         }
 
         if (this.agentWebViewClient != null) {
             this.agentWebViewClient.onReceivedHttpError(agentWebView, request, errorResponse);
+            return;
         }
         super.onReceivedHttpError(view, request, errorResponse);
     }
@@ -134,10 +144,12 @@ public abstract class BaseAndroidWebClient extends WebViewClient {
     public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
         if (this.webViewClient != null) {
             this.webViewClient.onReceivedSslError(view, handler, error);
+            return;
         }
 
         if (this.agentWebViewClient != null) {
             this.agentWebViewClient.onReceivedSslError(agentWebView, handler, error);
+            return;
         }
         super.onReceivedSslError(view, handler, error);
     }
@@ -146,10 +158,12 @@ public abstract class BaseAndroidWebClient extends WebViewClient {
     public void onReceivedHttpAuthRequest(WebView view, HttpAuthHandler handler, String host, String realm) {
         if (this.webViewClient != null) {
             this.webViewClient.onReceivedHttpAuthRequest(view, handler, host, realm);
+            return;
         }
 
         if (this.agentWebViewClient != null) {
             this.agentWebViewClient.onReceivedHttpAuthRequest(agentWebView, handler, host, realm);
+            return;
         }
         super.onReceivedHttpAuthRequest(view, handler, host, realm);
     }
@@ -159,10 +173,12 @@ public abstract class BaseAndroidWebClient extends WebViewClient {
     public void onReceivedClientCertRequest(WebView view, ClientCertRequest request) {
         if (this.webViewClient != null) {
             this.webViewClient.onReceivedClientCertRequest(view, request);
+            return;
         }
 
         if (this.agentWebViewClient != null) {
             this.agentWebViewClient.onReceivedClientCertRequest(agentWebView, request);
+            return;
         }
         super.onReceivedClientCertRequest(view, request);
     }
@@ -171,10 +187,12 @@ public abstract class BaseAndroidWebClient extends WebViewClient {
     public void onReceivedLoginRequest(WebView view, String realm, String account, String args) {
         if (this.webViewClient != null) {
             this.webViewClient.onReceivedLoginRequest(view, realm, account, args);
+            return;
         }
 
         if (this.agentWebViewClient != null) {
             this.agentWebViewClient.onReceivedLoginRequest(agentWebView, realm, account, args);
+            return;
         }
         super.onReceivedLoginRequest(view, realm, account, args);
     }
@@ -220,6 +238,7 @@ public abstract class BaseAndroidWebClient extends WebViewClient {
     public void onUnhandledKeyEvent(WebView view, KeyEvent event) {
         if (this.webViewClient != null) {
             this.webViewClient.onUnhandledKeyEvent(view, event);
+            return;
         }
 
         if (this.agentWebViewClient != null) {
@@ -232,10 +251,12 @@ public abstract class BaseAndroidWebClient extends WebViewClient {
     public void onLoadResource(WebView view, String url) {
         if (this.webViewClient != null) {
             this.webViewClient.onLoadResource(view, url);
+            return;
         }
 
         if (this.agentWebViewClient != null) {
             this.agentWebViewClient.onLoadResource(agentWebView, url);
+            return;
         }
         super.onLoadResource(view, url);
     }
@@ -245,10 +266,12 @@ public abstract class BaseAndroidWebClient extends WebViewClient {
     public void onPageCommitVisible(WebView view, String url) {
         if (this.webViewClient != null) {
             this.webViewClient.onPageCommitVisible(view, url);
+            return;
         }
 
         if (this.agentWebViewClient != null) {
             this.agentWebViewClient.onPageCommitVisible(agentWebView, url);
+            return;
         }
         super.onPageCommitVisible(view, url);
     }
@@ -257,10 +280,12 @@ public abstract class BaseAndroidWebClient extends WebViewClient {
     public void onTooManyRedirects(WebView view, Message cancelMsg, Message continueMsg) {
         if (this.webViewClient != null) {
             this.webViewClient.onTooManyRedirects(view, cancelMsg, continueMsg);
+            return;
         }
 
         if (this.agentWebViewClient != null) {
             this.agentWebViewClient.onTooManyRedirects(agentWebView, cancelMsg, continueMsg);
+            return;
         }
         super.onTooManyRedirects(view, cancelMsg, continueMsg);
     }
@@ -269,10 +294,12 @@ public abstract class BaseAndroidWebClient extends WebViewClient {
     public void onFormResubmission(WebView view, Message dontResend, Message resend) {
         if (this.webViewClient != null) {
             this.webViewClient.onFormResubmission(view, dontResend, resend);
+            return;
         }
 
         if (this.agentWebViewClient != null) {
             this.agentWebViewClient.onFormResubmission(agentWebView, dontResend, resend);
+            return;
         }
         super.onFormResubmission(view, dontResend, resend);
     }
@@ -281,10 +308,12 @@ public abstract class BaseAndroidWebClient extends WebViewClient {
     public void doUpdateVisitedHistory(WebView view, String url, boolean isReload) {
         if (this.webViewClient != null) {
             this.webViewClient.doUpdateVisitedHistory(view, url, isReload);
+            return;
         }
 
         if (this.agentWebViewClient != null) {
             this.agentWebViewClient.doUpdateVisitedHistory(agentWebView, url, isReload);
+            return;
         }
         super.doUpdateVisitedHistory(view, url, isReload);
     }
@@ -293,10 +322,12 @@ public abstract class BaseAndroidWebClient extends WebViewClient {
     public void onScaleChanged(WebView view, float oldScale, float newScale) {
         if (this.webViewClient != null) {
             this.webViewClient.onScaleChanged(view, oldScale, newScale);
+            return;
         }
 
         if (this.agentWebViewClient != null) {
             this.agentWebViewClient.onScaleChanged(agentWebView, oldScale, newScale);
+            return;
         }
         super.onScaleChanged(view, oldScale, newScale);
     }

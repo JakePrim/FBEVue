@@ -13,7 +13,6 @@ import android.text.TextUtils;
 
 import com.prim.primweb.core.uicontroller.AbsWebUIController;
 import com.prim.primweb.core.webclient.PrimWebClient;
-import com.prim.primweb.core.webclient.base.BaseX5WebViewClient;
 import com.prim.primweb.core.webview.IAgentWebView;
 import com.tencent.smtt.export.external.interfaces.WebResourceError;
 import com.tencent.smtt.export.external.interfaces.WebResourceRequest;

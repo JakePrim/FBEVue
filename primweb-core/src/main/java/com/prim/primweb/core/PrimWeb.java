@@ -30,15 +30,14 @@ import com.prim.primweb.core.uicontroller.BaseIndicatorView;
 import com.prim.primweb.core.uicontroller.DefaultWebUIController;
 import com.prim.primweb.core.uicontroller.IndicatorController;
 import com.prim.primweb.core.uicontroller.IndicatorHandler;
-import com.prim.primweb.core.uicontroller.WebParentLayout;
 import com.prim.primweb.core.uicontroller.WebViewManager;
-import com.prim.primweb.core.webclient.DefaultAgentWebChromeClient;
-import com.prim.primweb.core.webclient.IAgentWebChromeClient;
 import com.prim.primweb.core.jsinterface.IJsInterface;
 import com.prim.primweb.core.jsinterface.SafeJsInterface;
 import com.prim.primweb.core.jsloader.ICallJsLoader;
 import com.prim.primweb.core.jsloader.SafeCallJsLoaderImpl;
+import com.prim.primweb.core.webclient.PrimChromeClient;
 import com.prim.primweb.core.webclient.PrimWebClient;
+import com.prim.primweb.core.webclient.webchromeclient.AgentChromeClient;
 import com.prim.primweb.core.webclient.webviewclient.AgentWebViewClient;
 import com.prim.primweb.core.weblife.IWebLifeCycle;
 import com.prim.primweb.core.weblife.WebLifeCycle;
@@ -47,7 +46,6 @@ import com.prim.primweb.core.websetting.IAgentWebSetting;
 import com.prim.primweb.core.websetting.X5DefaultWebSetting;
 import com.prim.primweb.core.urlloader.IUrlLoader;
 import com.prim.primweb.core.urlloader.UrlLoader;
-import com.prim.primweb.core.utils.PrimWebUtils;
 import com.prim.primweb.core.webview.IAgentWebView;
 import com.prim.primweb.core.webview.AndroidAgentWebView;
 import com.prim.primweb.core.webview.X5AgentWebView;
@@ -108,7 +106,7 @@ public class PrimWeb {
 
     private AgentWebViewClient agentWebViewClient;
 
-    private IAgentWebChromeClient agentWebChromeClient;
+    private AgentChromeClient agentWebChromeClient;
 
     //初始化个数 30 * 0.75 多个左右,考虑到哈希表默认大小只有 4 * 0.75 个
     //而哈希表的缺点是:扩容性能会下降 初始化时提前计算好上限.
@@ -135,6 +133,10 @@ public class PrimWeb {
     private WebViewManager webViewManager;
 
     private AbsWebUIController absWebUIController;
+
+    public boolean isGeolocation = true;
+
+    public boolean allowUploadFile = true;
 
     public static PrimBuilder with(Activity context) {
         if (context == null) {
@@ -200,6 +202,8 @@ public class PrimWeb {
         this.commonJSListener = builder.commonJSListener;
         this.alwaysOpenOtherPage = builder.alwaysOpenOtherPage;
         this.absWebUIController = builder.absWebUIController;
+        this.isGeolocation = builder.isGeolocation;
+        this.allowUploadFile = builder.allowUploadFile;
         if (null == webView) {//webview 不能为空
             webView = new AndroidAgentWebView(context.get());
             mView = webView.getAgentWebView();
@@ -284,11 +288,18 @@ public class PrimWeb {
 
     private void createWebChromeClient() {
         IndicatorController indicatorController = IndicatorHandler.getInstance().setIndicator(webViewManager.getIndicator());
-        //加载代理的webChromeClient
-        if (null == agentWebChromeClient) {
-            agentWebChromeClient = new DefaultAgentWebChromeClient(context.get(), indicatorController);
-        }
-        webView.setAgentWebChromeClient(agentWebChromeClient);
+        PrimChromeClient.createChromeBuilder()
+                .setActivity(context.get())
+                .setType(webViewType)
+                .setWebView(webView)
+                .setWebChromeClient(x5WebChromeClient)
+                .setWebChromeClient(webChromeClient)
+                .setWebChromeClient(agentWebChromeClient)
+                .setAbsWebUIController(absWebUIController)
+                .setAllowUploadFile(allowUploadFile)
+                .setGeolocation(isGeolocation)
+                .setIndicatorController(indicatorController)
+                .build();
     }
 
     private void createWebViewClient() {
@@ -333,10 +344,12 @@ public class PrimWeb {
         private com.tencent.smtt.sdk.WebViewClient x5WebViewClient;
         private WebChromeClient webChromeClient;
         private com.tencent.smtt.sdk.WebChromeClient x5WebChromeClient;
-        private IAgentWebChromeClient agentWebChromeClient;
+        private AgentChromeClient agentWebChromeClient;
         private CommonJSListener commonJSListener;
         private boolean alwaysOpenOtherPage;
         private AbsWebUIController absWebUIController;
+        private boolean isGeolocation = true;
+        private boolean allowUploadFile = true;
         //UI Controller
         private boolean needTopIndicator;
         private boolean customTopIndicator;
@@ -585,17 +598,17 @@ public class PrimWeb {
         }
 
         /** 设置代理的WebChromeClient 兼容android webview 和 x5 webview */
-        public CommonBuilder setAgentWebChromeClient(IAgentWebChromeClient agentWebChromeClient) {
+        public CommonBuilder setWebChromeClient(AgentChromeClient agentWebChromeClient) {
             primBuilder.agentWebChromeClient = agentWebChromeClient;
             return this;
         }
 
-        public CommonBuilder setAndroidWebChromeClient(WebChromeClient webChromeClient) {
+        public CommonBuilder setWebChromeClient(WebChromeClient webChromeClient) {
             primBuilder.webChromeClient = webChromeClient;
             return this;
         }
 
-        public CommonBuilder setX5WebChromeClient(com.tencent.smtt.sdk.WebChromeClient webChromeClient) {
+        public CommonBuilder setWebChromeClient(com.tencent.smtt.sdk.WebChromeClient webChromeClient) {
             primBuilder.x5WebChromeClient = webChromeClient;
             return this;
         }
@@ -621,6 +634,18 @@ public class PrimWeb {
         /** 设置自定义的UI控制器 */
         public CommonBuilder setWebUIController(AbsWebUIController absWebUIController) {
             primBuilder.absWebUIController = absWebUIController;
+            return this;
+        }
+
+        /** 设置是否允许上传文件 默认为允许 */
+        public CommonBuilder setAllowUploadFile(boolean flag) {
+            primBuilder.allowUploadFile = flag;
+            return this;
+        }
+
+        /** 设置是否允许定位 默认为允许 */
+        public CommonBuilder setGeolocation(boolean flag) {
+            primBuilder.isGeolocation = flag;
             return this;
         }
 

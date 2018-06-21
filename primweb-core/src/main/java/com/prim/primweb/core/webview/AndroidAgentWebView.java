@@ -16,8 +16,6 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.prim.primweb.core.webclient.IAgentWebChromeClient;
-import com.prim.primweb.core.webclient.MyAndroidWebChromeClient;
 import com.prim.primweb.core.jsloader.AgentValueCallback;
 import com.prim.primweb.core.utils.PrimWebUtils;
 
@@ -249,17 +247,12 @@ public class AndroidAgentWebView extends WebView implements IAgentWebView<WebSet
     }
 
     @Override
-    public void setAgentWebChromeClient(IAgentWebChromeClient webChromeClient) {
-        setWebChromeClient(new MyAndroidWebChromeClient(webChromeClient));
+    public void setAgentWebChromeClient(WebChromeClient webChromeClient) {
+        this.setWebChromeClient(webChromeClient);
     }
 
     @Override
-    public void setAndroidWebChromeClient(WebChromeClient webChromeClient) {
-        setWebChromeClient(webChromeClient);
-    }
-
-    @Override
-    public void setX5WebChromeClient(com.tencent.smtt.sdk.WebChromeClient webChromeClient) {
+    public void setAgentWebChromeClient(com.tencent.smtt.sdk.WebChromeClient webChromeClient) {
 
     }
 
