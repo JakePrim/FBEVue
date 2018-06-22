@@ -25,6 +25,16 @@ PrimWeb 是一个代理的WebView基于的 Android WebView 和 腾讯 x5 WebView
 15. 支持自定义错误页面
 16. 支持跳转到其他应用页面
 
+
+Activity调用PrimWeb | Fragment调用PrimWeb | 识别电话短信邮箱
+---|---|---
+![activity.gif](https://upload-images.jianshu.io/upload_images/2005932-297ecc349a263621.gif?imageMogr2/auto-orient/strip) | ![fragment.gif](https://upload-images.jianshu.io/upload_images/2005932-6a44ccaec767c20e.gif?imageMogr2/auto-orient/strip) |![sms.gif](https://upload-images.jianshu.io/upload_images/2005932-8c636d66d6628881.gif?imageMogr2/auto-orient/strip)
+
+
+
+JS通信 | 文件上传 | 自定义错误页面
+---|---|---
+![js.gif](https://upload-images.jianshu.io/upload_images/2005932-74258121fbcd8b87.gif?imageMogr2/auto-orient/strip) | ![input.gif](https://upload-images.jianshu.io/upload_images/2005932-a268f8c2f1c268a7.gif?imageMogr2/auto-orient/strip) | ![error.gif](https://upload-images.jianshu.io/upload_images/2005932-5b8128c6a9831d50.gif?imageMogr2/auto-orient/strip)
 ## How Do I Use?
 
 ```

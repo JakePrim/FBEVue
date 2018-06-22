@@ -54,7 +54,7 @@ public class WebActivity extends AppCompatActivity {
                 .setWebViewType(PrimWeb.WebViewType.X5)
                 .setWebChromeClient(agentChromeClient)
                 .setWebViewClient(agentWebViewClient)
-                .alwaysOpenOtherPage(true)
+                .alwaysOpenOtherPage(false)
                 .buildWeb()
                 .lastGo()
                 .launch("https://m.jd.com/");
