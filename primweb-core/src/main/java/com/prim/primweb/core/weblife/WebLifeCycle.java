@@ -1,5 +1,6 @@
 package com.prim.primweb.core.weblife;
 
+import com.prim.primweb.core.PrimWeb;
 import com.prim.primweb.core.webview.IAgentWebView;
 
 /**
@@ -32,5 +33,7 @@ public class WebLifeCycle implements IWebLifeCycle {
     @Override
     public void onDestory() {
         webView.onAgentDestory();
+        PrimWeb.removeJsUploadChooserCallback();
+        PrimWeb.removeThriedChooserListener();
     }
 }

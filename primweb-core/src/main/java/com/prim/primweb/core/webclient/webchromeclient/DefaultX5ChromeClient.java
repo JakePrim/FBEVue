@@ -6,6 +6,7 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.webkit.GeolocationPermissions;
 
+import com.prim.primweb.core.PrimWeb;
 import com.prim.primweb.core.file.FileChooser;
 import com.prim.primweb.core.permission.FilePermissionWrap;
 import com.prim.primweb.core.permission.PermissionMiddleActivity;
@@ -121,7 +122,7 @@ public class DefaultX5ChromeClient extends BaseX5ChromeClient {
     /** 选择文件上传 */
     private void fileChooser(FilePermissionWrap filePermissionWrap) {
         if (mActivity != null && mActivity.get() != null) {
-            new FileChooser(filePermissionWrap, mActivity.get()).updateFile();
+            new FileChooser(filePermissionWrap, mActivity.get()).updateFile(builder.invokingThird);
         }
     }
 }

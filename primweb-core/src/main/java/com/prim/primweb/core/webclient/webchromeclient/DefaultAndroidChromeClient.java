@@ -12,6 +12,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebStorage;
 import android.webkit.WebView;
 
+import com.prim.primweb.core.PrimWeb;
 import com.prim.primweb.core.file.FileChooser;
 import com.prim.primweb.core.permission.FilePermissionWrap;
 import com.prim.primweb.core.permission.PermissionMiddleActivity;
@@ -54,10 +55,8 @@ public class DefaultAndroidChromeClient extends BaseAndroidChromeClient {
         super.setChromeClient(chromeClient, webView);
     }
 
-
     @Override
     public void onProgressChanged(WebView view, int newProgress) {
-
         super.onProgressChanged(view, newProgress);
         if (indicatorController != null) {
             indicatorController.progress(newProgress);
@@ -112,7 +111,7 @@ public class DefaultAndroidChromeClient extends BaseAndroidChromeClient {
 
     //  Android  >= 3.0
     @Override
-    public void openFileChooser(ValueCallback valueCallback, String acceptType) {
+    public void openFileChooser(ValueCallback<Uri> valueCallback, String acceptType) {
         if (!builder.allowUploadFile) {
             super.openFileChooser(valueCallback, acceptType);
             return;
@@ -146,22 +145,10 @@ public class DefaultAndroidChromeClient extends BaseAndroidChromeClient {
         return true;
     }
 
-
-    @Override
-    public void onExceededDatabaseQuota(String url, String databaseIdentifier, long quota, long estimatedDatabaseSize, long totalQuota, WebStorage.QuotaUpdater quotaUpdater) {
-        super.onExceededDatabaseQuota(url, databaseIdentifier, quota, estimatedDatabaseSize, totalQuota, quotaUpdater);
-
-    }
-
-    @Override
-    public void onReachedMaxAppCacheSize(long requiredStorage, long quota, WebStorage.QuotaUpdater quotaUpdater) {
-        super.onReachedMaxAppCacheSize(requiredStorage, quota, quotaUpdater);
-    }
-
     /** 选择文件上传 */
     private void fileChooser(FilePermissionWrap filePermissionWrap) {
         if (mActivity != null && mActivity.get() != null) {
-            new FileChooser(filePermissionWrap, mActivity.get()).updateFile();
+            new FileChooser(filePermissionWrap, mActivity.get()).updateFile(builder.invokingThird);
         }
     }
 }

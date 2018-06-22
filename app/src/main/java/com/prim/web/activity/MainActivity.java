@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
             "Java与Js之间的通信",
             "input标签文件上传",
             "Js通信文件上传",
+            "调用第三方文件选择库上传文件",
             "文件下载",
             "自定义WebSetting设置",
             "自定义进度条",
@@ -92,6 +93,15 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
                 break;
             case 10:
                 startActivity(new Intent(this, CommonActivity.class).putExtra(CommonActivity.TYPE, "9"));
+                break;
+            case 11:
+                startActivity(new Intent(this, CommonActivity.class).putExtra(CommonActivity.TYPE, "10"));
+                break;
+            case 12:
+                startActivity(new Intent(this, CommonActivity.class).putExtra(CommonActivity.TYPE, "11"));
+                break;
+            case 13:
+                startActivity(new Intent(this, CommonActivity.class).putExtra(CommonActivity.TYPE, "12"));
                 break;
         }
     }

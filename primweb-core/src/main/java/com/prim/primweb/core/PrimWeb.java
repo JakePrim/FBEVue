@@ -20,6 +20,7 @@ import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import com.prim.primweb.core.file.FileValueCallbackMiddleActivity;
 import com.prim.primweb.core.handler.IKeyEvent;
 import com.prim.primweb.core.handler.IKeyEventInterceptor;
 import com.prim.primweb.core.handler.KeyEventHandler;
@@ -134,9 +135,11 @@ public class PrimWeb {
 
     private AbsWebUIController absWebUIController;
 
-    public boolean isGeolocation = true;
+    private boolean isGeolocation;
 
-    public boolean allowUploadFile = true;
+    private boolean allowUploadFile;
+
+    private boolean invokingThird;
 
     public static PrimBuilder with(Activity context) {
         if (context == null) {
@@ -204,6 +207,7 @@ public class PrimWeb {
         this.absWebUIController = builder.absWebUIController;
         this.isGeolocation = builder.isGeolocation;
         this.allowUploadFile = builder.allowUploadFile;
+        this.invokingThird = builder.invokingThird;
         if (null == webView) {//webview 不能为空
             webView = new AndroidAgentWebView(context.get());
             mView = webView.getAgentWebView();
@@ -299,6 +303,7 @@ public class PrimWeb {
                 .setAllowUploadFile(allowUploadFile)
                 .setGeolocation(isGeolocation)
                 .setIndicatorController(indicatorController)
+                .setInvokingThird(invokingThird)
                 .build();
     }
 
@@ -350,6 +355,7 @@ public class PrimWeb {
         private AbsWebUIController absWebUIController;
         private boolean isGeolocation = true;
         private boolean allowUploadFile = true;
+        private boolean invokingThird = false;
         //UI Controller
         private boolean needTopIndicator;
         private boolean customTopIndicator;
@@ -649,6 +655,12 @@ public class PrimWeb {
             return this;
         }
 
+        /** 上传文件 false 调用系统文件  true 调用自定义的文件库 */
+        public CommonBuilder setUpdateInvokThrid(boolean flag) {
+            primBuilder.invokingThird = flag;
+            return this;
+        }
+
         /** 设置完成开始建造 */
         public PerBuilder buildWeb() {
             return primBuilder.build();
@@ -699,7 +711,6 @@ public class PrimWeb {
             return primWeb.launch(url);
         }
     }
-
 
     public WebViewType getWebViewType() {
         return webViewType;
@@ -847,6 +858,28 @@ public class PrimWeb {
 
     public void clearWebViewCache() {
 
+    }
+
+    public void setJsUploadChooserCallback(FileValueCallbackMiddleActivity.JsUploadChooserCallback jsUploadChooserCallback) {
+        FileValueCallbackMiddleActivity.setJsUploadChooserCallback(jsUploadChooserCallback);
+    }
+
+    public static void removeJsUploadChooserCallback() {
+        FileValueCallbackMiddleActivity.removeJsUploadChooserCallback();
+    }
+
+    /**
+     * 用第三方库选择文件,回调逻辑需自己处理
+     *
+     * @param thriedChooserListener
+     *         ThriedChooserListener
+     */
+    public void setThriedChooserListener(FileValueCallbackMiddleActivity.ThriedChooserListener thriedChooserListener) {
+        FileValueCallbackMiddleActivity.setThriedChooserListener(thriedChooserListener);
+    }
+
+    public static void removeThriedChooserListener() {
+        FileValueCallbackMiddleActivity.removeThriedChooserListener();
     }
 
     /**

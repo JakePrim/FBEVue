@@ -444,7 +444,7 @@ public class BaseAndroidChromeClient extends WebChromeClient {
     }
 
     //  Android  >= 3.0
-    public void openFileChooser(ValueCallback valueCallback, String acceptType) {
+    public void openFileChooser(ValueCallback<Uri> valueCallback, String acceptType) {
         commonRefect(this.mDelegate, "openFileChooser", new Object[]{valueCallback, acceptType}, ValueCallback.class, String.class);
         if (this.chormeClient != null) {
             this.chormeClient.openFileChooser(valueCallback, acceptType);

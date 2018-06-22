@@ -78,10 +78,32 @@ public class CommonActivity extends AppCompatActivity implements WebFragment.OnF
                 fragmentTransaction.add(R.id.frame_layout, webFragment = WebFragment.newInstance(url, "JS - Upload"), WebFragment.class.getSimpleName());
                 break;
             case "6":
+                url = "file:///android_asset/upload/h5-standard.html";
+                fragmentTransaction.add(R.id.frame_layout, webFragment = WebFragment.newInstance(url, "ThridUpload"), WebFragment.class.getSimpleName());
                 break;
             case "7":
+                url = "https://m.jd.com/";
+                fragmentTransaction.add(R.id.frame_layout, webFragment = WebFragment.newInstance(url, "Download"), WebFragment.class.getSimpleName());
                 break;
             case "8":
+                url = "https://m.jd.com/";
+                fragmentTransaction.add(R.id.frame_layout, webFragment = WebFragment.newInstance(url, "setting"), WebFragment.class.getSimpleName());
+                break;
+            case "9":
+                url = "https://m.jd.com/";
+                fragmentTransaction.add(R.id.frame_layout, webFragment = WebFragment.newInstance(url, "progress"), WebFragment.class.getSimpleName());
+                break;
+            case "10":
+                url = "https://m.jd.com/";
+                fragmentTransaction.add(R.id.frame_layout, webFragment = WebFragment.newInstance(url, "down-rebound"), WebFragment.class.getSimpleName());
+                break;
+            case "11":
+                url = "https://m.jd.com/";
+                fragmentTransaction.add(R.id.frame_layout, webFragment = WebFragment.newInstance(url, "down-refresh"), WebFragment.class.getSimpleName());
+                break;
+            case "12":
+                url = "https://github.com/Justson/AgentWeb";
+                fragmentTransaction.add(R.id.frame_layout, webFragment = WebFragment.newInstance(url, "thanks"), WebFragment.class.getSimpleName());
                 break;
         }
         fragmentTransaction.commit();

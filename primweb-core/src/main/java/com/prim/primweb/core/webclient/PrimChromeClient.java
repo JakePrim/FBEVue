@@ -2,7 +2,6 @@ package com.prim.primweb.core.webclient;
 
 import android.app.Activity;
 import android.webkit.WebChromeClient;
-import android.webkit.WebViewClient;
 
 import com.prim.primweb.core.PrimWeb;
 import com.prim.primweb.core.uicontroller.AbsWebUIController;
@@ -10,9 +9,6 @@ import com.prim.primweb.core.uicontroller.IndicatorController;
 import com.prim.primweb.core.webclient.webchromeclient.AgentChromeClient;
 import com.prim.primweb.core.webclient.webchromeclient.DefaultAndroidChromeClient;
 import com.prim.primweb.core.webclient.webchromeclient.DefaultX5ChromeClient;
-import com.prim.primweb.core.webclient.webviewclient.AgentWebViewClient;
-import com.prim.primweb.core.webclient.webviewclient.DefaultAndroidWebViewClient;
-import com.prim.primweb.core.webclient.webviewclient.DefaultX5WebViewClient;
 import com.prim.primweb.core.webview.IAgentWebView;
 
 import java.io.Serializable;
@@ -93,9 +89,19 @@ public class PrimChromeClient {
 
         public IndicatorController indicatorController;
 
-        public boolean isGeolocation = true;
+        public boolean isGeolocation;
 
-        public boolean allowUploadFile = true;
+        public boolean allowUploadFile;
+
+        /**
+         * 上传文件  false 调用系统的文件, true 调用第三库或者自定义的文件
+         */
+        public boolean invokingThird;
+
+        public Builder setInvokingThird(boolean invokingThird) {
+            this.invokingThird = invokingThird;
+            return this;
+        }
 
         public Builder setAllowUploadFile(boolean allowUploadFile) {
             this.allowUploadFile = allowUploadFile;

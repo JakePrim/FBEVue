@@ -155,7 +155,7 @@ public abstract class AgentChromeClient implements IWebChromeClient {
     }
 
     @Override
-    public void openFileChooser(ValueCallback valueCallback, String acceptType) {
+    public void openFileChooser(ValueCallback<Uri> valueCallback, String acceptType) {
 
     }
 

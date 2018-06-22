@@ -10,6 +10,7 @@ import android.os.Build;
 import android.util.Log;
 import android.webkit.ValueCallback;
 
+import com.prim.primweb.core.PrimWeb;
 import com.prim.primweb.core.permission.FilePermissionWrap;
 import com.prim.primweb.core.permission.PermissionMiddleActivity;
 import com.prim.primweb.core.permission.WebPermission;
@@ -39,6 +40,12 @@ public class FileChooser implements PermissionMiddleActivity.PermissionListener,
 
     private static final String TAG = "FileChooser";
 
+    public boolean invokingThird;
+
+    private boolean isJsUpload = false;
+
+    private String fileType;
+
     public FileChooser(FilePermissionWrap filePermissionWrap, Context context) {
         this.filePermissionWrap = filePermissionWrap;
         this.context = new WeakReference<>(context);
@@ -57,6 +64,20 @@ public class FileChooser implements PermissionMiddleActivity.PermissionListener,
         }
     }
 
+
+    public FileChooser(String fileType, Context context) {
+        this.isJsUpload = true;
+        this.fileType = fileType;
+        this.context = new WeakReference<>(context);
+    }
+
+    public void updateFile(boolean invokingThird) {
+        this.invokingThird = invokingThird;
+        PermissionMiddleActivity.setPermissionListener(this);
+        //检查权限的中间件
+        PermissionMiddleActivity.startCheckPermission((Activity) context.get(), WebPermission.CAMERA_TYPE);
+    }
+
     public interface UploadFileListener {
         void requestPermissionFile();
     }
@@ -67,12 +88,6 @@ public class FileChooser implements PermissionMiddleActivity.PermissionListener,
         mUploadListener = new WeakReference<UploadFileListener>(uploadFileListener);
     }
 
-    public void updateFile() {
-        PermissionMiddleActivity.setPermissionListener(this);
-        //检查权限的中间件
-        PermissionMiddleActivity.startCheckPermission((Activity) context.get(), WebPermission.CAMERA_TYPE);
-    }
-
     @Override
     public void requestPermissionSuccess(String permissionType) {
         if (permissionType.equals(WebPermission.CAMERA_TYPE)) {//权限请求成功获取要打开的类型
@@ -81,15 +96,16 @@ public class FileChooser implements PermissionMiddleActivity.PermissionListener,
     }
 
     private void fileValueCallback() {
-        Log.e(TAG, "fileValueCallback: " + acceptType.toString());
-        if (acceptType != null) {
-            //上传文件的类型
-            String type = acceptType[0];
-            FileValueCallbackMiddleActivity.setChooserFileListener(this);
-            FileValueCallbackMiddleActivity.getFileValueCallback((Activity) context.get(), type);
+        if (this.isJsUpload) {
+            FileValueCallbackMiddleActivity.getFileValueCallback(true, (Activity) context.get(), fileType, invokingThird, this);
         } else {
-            FileValueCallbackMiddleActivity.setChooserFileListener(this);
-            FileValueCallbackMiddleActivity.getFileValueCallback((Activity) context.get(), "file");
+            if (acceptType != null) {
+                //上传文件的类型
+                String type = acceptType[0];
+                FileValueCallbackMiddleActivity.getFileValueCallback((Activity) context.get(), type, invokingThird, this);
+            } else {
+                FileValueCallbackMiddleActivity.getFileValueCallback((Activity) context.get(), "*/*", invokingThird, this);
+            }
         }
     }
 
@@ -122,6 +138,7 @@ public class FileChooser implements PermissionMiddleActivity.PermissionListener,
             Uri[] uris = new Uri[1];
             uris[0] = uri;
             valueCallbacks.onReceiveValue(uris);
+            valueCallbacks = null;
         } else if (valueCallback != null) {
             valueCallback.onReceiveValue(uri);
             valueCallback = null;
@@ -134,6 +151,7 @@ public class FileChooser implements PermissionMiddleActivity.PermissionListener,
         if (data != null) {
             result = data.getData();
         }
+        Log.e(TAG, "updateFile: ");
         if (valueCallbacks != null) {
             onActivityResultAboveL(requestCode, resultCode, data);
         } else if (valueCallback != null) {
@@ -172,6 +190,8 @@ public class FileChooser implements PermissionMiddleActivity.PermissionListener,
             }
             valueCallbacks.onReceiveValue(results);
             valueCallbacks = null;
+        } else {
+            cancelFilePathCallback();
         }
     }
 }

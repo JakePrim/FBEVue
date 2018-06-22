@@ -1,30 +1,56 @@
 package com.prim.web.fragment;
 
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.content.ClipData;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
+import android.webkit.ValueCallback;
+import android.webkit.WebChromeClient;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.prim.primweb.core.PrimWeb;
+import com.prim.primweb.core.file.FileChooser;
+import com.prim.primweb.core.file.FileType;
+import com.prim.primweb.core.file.FileValueCallbackMiddleActivity;
 import com.prim.primweb.core.jsloader.AgentValueCallback;
 import com.prim.primweb.core.jsloader.CommonJSListener;
+import com.prim.primweb.core.utils.ImageHandlerUtil;
 import com.prim.primweb.core.utils.PrimWebUtils;
+import com.prim.primweb.core.webclient.webchromeclient.AgentChromeClient;
 import com.prim.web.R;
+import com.prim.web.setting.CustomX5Setting;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
+
+import java.io.File;
+import java.util.List;
+
+import picker.prim.com.primpicker_core.PrimPicker;
+import picker.prim.com.primpicker_core.engine.ImageEngine;
+import picker.prim.com.primpicker_core.entity.MimeType;
+
+import static android.app.Activity.RESULT_CANCELED;
+import static android.app.Activity.RESULT_OK;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -35,7 +61,8 @@ import org.json.JSONObject;
  * create an instance of this fragment.
  */
 public class WebFragment extends Fragment implements ItemSelected, FragmentKeyDown, View.OnClickListener
-        , CommonJSListener {
+        , CommonJSListener,
+        FileValueCallbackMiddleActivity.ThriedChooserListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -126,6 +153,60 @@ public class WebFragment extends Fragment implements ItemSelected, FragmentKeyDo
                     .buildWeb()
                     .lastGo()
                     .launch(mParam1);
+        } else if (mParam2.equals("JS")) {
+            primWeb = PrimWeb.with(getActivity())
+                    .setWebParent(webParent, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+                    .useDefaultUI()
+                    .useDefaultTopIndicator()
+                    .setWebViewType(PrimWeb.WebViewType.X5)
+                    .setListenerCheckJsFunction(this)
+                    .buildWeb()
+                    .lastGo()
+                    .launch(mParam1);
+            ll_JS.setVisibility(View.VISIBLE);
+            primWeb.getJsInterface().addJavaObject(new MyJsInterface(), "android");
+        } else if (mParam2.equals("JS - Upload")) {
+            primWeb = PrimWeb.with(getActivity())
+                    .setWebParent(webParent, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+                    .useDefaultUI()
+                    .useDefaultTopIndicator()
+                    .setWebViewType(PrimWeb.WebViewType.X5)
+                    .setListenerCheckJsFunction(this)
+                    .buildWeb()
+                    .lastGo()
+                    .launch(mParam1);
+            primWeb.getJsInterface().addJavaObject(new MyUploadJsInterface(), "upload");
+            primWeb.setJsUploadChooserCallback(new FileValueCallbackMiddleActivity.JsUploadChooserCallback() {
+                @Override
+                public void chooserFile(Intent data, String path, String encode) {
+                    Log.e(TAG, "chooserFile: " + path);
+                    primWeb.getCallJsLoader().callJS("uploadFileResult", encode);
+                }
+            });
+        } else if (mParam2.equals("ThridUpload")) {
+            primWeb = PrimWeb.with(getActivity())
+                    .setWebParent(webParent, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+                    .useDefaultUI()
+                    .useDefaultTopIndicator()
+                    .setWebViewType(PrimWeb.WebViewType.X5)
+                    .setListenerCheckJsFunction(this)
+                    .setUpdateInvokThrid(true)
+                    .setAllowUploadFile(true)
+                    .setWebChromeClient(agentChromeClient)
+                    .buildWeb()
+                    .lastGo()
+                    .launch(mParam1);
+        } else if (mParam2.equals("setting")) {
+            primWeb = PrimWeb.with(getActivity())
+                    .setWebParent(webParent, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+                    .useDefaultUI()
+                    .useDefaultTopIndicator()
+                    .setWebViewType(PrimWeb.WebViewType.X5)
+                    .setListenerCheckJsFunction(this)
+                    .setAgentWebSetting(new CustomX5Setting())
+                    .buildWeb()
+                    .lastGo()
+                    .launch(mParam1);
         } else {
             primWeb = PrimWeb.with(getActivity())
                     .setWebParent(webParent, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
@@ -137,10 +218,31 @@ public class WebFragment extends Fragment implements ItemSelected, FragmentKeyDo
                     .lastGo()
                     .launch(mParam1);
         }
-        if (mParam2.equals("JS")) {
-            ll_JS.setVisibility(View.VISIBLE);
-            primWeb.getJsInterface().addJavaObject(new MyJsInterface(), "android");
-        }
+    }
+
+    @Override
+    public void jsOpenVideos() {
+        Log.e(TAG, "jsOpenVideos: ");
+        PrimPicker.with(WebFragment.this)
+                .choose(MimeType.ofVideo())
+                .setMaxSelected(1)
+                .setImageLoader(new MyImageLoad())
+                .setShowSingleMediaType(true)
+                .setCapture(false)
+                .setSpanCount(3)
+                .lastGo(1001);
+    }
+
+    @Override
+    public void jsOpenPick() {
+        PrimPicker.with(WebFragment.this)
+                .choose(MimeType.ofImage())
+                .setMaxSelected(1)
+                .setImageLoader(new MyImageLoad())
+                .setShowSingleMediaType(true)
+                .setCapture(false)
+                .setSpanCount(3)
+                .lastGo(1001);
     }
 
     @Override
@@ -153,8 +255,14 @@ public class WebFragment extends Fragment implements ItemSelected, FragmentKeyDo
         Toast.makeText(getActivity(), data.toString() + "方法不存在", Toast.LENGTH_SHORT).show();
     }
 
-    public class MyJsInterface {
+    public class MyUploadJsInterface {
+        @JavascriptInterface
+        public void uploadFile() {
+            new FileChooser(FileType.WEB_IMAGE, getActivity()).updateFile(false);
+        }
+    }
 
+    public class MyJsInterface {
         @JavascriptInterface
         public void callAndroid(final String data) {
             PrimWebUtils.runUIRunable(new Runnable() {
@@ -164,9 +272,7 @@ public class WebFragment extends Fragment implements ItemSelected, FragmentKeyDo
                 }
             });
         }
-
     }
-
 
     private static final String TAG = "WebFragment";
 
@@ -340,6 +446,117 @@ public class WebFragment extends Fragment implements ItemSelected, FragmentKeyDo
             case R.id.jsClick6:
                 jsClick6();
                 break;
+        }
+    }
+
+
+    private class MyImageLoad implements ImageEngine {
+
+        @Override
+        public void loadImageThumbnail(Context context, int resize, Drawable placeholder, ImageView view, Uri uri) {
+            Picasso.with(getActivity())
+                    .load(uri)
+                    .resize(resize, resize)
+                    .centerCrop()
+                    .into(view);
+        }
+
+        @Override
+        public void loadImage(Context context, int resizeX, int resizeY, Drawable placeholder, ImageView view, Uri uri) {
+            Picasso.with(getActivity())
+                    .load(uri)
+                    .resize(resizeX, resizeY)
+                    .centerCrop()
+                    .into(view);
+        }
+
+        @Override
+        public void loadGifThumbnail(Context context, int resize, Drawable placeholder, ImageView view, Uri uri) {
+            Picasso.with(getActivity())
+                    .load(uri)
+                    .resize(resize, resize)
+                    .centerCrop()
+                    .into(view);
+        }
+
+        @Override
+        public void loadGifImage(Context context, int resizeX, int resizeY, Drawable placeholder, ImageView view, Uri uri) {
+            Picasso.with(getActivity())
+                    .load(uri)
+                    .resize(resizeX, resizeY)
+                    .centerCrop()
+                    .into(view);
+        }
+    }
+
+    private ValueCallback<Uri[]> agentValueCallbacks;
+
+    private ValueCallback<Uri> agentValueCallback;
+
+    AgentChromeClient agentChromeClient = new AgentChromeClient() {
+        @Override
+        public boolean onShowFileChooser(View webView, ValueCallback<Uri[]> valueCallback, com.tencent.smtt.sdk.WebChromeClient.FileChooserParams fileChooserParams) {
+            agentValueCallbacks = valueCallback;
+            //注意监听需要写在这里 否则监听有时候会收不到
+            primWeb.setThriedChooserListener(WebFragment.this);
+            return super.onShowFileChooser(webView, valueCallback, fileChooserParams);
+        }
+
+        @Override
+        public void openFileChooser(ValueCallback<Uri> valueCallback) {
+            agentValueCallback = valueCallback;
+            primWeb.setThriedChooserListener(WebFragment.this);
+            super.openFileChooser(valueCallback);
+        }
+
+        @Override
+        public void openFileChooser(ValueCallback<Uri> valueCallback, String acceptType) {
+            agentValueCallback = valueCallback;
+            primWeb.setThriedChooserListener(WebFragment.this);
+            super.openFileChooser(valueCallback, acceptType);
+        }
+
+        @Override
+        public void openFileChooser(ValueCallback<Uri> valueCallback, String acceptType, String capture) {
+            agentValueCallback = valueCallback;
+            primWeb.setThriedChooserListener(WebFragment.this);
+            super.openFileChooser(valueCallback, acceptType, capture);
+        }
+    };
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.e(TAG, "onActivityResult: requestCode --> " + requestCode + " | resultCode --> " + resultCode);
+        if (resultCode == RESULT_CANCELED && requestCode == 1001) {
+            cancelFilePathCallback();
+        } else if (resultCode == RESULT_OK && requestCode == 1001) {
+            uploadImgVideo(PrimPicker.obtainUriResult(data).get(0));
+        }
+    }
+
+    private void uploadImgVideo(Uri uri) {
+        Uri result = uri;
+        Uri[] results = new Uri[]{uri};
+        if (agentValueCallbacks != null) {
+            agentValueCallbacks.onReceiveValue(results);
+            agentValueCallbacks = null;
+        } else if (agentValueCallback != null) {
+            if (result == null) {
+                return;
+            }
+            agentValueCallback.onReceiveValue(result);
+            agentValueCallback = null;
+        }
+    }
+
+    private void cancelFilePathCallback() {
+        if (agentValueCallback != null) {
+            agentValueCallback.onReceiveValue(null);
+            agentValueCallback = null;
+        } else if (agentValueCallbacks != null) {
+            agentValueCallbacks.onReceiveValue(null);
+            agentValueCallbacks = null;
         }
     }
 
