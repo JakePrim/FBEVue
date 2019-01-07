@@ -36,6 +36,7 @@ import com.prim.primweb.core.jsinterface.IJsInterface;
 import com.prim.primweb.core.jsinterface.SafeJsInterface;
 import com.prim.primweb.core.jsloader.ICallJsLoader;
 import com.prim.primweb.core.jsloader.SafeCallJsLoaderImpl;
+import com.prim.primweb.core.utils.PWLog;
 import com.prim.primweb.core.webclient.PrimChromeClient;
 import com.prim.primweb.core.webclient.PrimWebClient;
 import com.prim.primweb.core.webclient.webchromeclient.AgentChromeClient;
@@ -153,12 +154,12 @@ public class PrimWeb {
         QbSdk.initX5Environment(application, new QbSdk.PreInitCallback() {
             @Override
             public void onCoreInitFinished() {
-
+                PWLog.d("onCoreInitFinished");
             }
 
             @Override
             public void onViewInitFinished(boolean b) {
-
+                PWLog.d("onViewInitFinished:" + b);
             }
         });
     }
@@ -167,8 +168,7 @@ public class PrimWeb {
     /**
      * 飞船建造阶段 -- 初始化各种配置设定
      *
-     * @param builder
-     *         飞船设定系统
+     * @param builder 飞船设定系统
      */
     PrimWeb(PrimBuilder builder) {
         doCheckSafe(builder);
@@ -182,7 +182,9 @@ public class PrimWeb {
     }
 
 
-    /** webView 安全检查 --- 检查飞船的各种设定是否安全 */
+    /**
+     * webView 安全检查 --- 检查飞船的各种设定是否安全
+     */
     private void doCheckSafe(PrimBuilder builder) {
         this.webView = builder.webView;
         this.mView = builder.mView;
@@ -221,8 +223,7 @@ public class PrimWeb {
     /**
      * 创建WebView的layout --- 创建飞船整体,飞船建造完毕
      *
-     * @param builder
-     *         PrimBuilder
+     * @param builder PrimBuilder
      */
     private void createLayout(PrimBuilder builder) {
         webViewManager = WebViewManager.createWebView()
@@ -246,15 +247,14 @@ public class PrimWeb {
                 .build();
     }
 
-    /** 飞船建造完毕进入 -- 准备阶段,检查所有引擎是否正常工作 */
+    /**
+     * 飞船建造完毕进入 -- 准备阶段,检查所有引擎是否正常工作
+     */
     void ready() {
         // 加载 webView设置
         createSetting();
+        createUrlLoader();
 
-        // 加载 url加载器
-        if (null == urlLoader) {
-            urlLoader = new UrlLoader(webView);
-        }
 
         // 加载 webViewClient
         createWebViewClient();
@@ -264,6 +264,13 @@ public class PrimWeb {
 
         // 加载js脚本注入
         createJsInterface();
+    }
+
+    private void createUrlLoader() {
+        // 加载 url加载器
+        if (null == urlLoader) {
+            urlLoader = new UrlLoader(webView);
+        }
     }
 
     private void createJsInterface() {
@@ -320,7 +327,9 @@ public class PrimWeb {
                 .build();
     }
 
-    /** 准备完毕 发起最终阶段 加载url -------> 飞船发射 */
+    /**
+     * 准备完毕 发起最终阶段 加载url -------> 飞船发射
+     */
     PrimWeb launch(String url) {
         if (null == headers || headers.isEmpty()) {
             urlLoader.loadUrl(url);
@@ -377,7 +386,9 @@ public class PrimWeb {
             this.context = new WeakReference<>(context);
         }
 
-        /** 设置webview的父类 */
+        /**
+         * 设置webview的父类
+         */
         public UIControllerBuilder setWebParent(@NonNull ViewGroup v, @NonNull ViewGroup.LayoutParams lp) {
             this.mViewGroup = v;
             this.mLayoutParams = lp;
@@ -391,7 +402,9 @@ public class PrimWeb {
             return new UIControllerBuilder(this);
         }
 
-        /** 所有设置完成 */
+        /**
+         * 所有设置完成
+         */
         public PerBuilder build() {
             if (mViewGroup == null) {
                 throw new NullPointerException("ViewGroup not null,please check your code!");
@@ -510,9 +523,7 @@ public class PrimWeb {
         /**
          * 使用自定义的进度指示器 注意需要继承{@link BaseIndicatorView}
          *
-         * @param indicatorView
-         *         自定义的指示器view
-         *
+         * @param indicatorView 自定义的指示器view
          * @return CommonBuilder
          */
         public CommonBuilder useCustomTopIndicator(@NonNull BaseIndicatorView indicatorView) {
@@ -545,7 +556,9 @@ public class PrimWeb {
             this.primBuilder = primBuilder;
         }
 
-        /** 设置代理的webview 若不设置使用默认的 */
+        /**
+         * 设置代理的webview 若不设置使用默认的
+         */
         public CommonBuilder setAgentWebView(IAgentWebView webView) {
             primBuilder.webView = webView;
             primBuilder.mView = webView.getAgentWebView();
@@ -557,37 +570,49 @@ public class PrimWeb {
             return this;
         }
 
-        /** web的代理设置 */
+        /**
+         * web的代理设置
+         */
         public CommonBuilder setAgentWebSetting(IAgentWebSetting agentWebSetting) {
             primBuilder.setting = agentWebSetting;
             return this;
         }
 
-        /** 设置自定义的url加载器 */
+        /**
+         * 设置自定义的url加载器
+         */
         public CommonBuilder setUrlLoader(IUrlLoader urlLoader) {
             primBuilder.urlLoader = urlLoader;
             return this;
         }
 
-        /** 设置自定义js 方法加载器 */
+        /**
+         * 设置自定义js 方法加载器
+         */
         public CommonBuilder setCallJsLoader(ICallJsLoader callJsLoader) {
             primBuilder.callJsLoader = callJsLoader;
             return this;
         }
 
-        /** 设置模式 js脚本的注入模式 */
+        /**
+         * 设置模式 js脚本的注入模式
+         */
         public CommonBuilder setModeType(ModeType modeType) {
             primBuilder.modeType = modeType;
             return this;
         }
 
-        /** 设置WebView的类型 如果设置了setAgentWebView 此方法最好不要调用setAgentWebView 会默认判断webview的类型 */
+        /**
+         * 设置WebView的类型 如果设置了setAgentWebView 此方法最好不要调用setAgentWebView 会默认判断webview的类型
+         */
         public CommonBuilder setWebViewType(WebViewType webViewType) {
             primBuilder.setWebViewType(webViewType);
             return this;
         }
 
-        /** 设置代理的WebViewClient 兼容android webview 和 x5 webview */
+        /**
+         * 设置代理的WebViewClient 兼容android webview 和 x5 webview
+         */
         public CommonBuilder setWebViewClient(AgentWebViewClient agentWebViewClient) {
             primBuilder.agentWebViewClient = agentWebViewClient;
             return this;
@@ -603,7 +628,9 @@ public class PrimWeb {
             return this;
         }
 
-        /** 设置代理的WebChromeClient 兼容android webview 和 x5 webview */
+        /**
+         * 设置代理的WebChromeClient 兼容android webview 和 x5 webview
+         */
         public CommonBuilder setWebChromeClient(AgentChromeClient agentWebChromeClient) {
             primBuilder.agentWebChromeClient = agentWebChromeClient;
             return this;
@@ -619,49 +646,65 @@ public class PrimWeb {
             return this;
         }
 
-        /** 检查js方法是否存在 */
+        /**
+         * 检查js方法是否存在
+         */
         public CommonBuilder setListenerCheckJsFunction(CommonJSListener commonJSListener) {
             primBuilder.commonJSListener = commonJSListener;
             return this;
         }
 
-        /** 注入js脚本 */
+        /**
+         * 注入js脚本
+         */
         public CommonBuilder addJavascriptInterface(@NonNull String name, @NonNull Object o) {
             primBuilder.addJavaObject(name, o);
             return this;
         }
 
-        /** 是否允许打开其他应用 */
+        /**
+         * 是否允许打开其他应用
+         */
         public CommonBuilder alwaysOpenOtherPage(boolean alwaysOpenOtherPage) {
             primBuilder.alwaysOpenOtherPage = alwaysOpenOtherPage;
             return this;
         }
 
-        /** 设置自定义的UI控制器 */
+        /**
+         * 设置自定义的UI控制器
+         */
         public CommonBuilder setWebUIController(AbsWebUIController absWebUIController) {
             primBuilder.absWebUIController = absWebUIController;
             return this;
         }
 
-        /** 设置是否允许上传文件 默认为允许 */
+        /**
+         * 设置是否允许上传文件 默认为允许
+         */
         public CommonBuilder setAllowUploadFile(boolean flag) {
             primBuilder.allowUploadFile = flag;
             return this;
         }
 
-        /** 设置是否允许定位 默认为允许 */
+        /**
+         * 设置是否允许定位 默认为允许
+         */
         public CommonBuilder setGeolocation(boolean flag) {
             primBuilder.isGeolocation = flag;
             return this;
         }
 
-        /** 上传文件 false 调用系统文件  true 调用自定义的文件库 */
+        /**
+         * 上传文件 false 调用系统文件  true 调用自定义的文件库
+         */
         public CommonBuilder setUpdateInvokThrid(boolean flag) {
             primBuilder.invokingThird = flag;
             return this;
         }
 
-        /** 设置完成开始建造 */
+        /**
+         * 设置完成开始建造
+         */
         public PerBuilder buildWeb() {
             return primBuilder.build();
         }
@@ -687,7 +730,9 @@ public class PrimWeb {
 //
 //    }
 
-    /** 设置完成准备发射 */
+    /**
+     * 设置完成准备发射
+     */
     public static class PerBuilder {
         private PrimWeb primWeb;
         private boolean isReady = false;
@@ -716,7 +761,9 @@ public class PrimWeb {
         return webViewType;
     }
 
-    /** 获取webview的父view */
+    /**
+     * 获取webview的父view
+     */
     public FrameLayout getRootView() {
         if (null != webViewManager) {
             return webViewManager.getWebParentView();
@@ -724,7 +771,9 @@ public class PrimWeb {
         return null;
     }
 
-    /** 获取调用js方法 */
+    /**
+     * 获取调用js方法
+     */
     public ICallJsLoader getCallJsLoader() {
         checkWebView();
         if (callJsLoader == null) {
@@ -733,7 +782,9 @@ public class PrimWeb {
         return callJsLoader;
     }
 
-    /** 获取注入js脚本方法 */
+    /**
+     * 获取注入js脚本方法
+     */
     public IJsInterface getJsInterface() {
         checkWebView();
         if (mJsInterface == null) {
@@ -742,7 +793,9 @@ public class PrimWeb {
         return mJsInterface;
     }
 
-    /** 获取websettings， Object具体的是android webSetting 还是x5 webSetting 自己判断强转 */
+    /**
+     * 获取websettings， Object具体的是android webSetting 还是x5 webSetting 自己判断强转
+     */
     public Object getWebSettings() {
         if (null == setting) {
             if (webViewType == WebViewType.Android) {
@@ -754,13 +807,17 @@ public class PrimWeb {
         return setting.getWebSetting();
     }
 
-    /** 长按图片等会用到 类型自己转换 */
+    /**
+     * 长按图片等会用到 类型自己转换
+     */
     public Object getHitTestResult() {
         checkWebView();
         return webView.getAgentHitTestResult();
     }
 
-    /** 获取url加载器 加载URL和刷新url操作 */
+    /**
+     * 获取url加载器 加载URL和刷新url操作
+     */
     public IUrlLoader getUrlLoader() {
         checkWebView();
         if (null == urlLoader) {
@@ -769,7 +826,9 @@ public class PrimWeb {
         return urlLoader;
     }
 
-    /** 设置webview的生命周期 */
+    /**
+     * 设置webview的生命周期
+     */
     public IWebLifeCycle webLifeCycle() {
         if (webLifeCycle == null) {
             if (webView != null) {
@@ -779,13 +838,17 @@ public class PrimWeb {
         return webLifeCycle;
     }
 
-    /** 获取webview */
+    /**
+     * 获取webview
+     */
     public IAgentWebView getWebView() {
         checkWebView();
         return webView;
     }
 
-    /** 获取真实的webview 类型可以自己强转 */
+    /**
+     * 获取真实的webview 类型可以自己强转
+     */
     public View getRealWebView() {
         checkWebView();
         return webView.getAgentWebView();
@@ -794,8 +857,7 @@ public class PrimWeb {
     /**
      * Check for the presence of a JS method
      *
-     * @param checkJsFunction
-     *         CommonJSListener
+     * @param checkJsFunction CommonJSListener
      */
     public void setListenerCheckJsFunction(CommonJSListener checkJsFunction) {
         if (null == commonJSListener) {
@@ -819,11 +881,8 @@ public class PrimWeb {
     /**
      * handler onKeyDown
      *
-     * @param keyCode
-     *         keyCode
-     * @param event
-     *         KeyEvent
-     *
+     * @param keyCode keyCode
+     * @param event   KeyEvent
      * @return true handler;false no handler
      */
     public boolean handlerKeyEvent(int keyCode, KeyEvent event) {
@@ -871,8 +930,7 @@ public class PrimWeb {
     /**
      * 用第三方库选择文件,回调逻辑需自己处理
      *
-     * @param thriedChooserListener
-     *         ThriedChooserListener
+     * @param thriedChooserListener ThriedChooserListener
      */
     public void setThriedChooserListener(FileValueCallbackMiddleActivity.ThriedChooserListener thriedChooserListener) {
         FileValueCallbackMiddleActivity.setThriedChooserListener(thriedChooserListener);
