@@ -142,6 +142,7 @@ public class PrimWeb {
 
     private boolean invokingThird;
 
+
     public static PrimBuilder with(Activity context) {
         if (context == null) {
             throw new NullPointerException("context can not be null");
@@ -150,18 +151,27 @@ public class PrimWeb {
     }
 
     public static void init(Application application) {
-        // X5浏览器初始化
-        QbSdk.initX5Environment(application, new QbSdk.PreInitCallback() {
-            @Override
-            public void onCoreInitFinished() {
-                PWLog.d("onCoreInitFinished");
+        init(application, false);
+    }
+
+    public static void init(Application application, boolean useX5) {
+        if (useX5) {//避免不必要的初始化
+            // X5浏览器初始化
+            if (!QbSdk.isTbsCoreInited()) {
+                QbSdk.initX5Environment(application, new QbSdk.PreInitCallback() {
+                    @Override
+                    public void onCoreInitFinished() {
+                        PWLog.d("onCoreInitFinished");
+                    }
+
+                    @Override
+                    public void onViewInitFinished(boolean b) {
+                        PWLog.d("onViewInitFinished:" + b);
+                    }
+                });
             }
 
-            @Override
-            public void onViewInitFinished(boolean b) {
-                PWLog.d("onViewInitFinished:" + b);
-            }
-        });
+        }
     }
 
 
@@ -709,26 +719,6 @@ public class PrimWeb {
             return primBuilder.build();
         }
     }
-
-//    public static class JsInterfaceBuilder {
-//        private PrimBuilder primBuilder;
-//
-//        public JsInterfaceBuilder(PrimBuilder primBuilder) {
-//            this.primBuilder = primBuilder;
-//        }
-//
-//        /** 注入js脚本 */
-//        public JsInterfaceBuilder addJavascriptInterface(@NonNull String name, @NonNull Object o) {
-//            primBuilder.addJavaObject(name, o);
-//            return this;
-//        }
-//
-//        /** 设置完成开始建造 */
-//        public PerBuilder buildWeb() {
-//            return primBuilder.build();
-//        }
-//
-//    }
 
     /**
      * 设置完成准备发射

@@ -9,7 +9,7 @@ import android.util.Log;
  * @time 2019/1/7 - 1:56 PM
  */
 public class PWLog {
-    public static boolean LOG = false;
+    public static boolean LOG = true;
 
     private static String TAG = "PrimWeb";
 

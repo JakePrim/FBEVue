@@ -54,7 +54,7 @@ public class CommonActivity extends AppCompatActivity implements WebFragment.OnF
         String url;
         switch (extra) {
             case "0":
-                url = "https://m.jd.com/";
+                url = "file:///android_asset/webpage/hitTestResult.html";
                 fragmentTransaction.add(R.id.frame_layout, webFragment = WebFragment.newInstance(url, "Fragment"), WebFragment.class.getSimpleName());
                 break;
             case "1":

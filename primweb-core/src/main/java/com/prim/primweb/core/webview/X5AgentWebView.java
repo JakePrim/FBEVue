@@ -7,11 +7,13 @@ import android.os.Looper;
 import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
 import com.prim.primweb.core.jsloader.AgentValueCallback;
+import com.prim.primweb.core.utils.PWLog;
 import com.prim.primweb.core.utils.PrimWebUtils;
 import com.tencent.smtt.sdk.ValueCallback;
 import com.tencent.smtt.sdk.WebChromeClient;
@@ -45,11 +47,12 @@ public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings
     }
 
     public X5AgentWebView(Context context, AttributeSet attributeSet) {
-        this(context, attributeSet,-1);
+        this(context, attributeSet, -1);
     }
 
     public X5AgentWebView(Context context, AttributeSet attributeSet, int i) {
         super(context, attributeSet, i);
+        PWLog.d("X5 Web浏览器内核创建");
     }
 
     @Override
@@ -145,6 +148,7 @@ public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings
 
     @Override
     public void loadAgentUrl(String url) {
+        PWLog.d("X5内核加载地址:" + url);
         this.loadUrl(url);
     }
 
@@ -215,6 +219,18 @@ public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings
         if (null != listener) {
             listener.onScrollChange(this, l, t, oldl, oldt);
         }
+    }
+
+    @Override
+    public ActionMode startActionMode(ActionMode.Callback callback) {
+        PWLog.e("startActionMode");
+        return super.startActionMode(callback);
+    }
+
+    @Override
+    public ActionMode startActionMode(ActionMode.Callback callback, int type) {
+        PWLog.e("startActionMode");
+        return super.startActionMode(callback, type);
     }
 
     @Override

@@ -17,6 +17,6 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        PrimWeb.init(this);
+        PrimWeb.init(this, true);
     }
 }

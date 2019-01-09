@@ -1,14 +1,17 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.novoda.bintray-release'
+//apply plugin: 'com.novoda.bintray-release'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion '26.0.2'
+    compileSdkVersion 27
+    buildToolsVersion '27.0.3'
     defaultConfig {
         minSdkVersion 17
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionCode 1
-        versionName "1.0"
+        versionName "1.1"
+        ndk {
+            abiFilters 'armeabi'
+        }
     }
 
     buildTypes {
@@ -21,12 +24,10 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    testCompile 'junit:junit:4.12'
-    compile 'com.zhy:mpermission-api:1.0.0'
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.zhy:mpermission-api:1.0.0'
     annotationProcessor 'com.zhy:mpermission-compiler:1.0.0'
-    compile files('libs/tbs_sdk_thirdapp_v3.6.0.1183_43604.jar')
+    api files('libs/tbs_sdk_thirdapp_v3.6.0.1310.jar')
 }
 
 repositories {
@@ -35,15 +36,15 @@ repositories {
     }
 }
 
-//添加
-publish {
-    userOrg = 'jakeprim'//bintray.com用户名
-    groupId = 'com.prim.lib'//jcenter上的路径
-    artifactId = 'prim-picker'//项目名称
-    publishVersion = '1.0.4'//版本号
-    desc = 'This is an android file selector'
-    website = 'https://github.com/JakePrim/PrimFilePicker'
-}
+////添加
+//publish {
+//    userOrg = 'jakeprim'//bintray.com用户名
+//    groupId = 'com.prim.lib'//jcenter上的路径
+//    artifactId = 'prim-picker'//项目名称
+//    publishVersion = '1.0.4'//版本号
+//    desc = 'This is an android file selector'
+//    website = 'https://github.com/JakePrim/PrimFilePicker'
+//}
 
 tasks.withType(Javadoc) {
     options.encoding = "UTF-8"
