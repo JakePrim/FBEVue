@@ -26,6 +26,7 @@ import com.prim.primweb.core.handler.IKeyEventInterceptor;
 import com.prim.primweb.core.handler.KeyEventHandler;
 import com.prim.primweb.core.jsloader.CommonJSListener;
 import com.prim.primweb.core.jsloader.CommonJavaObject;
+import com.prim.primweb.core.service.X5InitService;
 import com.prim.primweb.core.uicontroller.AbsWebUIController;
 import com.prim.primweb.core.uicontroller.BaseIndicatorView;
 import com.prim.primweb.core.uicontroller.DefaultWebUIController;
@@ -142,6 +143,8 @@ public class PrimWeb {
 
     private boolean invokingThird;
 
+    private Context mAppContext;
+
     //设置是否显示debug 的log，注意线上环境设置为false
     public static void setLog(boolean isLog) {
         PWLog.LOG = isLog;
@@ -171,23 +174,8 @@ public class PrimWeb {
      */
     public static void init(Application application, boolean useX5) {
         if (useX5) {//避免不必要的初始化
-            // X5浏览器初始化
-            if (!QbSdk.isTbsCoreInited()) {
-                QbSdk.initX5Environment(application, new QbSdk.PreInitCallback() {
-                    @Override
-                    public void onCoreInitFinished() {
-                        PWLog.d("X5 --> onCoreInitFinished");
-                    }
-
-                    @Override
-                    public void onViewInitFinished(boolean b) {
-                        PWLog.d("X5 --> onViewInitFinished:" + b);
-                    }
-                });
-            } else {
-                PWLog.d("X5 --> isTbsCoreInited");
-            }
-
+            Intent intent = new Intent(application, X5InitService.class);
+            application.startService(intent);
         }
     }
 
@@ -197,7 +185,7 @@ public class PrimWeb {
      *
      * @param builder 飞船设定系统
      */
-    PrimWeb(PrimBuilder builder) {
+    private PrimWeb(PrimBuilder builder) {
         doCheckSafe(builder);
 
         createLayout(builder);
@@ -449,6 +437,12 @@ public class PrimWeb {
             mJavaObject.put(key, o);
         }
 
+        /**
+         * 设置webview的类型
+         *
+         * @param webViewType 目前支持两种类型 X5 Android
+         *                    //TODO WebView初始化会消耗内存 加载速度慢 此处待优化
+         */
         private void setWebViewType(WebViewType webViewType) {
             this.webViewType = webViewType;
             if (null == this.webView) {
@@ -602,7 +596,7 @@ public class PrimWeb {
         /**
          * web的代理设置
          */
-        public CommonBuilder setAgentWebSetting(IAgentWebSetting agentWebSetting) {
+        public CommonBuilder setWebSetting(IAgentWebSetting agentWebSetting) {
             primBuilder.setting = agentWebSetting;
             return this;
         }
@@ -640,7 +634,7 @@ public class PrimWeb {
         }
 
         /**
-         * 设置代理的WebViewClient 兼容android webview 和 x5 webview
+         * 设置代理的WebViewClient 兼容android webView 和 x5 webView
          */
         public CommonBuilder setWebViewClient(AgentWebViewClient agentWebViewClient) {
             primBuilder.agentWebViewClient = agentWebViewClient;
@@ -658,7 +652,7 @@ public class PrimWeb {
         }
 
         /**
-         * 设置代理的WebChromeClient 兼容android webview 和 x5 webview
+         * 设置代理的WebChromeClient 兼容android webView 和 x5 webView
          */
         public CommonBuilder setWebChromeClient(AgentChromeClient agentWebChromeClient) {
             primBuilder.agentWebChromeClient = agentWebChromeClient;

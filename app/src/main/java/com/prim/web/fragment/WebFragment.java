@@ -1,8 +1,5 @@
 package com.prim.web.fragment;
 
-import android.annotation.TargetApi;
-import android.app.Activity;
-import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -12,7 +9,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -20,7 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
-import android.webkit.WebChromeClient;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -33,7 +28,6 @@ import com.prim.primweb.core.file.FileType;
 import com.prim.primweb.core.file.FileValueCallbackMiddleActivity;
 import com.prim.primweb.core.jsloader.AgentValueCallback;
 import com.prim.primweb.core.jsloader.CommonJSListener;
-import com.prim.primweb.core.utils.ImageHandlerUtil;
 import com.prim.primweb.core.utils.PrimWebUtils;
 import com.prim.primweb.core.webclient.webchromeclient.AgentChromeClient;
 import com.prim.web.R;
@@ -41,9 +35,6 @@ import com.prim.web.setting.CustomX5Setting;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
-
-import java.io.File;
-import java.util.List;
 
 import picker.prim.com.primpicker_core.PrimPicker;
 import picker.prim.com.primpicker_core.engine.ImageEngine;
@@ -203,7 +194,7 @@ public class WebFragment extends Fragment implements ItemSelected, FragmentKeyDo
                     .useDefaultTopIndicator()
                     .setWebViewType(PrimWeb.WebViewType.X5)
                     .setListenerCheckJsFunction(this)
-                    .setAgentWebSetting(new CustomX5Setting())
+                    .setWebSetting(new CustomX5Setting())
                     .buildWeb()
                     .lastGo()
                     .launch(mParam1);

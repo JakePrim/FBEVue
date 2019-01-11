@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.prim.primweb.core">
+    package="com.prim.primweb.core">
 
     <application>
 
@@ -9,7 +9,7 @@
             android:exported="false"
             android:launchMode="standard"
             android:theme="@style/PermissionActivity"
-            android:windowSoftInputMode="stateHidden|stateAlwaysHidden"/>
+            android:windowSoftInputMode="stateHidden|stateAlwaysHidden" />
 
         <activity
             android:name=".file.FileValueCallbackMiddleActivity"
@@ -17,7 +17,7 @@
             android:exported="false"
             android:launchMode="standard"
             android:theme="@style/PermissionActivity"
-            android:windowSoftInputMode="stateHidden|stateAlwaysHidden"/>
+            android:windowSoftInputMode="stateHidden|stateAlwaysHidden" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -26,8 +26,10 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"/>
+                android:resource="@xml/file_paths" />
         </provider>
+
+        <service android:name=".service.X5InitService" />
     </application>
 
 </manifest>
