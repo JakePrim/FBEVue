@@ -7,6 +7,8 @@ import android.os.Build;
 import android.os.Looper;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.ActionMode;
+import android.view.ContextMenu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -17,9 +19,11 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.prim.primweb.core.jsloader.AgentValueCallback;
+import com.prim.primweb.core.utils.PWLog;
 import com.prim.primweb.core.utils.PrimWebUtils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 
@@ -286,6 +290,23 @@ public class AndroidAgentWebView extends WebView implements IAgentWebView<WebSet
     @Override
     public void addJavascriptInterfaceAgent(Object object, String name) {
         this.addJavascriptInterface(object, name);
+    }
+
+    @Override
+    protected void onCreateContextMenu(ContextMenu menu) {
+        try {
+//            menu.add("测试");
+            Method emulateShiftHeld = getClass().getMethod("emulateShiftHeld", new Class[0]);
+            emulateShiftHeld.setAccessible(true);
+            emulateShiftHeld.invoke(this, (Object[]) null);
+        }  catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
     }
 
     // 解决WebView内存泄漏问题；参考AgentWeb X5 webview 解决了此问题，具体看x5webview源码

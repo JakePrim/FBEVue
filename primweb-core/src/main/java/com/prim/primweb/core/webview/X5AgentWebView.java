@@ -2,25 +2,35 @@ package com.prim.primweb.core.webview;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.os.Build;
 import android.os.Looper;
 import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.ActionMode;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
+import com.prim.primweb.core.R;
 import com.prim.primweb.core.jsloader.AgentValueCallback;
 import com.prim.primweb.core.utils.PWLog;
 import com.prim.primweb.core.utils.PrimWebUtils;
+import com.tencent.smtt.sdk.QbSdk;
 import com.tencent.smtt.sdk.ValueCallback;
 import com.tencent.smtt.sdk.WebChromeClient;
 import com.tencent.smtt.sdk.WebSettings;
 import com.tencent.smtt.sdk.WebView;
 import com.tencent.smtt.sdk.WebViewClient;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
 
@@ -53,6 +63,8 @@ public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings
     public X5AgentWebView(Context context, AttributeSet attributeSet, int i) {
         super(context, attributeSet, i);
         PWLog.d("X5 Web浏览器内核创建");
+        setARModeEnable(true);
+
     }
 
     @Override
@@ -222,6 +234,48 @@ public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings
     }
 
     @Override
+    public boolean onLongClick(View view) {
+        return super.onLongClick(view);
+    }
+
+    @Override
+    protected void onCreateContextMenu(ContextMenu menu) {
+        super.onCreateContextMenu(menu);
+        menu.add("测试");
+        try {
+            //通过反射获取webView
+            Field webViewField = getClass().getDeclaredField("g");
+            Object webView = webViewField.get(this);
+            //反射webView 的emulateShiftHeld 调用
+            Method var3 = com.tencent.smtt.utils.q.a(webView, "emulateShiftHeld", new Class[0]);
+            var3.setAccessible(true);
+            var3.invoke(webView, (Object[]) null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static Method a(Object var0, String var1, Class... var2) {
+        Method var3 = null;
+        Class var4 = var0.getClass();
+
+        while (var4 != Object.class) {
+            try {
+                if (var4 == null) {
+                    return null;
+                }
+
+                var3 = var4.getDeclaredMethod(var1, var2);
+                return var3;
+            } catch (Exception var6) {
+                var4 = var4.getSuperclass();
+            }
+        }
+
+        return null;
+    }
+
+    @Override
     public ActionMode startActionMode(ActionMode.Callback callback) {
         PWLog.e("startActionMode");
         return super.startActionMode(callback);
@@ -231,6 +285,43 @@ public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings
     public ActionMode startActionMode(ActionMode.Callback callback, int type) {
         PWLog.e("startActionMode");
         return super.startActionMode(callback, type);
+    }
+
+    @Override
+    public ActionMode startActionModeForChild(View originalView, ActionMode.Callback callback) {
+        PWLog.e("startActionModeForChild");
+        return super.startActionModeForChild(originalView, callback);
+    }
+
+    @Override
+    public ActionMode startActionModeForChild(View originalView, ActionMode.Callback callback, int type) {
+        PWLog.e("startActionModeForChild");
+        return super.startActionModeForChild(originalView, callback, type);
+    }
+
+    @Override
+    protected boolean drawChild(Canvas canvas, View child, long drawingTime) {
+        boolean ret = super.drawChild(canvas, child, drawingTime);
+        canvas.save();
+        Paint paint = new Paint();
+        paint.setColor(0x7fff0000);
+        paint.setTextSize(24.f);
+        paint.setAntiAlias(true);
+        if (getX5WebViewExtension() != null) {
+            canvas.drawText(this.getContext().getPackageName() + "-pid:"
+                    + android.os.Process.myPid(), 10, 50, paint);
+            canvas.drawText(
+                    "X5  Core:" + QbSdk.getTbsVersion(this.getContext()), 10,
+                    100, paint);
+        } else {
+            canvas.drawText(this.getContext().getPackageName() + "-pid:"
+                    + android.os.Process.myPid(), 10, 50, paint);
+            canvas.drawText("Sys Core", 10, 100, paint);
+        }
+        canvas.drawText(Build.MANUFACTURER, 10, 150, paint);
+        canvas.drawText(Build.MODEL, 10, 200, paint);
+        canvas.restore();
+        return ret;
     }
 
     @Override

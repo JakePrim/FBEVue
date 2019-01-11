@@ -142,6 +142,10 @@ public class PrimWeb {
 
     private boolean invokingThird;
 
+    //设置是否显示debug 的log，注意线上环境设置为false
+    public static void setLog(boolean isLog) {
+        PWLog.LOG = isLog;
+    }
 
     public static PrimBuilder with(Activity context) {
         if (context == null) {
@@ -150,10 +154,21 @@ public class PrimWeb {
         return new PrimBuilder(context);
     }
 
+    /**
+     * 使用系统的内核
+     *
+     * @param application
+     */
     public static void init(Application application) {
         init(application, false);
     }
 
+    /**
+     * 增加构造方法,如果不使用X5的内核，避免不必要的执行操作，不需要初始化X5
+     *
+     * @param application
+     * @param useX5
+     */
     public static void init(Application application, boolean useX5) {
         if (useX5) {//避免不必要的初始化
             // X5浏览器初始化
@@ -161,14 +176,16 @@ public class PrimWeb {
                 QbSdk.initX5Environment(application, new QbSdk.PreInitCallback() {
                     @Override
                     public void onCoreInitFinished() {
-                        PWLog.d("onCoreInitFinished");
+                        PWLog.d("X5 --> onCoreInitFinished");
                     }
 
                     @Override
                     public void onViewInitFinished(boolean b) {
-                        PWLog.d("onViewInitFinished:" + b);
+                        PWLog.d("X5 --> onViewInitFinished:" + b);
                     }
                 });
+            } else {
+                PWLog.d("X5 --> isTbsCoreInited");
             }
 
         }
@@ -193,7 +210,7 @@ public class PrimWeb {
 
 
     /**
-     * webView 安全检查 --- 检查飞船的各种设定是否安全
+     * webView 安全检查加载配置 --- 检查飞船的各种设定是否安全
      */
     private void doCheckSafe(PrimBuilder builder) {
         this.webView = builder.webView;
@@ -224,6 +241,7 @@ public class PrimWeb {
             webView = new AndroidAgentWebView(context.get());
             mView = webView.getAgentWebView();
         }
+        //移除存在风险的JavascriptInterface
         webView.removeRiskJavascriptInterface();
         if (this.absWebUIController == null) {
             this.absWebUIController = new DefaultWebUIController(context.get());
@@ -231,7 +249,7 @@ public class PrimWeb {
     }
 
     /**
-     * 创建WebView的layout --- 创建飞船整体,飞船建造完毕
+     * 创建WebView的layout --- 创建飞船整体
      *
      * @param builder PrimBuilder
      */
@@ -258,21 +276,22 @@ public class PrimWeb {
     }
 
     /**
-     * 飞船建造完毕进入 -- 准备阶段,检查所有引擎是否正常工作
+     * 飞船建造完毕进入 --- 准备阶段,检查所有引擎是否正常工作
      */
     void ready() {
-        // 加载 webView设置
+        //加载 webView设置
         createSetting();
+
+        //加载 url加载器
         createUrlLoader();
 
-
-        // 加载 webViewClient
+        //加载webViewClient 系统设置的优先
         createWebViewClient();
 
         //加载webChromeClient 系统设置的优先
         createWebChromeClient();
 
-        // 加载js脚本注入
+        //加载js脚本注入
         createJsInterface();
     }
 

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -50,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
         setContentView(R.layout.activity_main);
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         adapter = new PrimAdapter(data, this, this);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
 //        recyclerView.addItemDecoration(new DividerItemDecoration(this, VERTICAL_LIST));
         int resId = R.anim.layout_animation_fall_down;
         LayoutAnimationController animation = AnimationUtils.loadLayoutAnimation(this, resId);

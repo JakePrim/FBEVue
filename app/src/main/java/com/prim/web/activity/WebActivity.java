@@ -2,15 +2,20 @@ package com.prim.web.activity;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Message;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
@@ -20,10 +25,15 @@ import android.webkit.WebViewClient;
 import android.widget.RelativeLayout;
 
 import com.prim.primweb.core.PrimWeb;
+import com.prim.primweb.core.utils.PWLog;
+import com.prim.primweb.core.webclient.callback.CustomViewCallback;
 import com.prim.primweb.core.webclient.webchromeclient.AgentChromeClient;
 import com.prim.primweb.core.webclient.webviewclient.AgentWebViewClient;
 import com.prim.primweb.core.webview.IAgentWebView;
 import com.prim.web.R;
+import com.tencent.smtt.export.external.interfaces.IX5WebViewBase;
+import com.tencent.smtt.sdk.QbSdk;
+import com.tencent.smtt.sdk.WebViewCallbackClient;
 
 public class WebActivity extends AppCompatActivity {
 
@@ -59,6 +69,7 @@ public class WebActivity extends AppCompatActivity {
                 .lastGo()
                 .launch("file:///android_asset/webpage/hitTestResult.html");
     }
+
 
     AgentWebViewClient agentWebViewClient = new AgentWebViewClient() {
         @Override
@@ -112,6 +123,8 @@ public class WebActivity extends AppCompatActivity {
                 actionBar.setTitle(title);
             }
         }
+
+
     };
 
     AgentChromeClient agentChromeClient = new AgentChromeClient() {
@@ -121,6 +134,24 @@ public class WebActivity extends AppCompatActivity {
             if (actionBar != null) {
                 actionBar.setTitle(s);
             }
+        }
+
+        @Override
+        public boolean onCreateWindow(View view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
+            PWLog.e("onCreateWindow");
+            return super.onCreateWindow(view, isDialog, isUserGesture, resultMsg);
+        }
+
+        @Override
+        public void onShowCustomView(View view, int requestedOrientation, CustomViewCallback callback) {
+            super.onShowCustomView(view, requestedOrientation, callback);
+            PWLog.e("onShowCustomView");
+        }
+
+        @Override
+        public void onShowCustomView(View view, CustomViewCallback callback) {
+            super.onShowCustomView(view, callback);
+            PWLog.e("onShowCustomView");
         }
     };
 
@@ -155,8 +186,7 @@ public class WebActivity extends AppCompatActivity {
     /**
      * 显示更多菜单
      *
-     * @param view
-     *         菜单依附在该View下面
+     * @param view 菜单依附在该View下面
      */
     private void showPoPup(View view) {
         if (mPopupMenu == null) {
