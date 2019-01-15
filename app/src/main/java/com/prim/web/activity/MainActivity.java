@@ -42,7 +42,8 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
             "自定义进度条",
             "下拉回弹(仿微信的效果)",
             "下拉刷新",
-            "非常感谢AgentWeb开源项目提供的思路,参考了部分代码"
+            "非常感谢AgentWeb开源项目提供的思路,参考了部分代码",
+            "Web+原生混合"
     };
 
     @Override
@@ -103,6 +104,9 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
                 break;
             case 13:
                 startActivity(new Intent(this, CommonActivity.class).putExtra(CommonActivity.TYPE, "12"));
+                break;
+            case 14:
+                startActivity(new Intent(this, WebDetailActivity.class).putExtra(CommonActivity.TYPE, "12"));
                 break;
         }
     }

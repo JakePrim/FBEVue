@@ -38,8 +38,8 @@ public class X5InitService extends IntentService {
 
     private void initX5() {
         if (!QbSdk.isTbsCoreInited()) {
-            PWLog.e("preInit");
-            QbSdk.preInit(getApplicationContext(), preInitCallback);// 设置X5初始化完成的回调接口
+            PWLog.e("preInit 预加载中......");
+            QbSdk.preInit(getApplicationContext(), null);// 设置X5初始化完成的回调接口
         }
         QbSdk.initX5Environment(getApplicationContext(), preInitCallback);
     }

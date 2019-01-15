@@ -350,4 +350,43 @@ public class AndroidAgentWebView extends WebView implements IAgentWebView<WebSet
         }
     }
 
+    @Override
+    public void setScrollView(PrimScrollView scrollView) {
+
+    }
+
+    @Override
+    public void customScrollBy(int dy) {
+
+    }
+
+    @Override
+    public void customScrollTo(int toY) {
+
+    }
+
+    @Override
+    public int customGetContentHeight() {
+        return 0;
+    }
+
+    @Override
+    public int customGetWebScrollY() {
+        return 0;
+    }
+
+    @Override
+    public int customComputeVerticalScrollRange() {
+        return 0;
+    }
+
+    @Override
+    public void startFling(int vy) {
+
+    }
+
+    @Override
+    public void setOnScrollBarShowListener(PrimScrollView.OnScrollBarShowListener listener) {
+
+    }
 }

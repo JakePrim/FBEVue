@@ -28,6 +28,7 @@ import com.tencent.smtt.sdk.ValueCallback;
 import com.tencent.smtt.sdk.WebChromeClient;
 import com.tencent.smtt.sdk.WebSettings;
 import com.tencent.smtt.sdk.WebView;
+import com.tencent.smtt.sdk.WebViewCallbackClient;
 import com.tencent.smtt.sdk.WebViewClient;
 
 import java.lang.reflect.Field;
@@ -47,10 +48,13 @@ import java.util.Map;
 public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings> {
     private com.prim.primweb.core.listener.OnScrollChangeListener listener;
 
-
     private static final String TAG = "X5AgentWebView";
 
     private WebView.HitTestResult result;
+
+    private WebViewTouchHelper helper;
+
+    private boolean isTouched;
 
     public X5AgentWebView(Context context) {
         this(context, null);
@@ -62,9 +66,28 @@ public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings
 
     public X5AgentWebView(Context context, AttributeSet attributeSet, int i) {
         super(context, attributeSet, i);
-        PWLog.d("X5 Web浏览器内核创建");
-        setARModeEnable(true);
+        init();
+    }
 
+    public X5AgentWebView(Context context, AttributeSet attributeSet, int i, boolean b) {
+        super(context, attributeSet, i, b);
+        init();
+    }
+
+    public X5AgentWebView(Context context, AttributeSet attributeSet, int i, Map<String, Object> map, boolean b) {
+        super(context, attributeSet, i, map, b);
+        init();
+    }
+
+    private void init() {
+        getView().setVerticalScrollBarEnabled(false);
+        getView().setOverScrollMode(OVER_SCROLL_NEVER);
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        isTouched = ev.getAction() == MotionEvent.ACTION_DOWN || ev.getAction() == MotionEvent.ACTION_MOVE;
+        return super.dispatchTouchEvent(ev);
     }
 
     @Override
@@ -225,54 +248,39 @@ public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings
         this.listener = listener;
     }
 
+
     @Override
     protected void onScrollChanged(int l, int t, int oldl, int oldt) {
         super.onScrollChanged(l, t, oldl, oldt);
+        PWLog.e(TAG + ".onScrollChanged...");
         if (null != listener) {
             listener.onScrollChange(this, l, t, oldl, oldt);
         }
+        if (scrollBarShowListener != null) {
+            scrollBarShowListener.onShow();
+        }
+        int deltaY = t - oldt;
+        int height = getHeight() - getPaddingTop() - getPaddingBottom();
+        if (helper != null) {
+            helper.overScrollBy(deltaY, oldt, computeVerticalScrollRange() - height, isTouched);//计算速度
+        }
     }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent e) {
+        if (helper == null) {
+            return super.onTouchEvent(e);
+        }
+        if (!helper.onTouchEvent(e)) {
+            return false;
+        }
+        return super.onTouchEvent(e);
+    }
+
 
     @Override
     public boolean onLongClick(View view) {
         return super.onLongClick(view);
-    }
-
-    @Override
-    protected void onCreateContextMenu(ContextMenu menu) {
-        super.onCreateContextMenu(menu);
-        menu.add("测试");
-        try {
-            //通过反射获取webView
-            Field webViewField = getClass().getDeclaredField("g");
-            Object webView = webViewField.get(this);
-            //反射webView 的emulateShiftHeld 调用
-            Method var3 = com.tencent.smtt.utils.q.a(webView, "emulateShiftHeld", new Class[0]);
-            var3.setAccessible(true);
-            var3.invoke(webView, (Object[]) null);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static Method a(Object var0, String var1, Class... var2) {
-        Method var3 = null;
-        Class var4 = var0.getClass();
-
-        while (var4 != Object.class) {
-            try {
-                if (var4 == null) {
-                    return null;
-                }
-
-                var3 = var4.getDeclaredMethod(var1, var2);
-                return var3;
-            } catch (Exception var6) {
-                var4 = var4.getSuperclass();
-            }
-        }
-
-        return null;
     }
 
     @Override
@@ -380,5 +388,52 @@ public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void setScrollView(PrimScrollView scrollView) {
+        helper = new WebViewTouchHelper(scrollView, this);
+    }
+
+    @Override
+    public void customScrollBy(int dy) {
+        getView().scrollBy(0, dy);
+    }
+
+    @Override
+    public void customScrollTo(int toY) {
+        getView().scrollTo(0, toY);
+    }
+
+    @Override
+    public int customGetContentHeight() {
+        return (int) (getContentHeight() * getScale());
+    }
+
+    @Override
+    public int customGetWebScrollY() {
+        return getWebScrollY();
+    }
+
+    @Override
+    public int customComputeVerticalScrollRange() {
+        return super.computeVerticalScrollRange();
+    }
+
+    @Override
+    public void startFling(int vy) {
+        flingScroll(0, vy);
+    }
+
+    private PrimScrollView.OnScrollBarShowListener scrollBarShowListener;
+
+    @Override
+    public void setOnScrollBarShowListener(PrimScrollView.OnScrollBarShowListener listener) {
+        this.scrollBarShowListener = listener;
+    }
+
+    @Override
+    public boolean canScrollVertically(int direction) {
+        return getView().canScrollVertically(direction);///direction = -1 表示能否向下滚动 = 1 表示能否向上滚动
     }
 }

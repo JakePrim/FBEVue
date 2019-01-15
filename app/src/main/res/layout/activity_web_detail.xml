@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.prim.primweb.core.webview.PrimScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="50dp">
+
+        <com.prim.primweb.core.webview.X5AgentWebView
+            android:id="@+id/weView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginTop="10dp"
+            android:background="#eeeeee"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="点赞" />
+
+        <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginTop="10dp"-->
+        <!--android:orientation="vertical">-->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:layout_marginTop="10dp"
+            android:background="#eeeeee"
+            android:gravity="center"
+            android:text="推荐阅读" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:layout_marginTop="10dp"
+            android:background="#eeeeee"
+            android:gravity="center"
+            android:text="推荐阅读" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:layout_marginTop="10dp"
+            android:background="#eeeeee"
+            android:gravity="center"
+            android:text="推荐阅读" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="10dp"
+            android:background="#eeeeee"
+            android:gravity="center"
+            android:text="广告" />
+        <!--</LinearLayout>-->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="10dp"
+            android:background="#eeeeee"
+            android:gravity="center"
+            android:text="评论" />
+
+        <com.prim.primweb.core.webview.DetailRecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </com.prim.primweb.core.webview.PrimScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:background="#eeeeee"
+        android:orientation="horizontal"
+        android:visibility="visible">
+
+        <TextView
+            android:layout_width="150dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="输入评论" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="10dp"
+            android:background="@color/colorPrimary"
+            android:text="评论"
+            android:textColor="#ffffff" />
+    </LinearLayout>
+
+</RelativeLayout>

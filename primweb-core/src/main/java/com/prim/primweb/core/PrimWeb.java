@@ -58,6 +58,7 @@ import com.tencent.smtt.sdk.WebView;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * ================================================
@@ -145,6 +146,8 @@ public class PrimWeb {
 
     private Context mAppContext;
 
+    private static AtomicBoolean sLazyInitTag = new AtomicBoolean(false);
+
     //设置是否显示debug 的log，注意线上环境设置为false
     public static void setLog(boolean isLog) {
         PWLog.LOG = isLog;
@@ -172,11 +175,21 @@ public class PrimWeb {
      * @param application
      * @param useX5
      */
-    public static void init(Application application, boolean useX5) {
+    public static void init(Context application, boolean useX5) {
         if (useX5) {//避免不必要的初始化
             Intent intent = new Intent(application, X5InitService.class);
             application.startService(intent);
         }
+    }
+
+    public static void lazyInit(Context ctx) {
+
+        if (sLazyInitTag.get()) return;
+
+        sLazyInitTag.set(true);
+
+        // X5浏览器实列化
+        QbSdk.initX5Environment(ctx.getApplicationContext(), null);
     }
 
 
@@ -441,15 +454,21 @@ public class PrimWeb {
          * 设置webview的类型
          *
          * @param webViewType 目前支持两种类型 X5 Android
-         *                    //TODO WebView初始化会消耗内存 加载速度慢 此处待优化
+         *                    TODO WebView初始化会消耗内存 加载速度慢 此处待优化
          */
         private void setWebViewType(WebViewType webViewType) {
             this.webViewType = webViewType;
             if (null == this.webView) {
-                if (webViewType == WebViewType.X5) {
-                    this.webView = new X5AgentWebView(context.get());
-                    this.mView = this.webView.getAgentWebView();
-                } else {
+                try {
+                    if (webViewType == WebViewType.X5) {
+                        this.webView = new X5AgentWebView(context.get());
+                        this.mView = this.webView.getAgentWebView();
+                    } else {
+                        this.webView = new AndroidAgentWebView(context.get());
+                        this.mView = this.webView.getAgentWebView();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                     this.webView = new AndroidAgentWebView(context.get());
                     this.mView = this.webView.getAgentWebView();
                 }

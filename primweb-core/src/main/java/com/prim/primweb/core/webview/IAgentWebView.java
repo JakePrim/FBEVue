@@ -19,7 +19,7 @@ import java.util.Map;
  * 修订历史：v1.0.0
  * ================================================
  */
-public interface IAgentWebView<T> {
+public interface IAgentWebView<T> extends IDetailWebView{
 
     /** 移除有风险的 Webview 系统隐藏接口 */
     void removeRiskJavascriptInterface();

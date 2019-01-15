@@ -74,7 +74,7 @@ public class FileValueCallbackMiddleActivity extends Activity implements View.On
     }
 
     public static void getFileValueCallback(Activity activity, String type, boolean invokingThird, ChooserFileListener chooserFileListener) {
-        mChooserFileListener = new WeakReference<>(chooserFileListener);
+        mChooserFileListener = chooserFileListener;
         Intent intent = new Intent(activity, FileValueCallbackMiddleActivity.class);
         intent.putExtra(KEY_TYPE, type);
         intent.putExtra(INVOKING, invokingThird);
@@ -82,7 +82,7 @@ public class FileValueCallbackMiddleActivity extends Activity implements View.On
     }
 
     public static void getFileValueCallback(boolean isJsUpload, Activity activity, String type, boolean invokingThird, ChooserFileListener chooserFileListener) {
-        mChooserFileListener = new WeakReference<>(chooserFileListener);
+        mChooserFileListener = chooserFileListener;
         Intent intent = new Intent(activity, FileValueCallbackMiddleActivity.class);
         intent.putExtra(KEY_TYPE, type);
         intent.putExtra(INVOKING, invokingThird);
@@ -109,36 +109,32 @@ public class FileValueCallbackMiddleActivity extends Activity implements View.On
         void chooserFile(Intent data, String path, String encode);
     }
 
-    public static WeakReference<JsUploadChooserCallback> mJsUploadChooserCallback;
+    public static JsUploadChooserCallback mJsUploadChooserCallback;
 
-    public static WeakReference<ChooserFileListener> mChooserFileListener;
+    public static ChooserFileListener mChooserFileListener;
 
-    public static WeakReference<ThriedChooserListener> mThriedChooserListener;
+    public static ThriedChooserListener mThriedChooserListener;
 
     public static void setJsUploadChooserCallback(JsUploadChooserCallback jsUploadChooserCallback) {
-        mJsUploadChooserCallback = new WeakReference<>(jsUploadChooserCallback);
-        Log.e(TAG, "setJsUploadChooserCallback: " + mJsUploadChooserCallback.get());
+        mJsUploadChooserCallback = jsUploadChooserCallback;
     }
 
     public static void removeJsUploadChooserCallback() {
         if (mJsUploadChooserCallback != null) {
-            mJsUploadChooserCallback.clear();
             mJsUploadChooserCallback = null;
         }
     }
 
     public static void setChooserFileListener(ChooserFileListener chooserFileListener) {
-        mChooserFileListener = new WeakReference<>(chooserFileListener);
+        mChooserFileListener =chooserFileListener;
     }
 
     public static void setThriedChooserListener(ThriedChooserListener thriedChooserListener) {
-        mThriedChooserListener = new WeakReference<>(thriedChooserListener);
-        Log.e(TAG, "setThriedChooserListener: " + mThriedChooserListener.get());
+        mThriedChooserListener = thriedChooserListener;
     }
 
     public static void removeThriedChooserListener() {
         if (mThriedChooserListener != null) {
-            mThriedChooserListener.clear();
             mThriedChooserListener = null;
         }
     }
@@ -214,9 +210,9 @@ public class FileValueCallbackMiddleActivity extends Activity implements View.On
 
     private void jsOpenVideos() {
         if (invokingThird) {
-            if (mThriedChooserListener != null && mThriedChooserListener.get() != null) {
+            if (mThriedChooserListener != null ) {
                 //调用第三方库逻辑需要自己处理
-                mThriedChooserListener.get().jsOpenVideos();
+                mThriedChooserListener.jsOpenVideos();
             }
             commentDialog.dismiss();
             finish();
@@ -227,9 +223,9 @@ public class FileValueCallbackMiddleActivity extends Activity implements View.On
 
     private void jsOpenPick() {
         if (invokingThird) {
-            if (mThriedChooserListener != null && mThriedChooserListener.get() != null) {
+            if (mThriedChooserListener != null) {
                 //调用第三方库逻辑需要自己处理
-                mThriedChooserListener.get().jsOpenPick();
+                mThriedChooserListener.jsOpenPick();
             }
             commentDialog.dismiss();
             finish();
@@ -341,7 +337,6 @@ public class FileValueCallbackMiddleActivity extends Activity implements View.On
     /** 上传视频或者图片 */
     private void requestImgVideo(Intent data, int requestCode, int resultCode) {
         if (isJsUpload) {
-            Log.e(TAG, "requestImgVideo: " + mJsUploadChooserCallback.get());
             String path = PrimWebUtils.uriToPath(this, processData(data)[0]);
             try {
                 new EncodeFileThread(path, data, mJsUploadChooserCallback).start();
@@ -350,8 +345,8 @@ public class FileValueCallbackMiddleActivity extends Activity implements View.On
                 finish();
             }
         } else {
-            if (mChooserFileListener != null && mChooserFileListener.get() != null) {
-                mChooserFileListener.get().updateFile(data, requestCode, resultCode);
+            if (mChooserFileListener != null) {
+                mChooserFileListener.updateFile(data, requestCode, resultCode);
             }
             mChooserFileListener = null;
             finish();
@@ -362,22 +357,20 @@ public class FileValueCallbackMiddleActivity extends Activity implements View.On
     private class EncodeFileThread extends Thread {
         private String path;
         private Intent data;
-        private WeakReference<JsUploadChooserCallback> mJsUploadChooserCallback;
+        private JsUploadChooserCallback mJsUploadChooserCallback;
 
-        EncodeFileThread(String path, Intent data, WeakReference<JsUploadChooserCallback> mJsUploadChooserCallback) {
+        EncodeFileThread(String path, Intent data, JsUploadChooserCallback mJsUploadChooserCallback) {
             this.path = path;
             this.data = data;
             this.mJsUploadChooserCallback = mJsUploadChooserCallback;
-            Log.e(TAG, "EncodeFileThread: " + this.mJsUploadChooserCallback.get());
         }
 
         @Override
         public void run() {
             String encode = encode(path);
-            Log.e(TAG, "run: " + "path -->　" + path + " | " + this.mJsUploadChooserCallback.get());
-            if (mJsUploadChooserCallback != null && mJsUploadChooserCallback.get() != null) {
+            if (mJsUploadChooserCallback != null) {
                 Log.e(TAG, "requestImgVideo: path --> " + mJsUploadChooserCallback + " path --> " + path + " | encode --> " + encode);
-                mJsUploadChooserCallback.get().chooserFile(data, path, encode);
+                mJsUploadChooserCallback.chooserFile(data, path, encode);
             }
             finish();
         }
@@ -423,13 +416,13 @@ public class FileValueCallbackMiddleActivity extends Activity implements View.On
         uri = cameraUri;
         if (isJsUpload) {
             String path = PrimWebUtils.uriToPath(this, uri);
-            if (mJsUploadChooserCallback != null && mJsUploadChooserCallback.get() != null) {
-                mJsUploadChooserCallback.get().chooserFile(data, path, null);
+            if (mJsUploadChooserCallback != null) {
+                mJsUploadChooserCallback.chooserFile(data, path, null);
             }
             finish();
         } else {
-            if (mChooserFileListener != null && mChooserFileListener.get() != null) {
-                mChooserFileListener.get().updateFile(uri);
+            if (mChooserFileListener != null) {
+                mChooserFileListener.updateFile(uri);
             }
             mChooserFileListener = null;
             finish();
@@ -451,13 +444,13 @@ public class FileValueCallbackMiddleActivity extends Activity implements View.On
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            if (mJsUploadChooserCallback != null && mJsUploadChooserCallback.get() != null) {
-                mJsUploadChooserCallback.get().chooserFile(data, path, encode);
+            if (mJsUploadChooserCallback != null) {
+                mJsUploadChooserCallback.chooserFile(data, path, encode);
             }
             finish();
         } else {
-            if (mChooserFileListener != null && mChooserFileListener.get() != null) {
-                mChooserFileListener.get().updateFile(uri);
+            if (mChooserFileListener != null) {
+                mChooserFileListener.updateFile(uri);
             }
             mChooserFileListener = null;
             finish();
@@ -469,8 +462,8 @@ public class FileValueCallbackMiddleActivity extends Activity implements View.On
      * 取消mFilePathCallback回调
      */
     private void cancelFilePathCallback() {
-        if (mChooserFileListener != null && mChooserFileListener.get() != null) {
-            mChooserFileListener.get().updateCancle();
+        if (mChooserFileListener != null) {
+            mChooserFileListener.updateCancle();
         }
         mChooserFileListener = null;
         finish();
