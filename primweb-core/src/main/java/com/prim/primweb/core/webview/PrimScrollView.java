@@ -589,18 +589,6 @@ public class PrimScrollView extends ViewGroup {
         //同时滚动webView
         detailWebView.customScrollTo(webViewToY);
         mScroller.startScroll(getScrollX(), getScrollY(), 0, dy);
-        if (onScrollChangeListener != null) {
-            postDelayed(new Runnable() {
-                @Override
-                public void run() {
-
-                }
-            }, 100);
-        }
-        if (onScrollChangeListener != null) {
-            PWLog.e(TAG + ".toggleScrollToListView...isWebComment:" + isWebComment);
-            onScrollChangeListener.onChange(isWebComment ? ViewType.COMMENT : ViewType.WEB);
-        }
         ViewCompat.postInvalidateOnAnimation(this);
         return isWebComment;
     }
@@ -695,7 +683,11 @@ public class PrimScrollView extends ViewGroup {
     protected void onScrollChanged(int l, int t, int oldl, int oldt) {
         super.onScrollChanged(l, t, oldl, oldt);
         if (onScrollChangeListener != null) {
-            onScrollChangeListener.onChange(ViewType.OTHER);
+            if (t >= maxScrollY) {
+                onScrollChangeListener.onChange(ViewType.COMMENT);
+            } else {
+                onScrollChangeListener.onChange(ViewType.OTHER);
+            }
         }
     }
 
