@@ -386,6 +386,11 @@ public class AndroidAgentWebView extends WebView implements IAgentWebView<WebSet
     }
 
     @Override
+    public void setOnDetailScrollChangeListener(PrimScrollView.OnScrollChangeListener scrollChangeListener) {
+
+    }
+
+    @Override
     public void setOnScrollBarShowListener(PrimScrollView.OnScrollBarShowListener listener) {
 
     }

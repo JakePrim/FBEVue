@@ -32,32 +32,28 @@ import java.lang.reflect.Method;
 public class PrimScrollView extends ViewGroup {
 
     private static final String TAG = "PrimScrollView";
-
     //子view的数量
     private int mChildrenSize = 0;
-
-
     private Scroller mScroller;
     private float mLastY;
     private VelocityTracker mVelocityTracker;
     private int mMinimumVelocity;
     private int maxScrollY;
     private boolean isTouched;
-    //    private MyScrollBarShowListener mScrollBarShowListener;
     private int oldScrollY;
     private int oldWebViewScrollY;
     private int mTouchSlop;
-
     private IDetailWebView detailWebView;
-
-    private IDetailListView listView;
-
+    private IDetailListView commentListView;
     private MyScrollBarShowListener scrollBarShowListener;
-
+    private MyOnScrollChangeListener onScrollChangeListener;
     public static final int DIRECT_BOTTOM = 1;
     public static final int DIRECT_TOP = -1;
-
     private boolean isIntercept = false;
+    private View mWebView;
+    private int mWebHeight = 0;
+    private int mListHeight = 0;
+    private int mOtherHeight = 0;
 
     public PrimScrollView(Context context) {
         this(context, null);
@@ -84,6 +80,7 @@ public class PrimScrollView extends ViewGroup {
         mMinimumVelocity = configuration.getScaledMinimumFlingVelocity();
         mTouchSlop = configuration.getScaledTouchSlop();
         scrollBarShowListener = new MyScrollBarShowListener();
+        onScrollChangeListener = new MyOnScrollChangeListener();
         //初始化滚动条
         boolean hasScrollBarVerticalThumb = false;//有的手机没有滚动条，开启滚动条的话会崩溃
         try {
@@ -124,23 +121,23 @@ public class PrimScrollView extends ViewGroup {
         for (int i = 0; i < getChildCount(); i++) {
             View childAt = getChildAt(i);
             if (childAt instanceof IDetailListView) {
-                listView = (IDetailListView) childAt;
+                commentListView = (IDetailListView) childAt;
             } else if (childAt instanceof IDetailWebView) {
                 detailWebView = (IDetailWebView) childAt;
             }
         }
-        if (listView != null) {
-            listView.setScrollView(this);
-            listView.setOnScrollBarShowListener(scrollBarShowListener);
+        if (commentListView != null) {
+            commentListView.setScrollView(this);
+            commentListView.setOnScrollBarShowListener(scrollBarShowListener);
+            commentListView.setOnDetailScrollChangeListener(onScrollChangeListener);
         }
         if (detailWebView != null) {
             detailWebView.setScrollView(this);
             detailWebView.setOnScrollBarShowListener(scrollBarShowListener);
+            detailWebView.setOnDetailScrollChangeListener(onScrollChangeListener);
             observeWebViewHeightChange();
         }
     }
-
-    private View mWebView;
 
     /**
      * 监听WebView的高度是否发生变化
@@ -156,27 +153,33 @@ public class PrimScrollView extends ViewGroup {
 
                 @Override
                 public boolean onPreDraw() {
+                    PWLog.e(TAG + ".onPreDraw...update");
                     mWebView.getGlobalVisibleRect(outRect);
                     int distBottom = PrimScrollView.this.getHeight() - outRect.height();
-                    if (distBottom <= 0
-                            || PrimScrollView.this.getScrollY() == 0 //没触发滑动的时候不扩展
-                            || mWebView.getHeight() < PrimScrollView.this.getHeight()) {//webview的高度本省就小于ScrollView
-                        return true;
-                    }
+                    //if判断代码有问题 不能及时的更新webView的高度
+//                    if (distBottom <= 0
+////                            || PrimScrollView.this.getScrollY() == 0 //没触发滑动的时候不扩展
+//                            || mWebView.getHeight() < PrimScrollView.this.getHeight()) {//webview的高度本省就小于ScrollView
+//                        return true;
+//                    }
                     int newWebViewContentHeight = ((IAgentWebView) detailWebView).getAgentContentHeight();
                     if (mOldWebViewContentHeight == newWebViewContentHeight) {//新的高度等于老的高度不改变
                         return true;
                     }
                     mOldWebViewContentHeight = newWebViewContentHeight;
-                    LayoutParams layoutParams = mWebView.getLayoutParams();
-                    layoutParams.height = mWebView.getMeasuredHeight() + distBottom;
-                    mWebView.setLayoutParams(layoutParams);
+                    setWebHeight(mWebView.getMeasuredHeight() + distBottom);
+                    mWebView.getViewTreeObserver().removeOnPreDrawListener(this);
                     return true;
                 }
             });
         }
     }
 
+    public void setWebHeight(int height) {
+        LayoutParams layoutParams = mWebView.getLayoutParams();
+        layoutParams.height = height;
+        mWebView.setLayoutParams(layoutParams);
+    }
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
@@ -188,9 +191,9 @@ public class PrimScrollView extends ViewGroup {
         final int parentHeight = b - t;
         mChildrenSize = childCount;
         maxScrollY = 0;
-        int mWebHeight = 0;
-        int mListHeight = 0;
-        int mOtherHeight = 0;
+        mWebHeight = 0;
+        mListHeight = 0;
+        mOtherHeight = 0;
         PWLog.e(TAG + ".onLayout...parentBottom+" + parentBottom);
         //遍历子view 设置子view的高度和宽度
         for (int i = 0; i < childCount; i++) {
@@ -238,17 +241,12 @@ public class PrimScrollView extends ViewGroup {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         //onMeasure 在onLayout之前
-        int totalHeight = 0;
         final int childCount = getChildCount();
         for (int i = 0; i < childCount; i++) {
             View childAt = getChildAt(i);
             //如果子View也为ViewGroup则先测量子View
             measureChildWithMargins(childAt, widthMeasureSpec, 0, heightMeasureSpec, 0);
-//            if (childAt.getMeasuredHeight() > totalHeight) {
-//                totalHeight += childAt.getMeasuredHeight();
-//            }
         }
-//        setMeasuredDimension(widthMeasureSpec, totalHeight);
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
@@ -262,7 +260,6 @@ public class PrimScrollView extends ViewGroup {
         //重新生成子view的LayoutParams -> MarginLayoutParams extends ViewGroup.LayoutParams
         return new MarginLayoutParams(getContext(), attrs);
     }
-
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -291,31 +288,36 @@ public class PrimScrollView extends ViewGroup {
                         + ",maxScrollY=" + maxScrollY + "\n"
                         + ",getScaleY=" + getScrollY());
                 if (dY != 0) {//下滑操作
-                    if (listView != null && listView.canScrollVertically(DIRECT_TOP) && isAtTop) {////因为ListView上滑操作导致ListView可以继续下滑，故要先ListView滑到顶部，再滑动MyScrollView
-                        listView.customScrollBy((int) -delta);
-                        PWLog.e(TAG + "dY != 0.listView.customScrollBy...交给listview 滚动delta:" + delta);
+                    if (commentListView != null && commentListView.canScrollVertically(DIRECT_TOP) && isAtTop) {////因为ListView上滑操作导致ListView可以继续下滑，故要先ListView滑到顶部，再滑动MyScrollView
+                        commentListView.customScrollBy((int) -delta);
+                        PWLog.e(TAG + ".onTouchEvent dY != 0.commentListView.customScrollBy...交给listview 滚动delta:" + delta);
                     } else if (detailWebView != null && detailWebView.canScrollVertically(DIRECT_BOTTOM) && isAtBottom) {////因为WebView下滑，导致WebView可以继续上滑，故要先让WebView滑到底部，再滑动MyScrollView
                         detailWebView.customScrollBy((int) -delta);
-                        PWLog.e(TAG + "dY != 0.listView.customScrollBy...交给listview 滚动delta:" + delta);
+                        PWLog.e(TAG + ".onTouchEvent dY != 0.commentListView.customScrollBy...交给listview 滚动delta:" + delta);
                     } else {//当listview处于顶部 webview处于底部时 滑动ScrollView
                         customScrollBy(dY);
-                        PWLog.e(TAG + "dY != 0.customScrollBy...交给ScrollView 滚动adjustScrollY:" + dY);
+//                        if (webToCommentListener != null) {
+//                            webToCommentListener.onComment(false);
+//                        }
+                        PWLog.e(TAG + ".onTouchEvent dY != 0.customScrollBy...交给ScrollView 滚动adjustScrollY:" + dY);
                     }
                 } else {//dY == 0表示滑动到顶部或者底部了
-                    if (delta < 0 && isAtTop && listView != null) {//上滑操作
-                        PWLog.e(TAG + "dY = 0.customScrollBy...交给listView 滚动delta:" + delta);
-                        listView.customScrollBy((int) -delta);
+                    if (delta < 0 && isAtTop && commentListView != null) {//上滑操作
+                        PWLog.e(TAG + ".onTouchEvent dY = 0.customScrollBy...交给listView 滚动delta:" + delta);
+                        commentListView.customScrollBy((int) -delta);
+//                        if (webToCommentListener != null) {
+//                            webToCommentListener.onComment(true);
+//                        }
                     } else if (delta > 0 && isAtBottom && detailWebView != null) {
                         detailWebView.customScrollBy((int) -delta);
-                        PWLog.e(TAG + "dY = 0.customScrollBy...交给WebView 滚动delta:" + delta);
-                    } else {
-                        PWLog.e(TAG + "dY = 0.customScrollBy...交给ScrollView 滚动delta:" + delta);
+                        PWLog.e(TAG + ".onTouchEvent dY = 0.customScrollBy...交给WebView 滚动delta:" + delta);
                     }
                 }
                 mLastY = y;
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
+                PWLog.e(TAG + ".ACTION_CANCEL..." + event.getY());
                 //设置滑动速度
                 final VelocityTracker velocityTracker = mVelocityTracker;
                 //计算当前的速度
@@ -324,8 +326,8 @@ public class PrimScrollView extends ViewGroup {
                 float yVelocity = velocityTracker.getYVelocity(0);
                 if (Math.abs(yVelocity) > mMinimumVelocity) {
                     if (isAtTop) {
-                        if (listView != null && listView.canScrollVertically(DIRECT_TOP)) {
-                            listView.startFling((int) -yVelocity);
+                        if (commentListView != null && commentListView.canScrollVertically(DIRECT_TOP)) {
+                            commentListView.startFling((int) -yVelocity);
                         }
                     } else if (isAtBottom) {
                         if (detailWebView != null && detailWebView.canScrollVertically(DIRECT_BOTTOM)) {
@@ -349,7 +351,7 @@ public class PrimScrollView extends ViewGroup {
         boolean isCanScrollBottom = getScrollY() < maxScrollY && mScroller.isFinished();//滑动的Y的距离小于最大的滑动距离 并且 滑动动画已完成才允许滑动
         boolean isCanScrollTop = getScrollY() > 0 && mScroller.isFinished();//滑动的Y的距离大于0 如果小于或等于0 则表示已经滑动到底部了
         boolean isWebViewScrollBottom = detailWebView != null && detailWebView.canScrollVertically(DIRECT_BOTTOM);//判断web是否继续向下滑//
-        boolean isListViewScrollTop = listView != null && listView.canScrollVertically(DIRECT_TOP);//listview 是否可以继续向上滑动
+        boolean isListViewScrollTop = commentListView != null && commentListView.canScrollVertically(DIRECT_TOP);//listview 是否可以继续向上滑动
         int action = ev.getAction();
         acquireVelocityTracker(ev);
         switch (action & MotionEvent.ACTION_MASK) {//ACTION_MASK应用于多点触摸操作可以处理 ACTION_POINTER_DOWN ACTION_POINTER_UP 而ACTION_DOWN ACTION_UP是单点触摸操作
@@ -367,18 +369,24 @@ public class PrimScrollView extends ViewGroup {
                 if (dY < 0) {//向下滚动
                     if (isTouchPointInView((View) detailWebView, ev)) {
                         isIntercept = !isWebViewScrollBottom && isCanScrollBottom;//如果触摸的是webView webview可以向下滚动 则滚动交给webview自己处理 如果webView 不能向下滚动则进行拦截
-                    } else if (isTouchPointInView((View) listView, ev)) {
+                        PWLog.e(TAG + ".onInterceptTouchEvent...down...detailWebView -> " + isIntercept);
+                    } else if (isTouchPointInView((View) commentListView, ev)) {
                         isIntercept = isCanScrollBottom;
+                        PWLog.e(TAG + ".onInterceptTouchEvent...down...commentListView -> " + isIntercept);
                     } else {
                         isIntercept = false;
+                        PWLog.e(TAG + ".onInterceptTouchEvent...down...scrollview -> " + isIntercept);
                     }
                 } else if (dY > 0) {//向上滚动
                     if (isTouchPointInView((View) detailWebView, ev)) {
                         isIntercept = isCanScrollTop;
-                    } else if (isTouchPointInView((View) listView, ev)) {
+                        PWLog.e(TAG + ".onInterceptTouchEvent...up...detailWebView -> " + isIntercept);
+                    } else if (isTouchPointInView((View) commentListView, ev)) {
                         isIntercept = !isListViewScrollTop && isCanScrollTop;
+                        PWLog.e(TAG + ".onInterceptTouchEvent...up...commentListView -> " + isIntercept);
                     } else {
                         isIntercept = false;
+                        PWLog.e(TAG + ".onInterceptTouchEvent...up...scrollview -> " + isIntercept);
                     }
                 }
                 mLastY = y;
@@ -484,7 +492,7 @@ public class PrimScrollView extends ViewGroup {
                 this.detailWebView.startFling(-curVelocity);
                 return;
             }
-        } else if (currY > oldY && oldY >= maxScrollY && curVelocity != 0 && listView != null && listView.startFling(curVelocity)) {
+        } else if (currY > oldY && oldY >= maxScrollY && curVelocity != 0 && commentListView != null && commentListView.startFling(curVelocity)) {
             mScroller.forceFinished(true);
             return;
         }
@@ -507,7 +515,7 @@ public class PrimScrollView extends ViewGroup {
     protected int computeVerticalScrollExtent() {
         try {
             int webExtent = ViewUtils.computeVerticalScrollExtent((View) detailWebView);
-            int listExtent = ViewUtils.computeVerticalScrollExtent((View) listView);
+            int listExtent = ViewUtils.computeVerticalScrollExtent((View) commentListView);
             return webExtent + listExtent;
         } catch (Exception e) {
             e.printStackTrace();
@@ -524,7 +532,7 @@ public class PrimScrollView extends ViewGroup {
     protected int computeVerticalScrollOffset() {
         try {
             int webOffset = ViewUtils.computeVerticalScrollOffset((View) detailWebView);
-            int listOffset = ViewUtils.computeVerticalScrollOffset((View) listView);
+            int listOffset = ViewUtils.computeVerticalScrollOffset((View) commentListView);
             return webOffset + getScrollY() + listOffset;
         } catch (Exception e) {
             e.printStackTrace();
@@ -541,7 +549,7 @@ public class PrimScrollView extends ViewGroup {
     protected int computeVerticalScrollRange() {
         try {
             int webScrollRange = detailWebView.customComputeVerticalScrollRange();
-            int listScrollRange = ViewUtils.computeVerticalScrollRange((View) listView);
+            int listScrollRange = ViewUtils.computeVerticalScrollRange((View) commentListView);
             return webScrollRange + maxScrollY + listScrollRange;
         } catch (Exception e) {
             e.printStackTrace();
@@ -551,29 +559,50 @@ public class PrimScrollView extends ViewGroup {
 
     /**
      * 跳转到列表区域，如果已经在列表区域，则跳回去，如果滚动动画没有结束，则无响应
+     *
+     * @return false 说明跳转到了评论列表 true 说明跳转到了正文
      */
-    public void toggleScrollToListView() {
+    public boolean toggleScrollToListView() {
         if (!mScroller.isFinished()) {
-            return;
+            return false;
         }
-        View webView = (View) mWebView;
+        final boolean isWebComment;
+        View webView = (View) detailWebView;
         int webHeight = webView.getHeight() - webView.getPaddingTop() - webView.getPaddingBottom();
         int dy;
         int webViewToY;
         int scrollY = getScrollY();
         if (scrollY >= maxScrollY) {//不是toggle模式才回到原来的位置
+            isWebComment = false;
             dy = oldScrollY - maxScrollY;
             webViewToY = oldWebViewScrollY;
         } else {
+            isWebComment = true;
             dy = maxScrollY - scrollY;
             oldScrollY = scrollY;
+            //存储当前web的位置
             oldWebViewScrollY = detailWebView.customGetWebScrollY();
             webViewToY = detailWebView.customComputeVerticalScrollRange() - webHeight;
         }
-        listView.scrollToFirst();
+        //评论永远保持在第一个
+        commentListView.scrollToFirst();
+        //同时滚动webView
         detailWebView.customScrollTo(webViewToY);
         mScroller.startScroll(getScrollX(), getScrollY(), 0, dy);
+        if (onScrollChangeListener != null) {
+            postDelayed(new Runnable() {
+                @Override
+                public void run() {
+
+                }
+            }, 100);
+        }
+        if (onScrollChangeListener != null) {
+            PWLog.e(TAG + ".toggleScrollToListView...isWebComment:" + isWebComment);
+            onScrollChangeListener.onChange(isWebComment ? ViewType.COMMENT : ViewType.WEB);
+        }
         ViewCompat.postInvalidateOnAnimation(this);
+        return isWebComment;
     }
 
     /**
@@ -584,7 +613,7 @@ public class PrimScrollView extends ViewGroup {
         View webView = (View) mWebView;
         int webHeight = webView.getHeight() - webView.getPaddingTop() - webView.getPaddingBottom();
         int webViewToY = detailWebView.customComputeVerticalScrollRange() - webHeight;
-        listView.scrollToFirst();
+        commentListView.scrollToFirst();
         detailWebView.customScrollTo(webViewToY);
         mScroller.startScroll(getScrollX(), getScrollY(), 0, dy);
         ViewCompat.postInvalidateOnAnimation(this);
@@ -596,7 +625,7 @@ public class PrimScrollView extends ViewGroup {
     public void scrollToTop() {
         detailWebView.customScrollTo(0);
         mScroller.startScroll(getScrollX(), getScrollY(), 0, -getScrollY());
-        listView.scrollToFirst();
+        commentListView.scrollToFirst();
         ViewCompat.postInvalidateOnAnimation(this);
     }
 
@@ -616,5 +645,62 @@ public class PrimScrollView extends ViewGroup {
                 awakenScrollBars();
             }
         }
+    }
+
+    private OnScrollWebToCommentListener webToCommentListener;
+
+    public interface OnScrollWebToCommentListener {
+        void onComment(boolean isComment);
+    }
+
+    public void setOnScrollWebToCommentListener(OnScrollWebToCommentListener webToCommentListener) {
+        this.webToCommentListener = webToCommentListener;
+    }
+
+    public enum ViewType {
+        WEB,
+        COMMENT,
+        OTHER
+    }
+
+    public interface OnScrollChangeListener {
+        void onChange(ViewType viewType);
+    }
+
+    private class MyOnScrollChangeListener implements OnScrollChangeListener {
+
+        @Override
+        public void onChange(ViewType viewType) {
+            switch (viewType) {
+                case WEB:
+                    if (webToCommentListener != null) {
+                        webToCommentListener.onComment(false);
+                    }
+                    break;
+                case COMMENT:
+                    if (webToCommentListener != null) {
+                        webToCommentListener.onComment(true);
+                    }
+                    break;
+                case OTHER:
+                    if (webToCommentListener != null) {
+                        webToCommentListener.onComment(false);
+                    }
+                    break;
+            }
+        }
+    }
+
+    @Override
+    protected void onScrollChanged(int l, int t, int oldl, int oldt) {
+        super.onScrollChanged(l, t, oldl, oldt);
+        if (onScrollChangeListener != null) {
+            onScrollChangeListener.onChange(ViewType.OTHER);
+        }
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
     }
 }

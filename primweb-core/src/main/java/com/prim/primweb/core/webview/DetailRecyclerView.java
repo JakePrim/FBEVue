@@ -11,6 +11,8 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.OverScroller;
 
+import com.prim.primweb.core.utils.PWLog;
+
 import java.lang.reflect.Field;
 
 /**
@@ -26,6 +28,10 @@ public class DetailRecyclerView extends RecyclerView implements IDetailListView 
     private ScrollerCompat scrollerCompat;//下次就不用再反射了
 
     private OverScroller overScroller;
+
+    private PrimScrollView.OnScrollBarShowListener listener;
+
+    private PrimScrollView.OnScrollChangeListener scrollChangeListener;
 
     public DetailRecyclerView(Context context) {
         super(context);
@@ -53,12 +59,18 @@ public class DetailRecyclerView extends RecyclerView implements IDetailListView 
 
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                PWLog.e(TAG + ".onScrollChanged..." + dy);
                 if (listener != null) {//滚动时显示滚动条
                     listener.onShow();
+                }
+                if (scrollChangeListener != null && dy != 0) {
+                    scrollChangeListener.onChange(PrimScrollView.ViewType.COMMENT);
                 }
             }
         });
     }
+
+    private static final String TAG = "DetailRecyclerView";
 
     @Override
     public void setScrollView(PrimScrollView scrollView) {
@@ -88,11 +100,16 @@ public class DetailRecyclerView extends RecyclerView implements IDetailListView 
         return fling(0, vy);
     }
 
-    private PrimScrollView.OnScrollBarShowListener listener;
 
     @Override
     public void setOnScrollBarShowListener(PrimScrollView.OnScrollBarShowListener listener) {
         this.listener = listener;
+    }
+
+
+    @Override
+    public void setOnDetailScrollChangeListener(PrimScrollView.OnScrollChangeListener scrollChangeListener) {
+        this.scrollChangeListener = scrollChangeListener;
     }
 
     @Override
@@ -131,7 +148,6 @@ public class DetailRecyclerView extends RecyclerView implements IDetailListView 
                 scrollerCompat = (ScrollerCompat) scrollerField.get(viewFlinger);
                 return (int) scrollerCompat.getCurrVelocity();
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }

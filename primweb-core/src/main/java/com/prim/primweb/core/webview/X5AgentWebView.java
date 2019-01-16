@@ -252,12 +252,15 @@ public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings
     @Override
     protected void onScrollChanged(int l, int t, int oldl, int oldt) {
         super.onScrollChanged(l, t, oldl, oldt);
-        PWLog.e(TAG + ".onScrollChanged...");
+        PWLog.e(TAG + ".onScrollChanged...l:" + l + " t:" + t);
         if (null != listener) {
             listener.onScrollChange(this, l, t, oldl, oldt);
         }
         if (scrollBarShowListener != null) {
             scrollBarShowListener.onShow();
+        }
+        if (scrollChangeListener != null) {
+            scrollChangeListener.onChange(PrimScrollView.ViewType.WEB);
         }
         int deltaY = t - oldt;
         int height = getHeight() - getPaddingTop() - getPaddingBottom();
@@ -423,6 +426,13 @@ public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings
     @Override
     public void startFling(int vy) {
         flingScroll(0, vy);
+    }
+
+    private PrimScrollView.OnScrollChangeListener scrollChangeListener;
+
+    @Override
+    public void setOnDetailScrollChangeListener(PrimScrollView.OnScrollChangeListener scrollChangeListener) {
+        this.scrollChangeListener = scrollChangeListener;
     }
 
     private PrimScrollView.OnScrollBarShowListener scrollBarShowListener;

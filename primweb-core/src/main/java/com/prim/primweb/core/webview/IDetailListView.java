@@ -17,6 +17,8 @@ public interface IDetailListView {
 
     void setOnScrollBarShowListener(PrimScrollView.OnScrollBarShowListener listener);
 
+    void setOnDetailScrollChangeListener(PrimScrollView.OnScrollChangeListener scrollChangeListener);
+
     /**
      * 滑到第一项
      */

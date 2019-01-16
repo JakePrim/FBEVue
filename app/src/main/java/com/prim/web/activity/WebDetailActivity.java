@@ -1,15 +1,19 @@
 package com.prim.web.activity;
 
 import android.os.Bundle;
+import android.os.TestLooperManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebSettings.LayoutAlgorithm;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.TextView;
 
+import com.prim.primweb.core.webview.PrimScrollView;
 import com.prim.primweb.core.webview.X5AgentWebView;
 import com.prim.web.R;
 import com.prim.web.adapter.DetailAdapter;
@@ -33,14 +37,18 @@ public class WebDetailActivity extends AppCompatActivity {
 
     private X5AgentWebView mWebView;
 
+    private PrimScrollView scrollView;
+
+    private TextView tv_comment;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web_detail);
         recyclerView = findViewById(R.id.recyclerView);
         mWebView = findViewById(R.id.weView);
-
-
+        scrollView = findViewById(R.id.scrollView);
+        tv_comment = findViewById(R.id.tv_comment);
         //支持javascript
         mWebView.getSettings().setJavaScriptEnabled(true);
         // 设置可以支持缩放
@@ -67,6 +75,17 @@ public class WebDetailActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new DetailAdapter(this, newBodyBeanList);
         recyclerView.setAdapter(adapter);
+
+        scrollView.setOnScrollWebToCommentListener(new PrimScrollView.OnScrollWebToCommentListener() {
+            @Override
+            public void onComment(boolean isComment) {
+                if (!isComment) {
+                    tv_comment.setText("评论");
+                } else {
+                    tv_comment.setText("正文");
+                }
+            }
+        });
     }
 
     /**
@@ -81,15 +100,23 @@ public class WebDetailActivity extends AppCompatActivity {
         //模拟详情页接口
         for (int i = 0; i < 200; i++) {
             NewBodyBean newBodyBean = null;
-//            if (i == 0) {
-//                newBodyBean = new NewBodyBean(0, "test", "", "", null);
-//            } else {
-            newBodyBean = new NewBodyBean(2, "test" + i, "data" + i, "url" + i, comments);
-//            }
+            if (i == 0) {
+                newBodyBean = new NewBodyBean(0, "test", "", "", null);
+            } else {
+                newBodyBean = new NewBodyBean(2, "test" + i, "data" + i, "url" + i, comments);
+            }
             newBodyBeanList.add(newBodyBean);
         }
     }
 
+    public void comment(View view) {
+        boolean b = scrollView.toggleScrollToListView();
+        if (b) {
+            tv_comment.setText("评论");
+        } else {
+            tv_comment.setText("正文");
+        }
+    }
 
     public static class NewBodyBean {
         private int tyoe;

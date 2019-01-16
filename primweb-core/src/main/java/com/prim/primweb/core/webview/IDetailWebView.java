@@ -23,5 +23,7 @@ public interface IDetailWebView {
 
     void startFling(int vy);
 
+    void setOnDetailScrollChangeListener(PrimScrollView.OnScrollChangeListener scrollChangeListener);
+
     void setOnScrollBarShowListener(PrimScrollView.OnScrollBarShowListener listener);
 }
