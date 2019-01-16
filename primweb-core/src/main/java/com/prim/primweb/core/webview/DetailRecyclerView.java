@@ -122,6 +122,16 @@ public class DetailRecyclerView extends RecyclerView implements IDetailListView 
         }
     }
 
+    @Override
+    public void scrollToCommentPosition(int position) {
+        LayoutManager layoutManager = getLayoutManager();
+        if (layoutManager instanceof LinearLayoutManager) {
+            ((LinearLayoutManager) layoutManager).scrollToPositionWithOffset(position, 0);
+        } else if (layoutManager instanceof StaggeredGridLayoutManager) {
+            ((StaggeredGridLayoutManager) layoutManager).scrollToPositionWithOffset(position, 0);
+        }
+    }
+
     /**
      * 获取RecyclerView滑动速度
      *

@@ -18,6 +18,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.prim.primweb.core.PrimWeb;
 import com.prim.web.R;
@@ -98,8 +99,14 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.BaseViewHo
         }
 
         @Override
-        public void setItem(WebDetailActivity.NewBodyBean bodyBean, int position) {
-            tv_item_title.setText(bodyBean.getTitle());
+        public void setItem(WebDetailActivity.NewBodyBean bodyBean, final int position) {
+            tv_item_title.setText("评论内容:你点我啊 "+bodyBean.getTitle());
+            tv_item_title.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(context, "你点到我了！" + position, Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 
@@ -155,8 +162,14 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.BaseViewHo
         }
 
         @Override
-        public void setItem(WebDetailActivity.NewBodyBean bodyBean, int position) {
+        public void setItem(WebDetailActivity.NewBodyBean bodyBean, final int position) {
             tv_item_comment_content.setText(bodyBean.getComments().get(0));
+            tv_item_comment_content.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(context, "哎呀，你点到我了！" + position, Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 }

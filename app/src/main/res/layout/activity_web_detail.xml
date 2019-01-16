@@ -14,62 +14,114 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
+
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:background="#eeeeee"
             android:gravity="center"
             android:padding="10dp"
-            android:text="点赞" />
+            android:text="这是点赞区哦" />
 
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_marginTop="10dp"
+                android:background="#eeeeee"
+                android:gravity="center"
+                android:padding="10dp"
+                android:onClick="zanClick"
+                android:text="点赞" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:background="#eeeeee"
+                android:gravity="center"
+                android:padding="10dp"
+                android:onClick="wxClick"
+                android:text="微信" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:background="#eeeeee"
+                android:gravity="center"
+                android:padding="10dp"
+                android:onClick="wxCClick"
+                android:text="朋友圈" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="#eeeeee"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="这是推荐区哦" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerView_test"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
         <!--<LinearLayout-->
         <!--android:layout_width="match_parent"-->
         <!--android:layout_height="wrap_content"-->
         <!--android:layout_marginTop="10dp"-->
         <!--android:orientation="vertical">-->
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="150dp"
-            android:layout_marginTop="10dp"
-            android:background="#eeeeee"
-            android:gravity="center"
-            android:text="推荐阅读" />
+        <!--<TextView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="150dp"-->
+        <!--android:layout_marginTop="10dp"-->
+        <!--android:background="#eeeeee"-->
+        <!--android:gravity="center"-->
+        <!--android:text="推荐阅读" />-->
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="150dp"
-            android:layout_marginTop="10dp"
-            android:background="#eeeeee"
-            android:gravity="center"
-            android:text="推荐阅读" />
+        <!--<TextView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="150dp"-->
+        <!--android:layout_marginTop="10dp"-->
+        <!--android:background="#eeeeee"-->
+        <!--android:gravity="center"-->
+        <!--android:text="推荐阅读" />-->
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="150dp"
-            android:layout_marginTop="10dp"
-            android:background="#eeeeee"
-            android:gravity="center"
-            android:text="推荐阅读" />
+        <!--<TextView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="150dp"-->
+        <!--android:layout_marginTop="10dp"-->
+        <!--android:background="#eeeeee"-->
+        <!--android:gravity="center"-->
+        <!--android:text="推荐阅读" />-->
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_marginTop="10dp"
-            android:background="#eeeeee"
-            android:gravity="center"
-            android:text="广告" />
+        <!--<TextView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="200dp"-->
+        <!--android:layout_marginTop="10dp"-->
+        <!--android:background="#eeeeee"-->
+        <!--android:gravity="center"-->
+        <!--android:text="广告" />-->
         <!--</LinearLayout>-->
 
         <TextView
-
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_marginTop="10dp"
             android:background="#eeeeee"
             android:gravity="center"
-            android:text="评论" />
+            android:text="在往下滑我就要到评论区了！" />
 
         <com.prim.primweb.core.webview.DetailRecyclerView
             android:id="@+id/recyclerView"
@@ -102,6 +154,18 @@
             android:onClick="comment"
             android:padding="10dp"
             android:text="评论"
+            android:textColor="#ffffff" />
+
+        <TextView
+            android:id="@+id/tv_comment_position"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="10dp"
+            android:background="@color/colorPrimary"
+            android:onClick="commentPosition"
+            android:padding="10dp"
+            android:text="强制定位评论第5条"
             android:textColor="#ffffff" />
     </LinearLayout>
 

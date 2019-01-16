@@ -12,6 +12,7 @@ import android.webkit.WebSettings.LayoutAlgorithm;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.prim.primweb.core.webview.PrimScrollView;
 import com.prim.primweb.core.webview.X5AgentWebView;
@@ -29,17 +30,19 @@ import java.util.List;
  */
 public class WebDetailActivity extends AppCompatActivity {
 
-    private RecyclerView recyclerView;
+    private RecyclerView recyclerView, recyclerView_test;
 
     private List<NewBodyBean> newBodyBeanList;
+    private List<NewBodyBean> testBeanList;
 
     DetailAdapter adapter;
+    DetailAdapter testAdapter;
 
     private X5AgentWebView mWebView;
 
     private PrimScrollView scrollView;
 
-    private TextView tv_comment;
+    private TextView tv_comment, tv_comment_position;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -48,7 +51,9 @@ public class WebDetailActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerView);
         mWebView = findViewById(R.id.weView);
         scrollView = findViewById(R.id.scrollView);
+        recyclerView_test = findViewById(R.id.recyclerView_test);
         tv_comment = findViewById(R.id.tv_comment);
+        tv_comment_position = findViewById(R.id.tv_comment_position);
         //支持javascript
         mWebView.getSettings().setJavaScriptEnabled(true);
         // 设置可以支持缩放
@@ -70,12 +75,15 @@ public class WebDetailActivity extends AppCompatActivity {
         mWebView.loadUrl("https://www.toutiao.com/a6645933655317283335/");
         //android:descendantFocusability="blocksDescendants"
 
+        recyclerView_test.setLayoutManager(new LinearLayoutManager(this));
+
         newBodyBeanList = new ArrayList<>();
         loadData();
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new DetailAdapter(this, newBodyBeanList);
+        testAdapter = new DetailAdapter(this, testBeanList);
         recyclerView.setAdapter(adapter);
-
+        recyclerView_test.setAdapter(testAdapter);
         scrollView.setOnScrollWebToCommentListener(new PrimScrollView.OnScrollWebToCommentListener() {
             @Override
             public void onComment(boolean isComment) {
@@ -92,19 +100,26 @@ public class WebDetailActivity extends AppCompatActivity {
      * 所有的数据都在一个接口中
      */
     private void loadData() {
-        List<String> comments = new ArrayList<>();
-        //模拟评论盖楼
-        for (int i = 0; i < 20; i++) {
-            comments.add("comment:" + i);
+        testBeanList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            NewBodyBean bodyBean = new NewBodyBean(0, "推荐阅读::" + i, "", "", null);
+            testBeanList.add(bodyBean);
         }
+
+        //模拟评论盖楼
+//        for (int i = 0; i < 20; i++) {
+//            comments.add("comment:" + i);
+//        }
         //模拟详情页接口
         for (int i = 0; i < 200; i++) {
+            List<String> comments = new ArrayList<>();
+            comments.add("comment::" + i);
             NewBodyBean newBodyBean = null;
-            if (i == 0) {
-                newBodyBean = new NewBodyBean(0, "test", "", "", null);
-            } else {
-                newBodyBean = new NewBodyBean(2, "test" + i, "data" + i, "url" + i, comments);
-            }
+//            if (i == 0) {
+////                newBodyBean = new NewBodyBean(0, "test", "", "", null);
+//            } else {
+            newBodyBean = new NewBodyBean(2, "test" + i, "data" + i, "url" + i, comments);
+//            }
             newBodyBeanList.add(newBodyBean);
         }
     }
@@ -116,6 +131,22 @@ public class WebDetailActivity extends AppCompatActivity {
         } else {
             tv_comment.setText("正文");
         }
+    }
+
+    public void commentPosition(View view) {
+        scrollView.scrollToCommentListView(5);
+    }
+
+    public void zanClick(View view) {
+        Toast.makeText(this, "赞了哦", Toast.LENGTH_SHORT).show();
+    }
+
+    public void wxClick(View view) {
+        Toast.makeText(this, "分享到微信了哦", Toast.LENGTH_SHORT).show();
+    }
+
+    public void wxCClick(View view) {
+        Toast.makeText(this, "分享到朋友圈了哦", Toast.LENGTH_SHORT).show();
     }
 
     public static class NewBodyBean {

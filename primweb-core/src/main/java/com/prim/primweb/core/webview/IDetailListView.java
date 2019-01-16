@@ -23,4 +23,11 @@ public interface IDetailListView {
      * 滑到第一项
      */
     void scrollToFirst();
+
+    /**
+     * 滑动到列表到某一项
+     *
+     * @param position
+     */
+    void scrollToCommentPosition(int position);
 }

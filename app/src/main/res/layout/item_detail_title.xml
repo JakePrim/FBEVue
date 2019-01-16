@@ -6,8 +6,11 @@
     <TextView
         android:id="@+id/tv_item_title"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="123"
+        android:layout_height="150dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:background="#eeeeee"
         android:gravity="center"
-        android:padding="10dp"/>
+        android:padding="10dp"
+        android:text="123" />
 </LinearLayout>
