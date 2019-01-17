@@ -6,14 +6,20 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebSettings.LayoutAlgorithm;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.prim.primweb.core.PrimWeb;
+import com.prim.primweb.core.webview.FullyLinearLayoutManager;
+import com.prim.primweb.core.webview.MyLinearLayoutManger;
 import com.prim.primweb.core.webview.PrimScrollView;
 import com.prim.primweb.core.webview.X5AgentWebView;
 import com.prim.web.R;
@@ -30,18 +36,12 @@ import java.util.List;
  */
 public class WebDetailActivity extends AppCompatActivity {
 
-    private RecyclerView recyclerView, recyclerView_test;
-
+    private RecyclerView recyclerView;
     private List<NewBodyBean> newBodyBeanList;
     private List<NewBodyBean> testBeanList;
-
     DetailAdapter adapter;
     DetailAdapter testAdapter;
-
-    private X5AgentWebView mWebView;
-
     private PrimScrollView scrollView;
-
     private TextView tv_comment, tv_comment_position;
 
     @Override
@@ -49,41 +49,30 @@ public class WebDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web_detail);
         recyclerView = findViewById(R.id.recyclerView);
-        mWebView = findViewById(R.id.weView);
         scrollView = findViewById(R.id.scrollView);
-        recyclerView_test = findViewById(R.id.recyclerView_test);
         tv_comment = findViewById(R.id.tv_comment);
         tv_comment_position = findViewById(R.id.tv_comment_position);
-        //支持javascript
-        mWebView.getSettings().setJavaScriptEnabled(true);
-        // 设置可以支持缩放
-        mWebView.getSettings().setSupportZoom(true);
-        // 设置出现缩放工具
-        mWebView.getSettings().setBuiltInZoomControls(true);
-        //扩大比例的缩放
-        mWebView.getSettings().setUseWideViewPort(true);
-        //自适应屏幕
-//        mWebView.getSettings().setLayoutAlgorithm(LayoutAlgorithm.SINGLE_COLUMN);
-        mWebView.getSettings().setLoadWithOverviewMode(true);
-        mWebView.setWebViewClient(new com.tencent.smtt.sdk.WebViewClient() {
+        PrimWeb.with(this)
+                .setWebParent(scrollView, 0)
+                .useDefaultUI()
+                .useDefaultTopIndicator()
+                .setWebViewType(PrimWeb.WebViewType.X5)
+                .buildWeb()
+                .lastGo()
+                .launch("https://www.toutiao.com/a6647258207351734787/");
+
+        recyclerView.postDelayed(new Runnable() {
             @Override
-            public boolean shouldOverrideUrlLoading(com.tencent.smtt.sdk.WebView webView, String s) {
-                webView.loadUrl(s);
-                return true;
+            public void run() {
+                recyclerView.setLayoutManager(new LinearLayoutManager(WebDetailActivity.this));
+                newBodyBeanList = new ArrayList<>();
+                loadData();
+                adapter = new DetailAdapter(WebDetailActivity.this, newBodyBeanList);
+                testAdapter = new DetailAdapter(WebDetailActivity.this, testBeanList);
+                recyclerView.setAdapter(adapter);
             }
-        });
-        mWebView.loadUrl("https://www.toutiao.com/a6645933655317283335/");
-        //android:descendantFocusability="blocksDescendants"
+        }, 2000);
 
-        recyclerView_test.setLayoutManager(new LinearLayoutManager(this));
-
-        newBodyBeanList = new ArrayList<>();
-        loadData();
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new DetailAdapter(this, newBodyBeanList);
-        testAdapter = new DetailAdapter(this, testBeanList);
-        recyclerView.setAdapter(adapter);
-        recyclerView_test.setAdapter(testAdapter);
         scrollView.setOnScrollWebToCommentListener(new PrimScrollView.OnScrollWebToCommentListener() {
             @Override
             public void onComment(boolean isComment) {
@@ -101,24 +90,22 @@ public class WebDetailActivity extends AppCompatActivity {
      */
     private void loadData() {
         testBeanList = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            NewBodyBean bodyBean = new NewBodyBean(0, "推荐阅读::" + i, "", "", null);
-            testBeanList.add(bodyBean);
-        }
-
+        List<String> list = new ArrayList<>();
         //模拟评论盖楼
-//        for (int i = 0; i < 20; i++) {
-//            comments.add("comment:" + i);
-//        }
+        for (int i = 0; i < 20; i++) {
+            list.add("推荐阅读:" + i);
+        }
         //模拟详情页接口
         for (int i = 0; i < 200; i++) {
             List<String> comments = new ArrayList<>();
             comments.add("comment::" + i);
             NewBodyBean newBodyBean = null;
 //            if (i == 0) {
-////                newBodyBean = new NewBodyBean(0, "test", "", "", null);
+//                newBodyBean = new NewBodyBean(0, "推荐阅读", list, "", null);
+//            } else if (i == 1) {
+//                newBodyBean = new NewBodyBean(1, "广告", null, "", null);
 //            } else {
-            newBodyBean = new NewBodyBean(2, "test" + i, "data" + i, "url" + i, comments);
+            newBodyBean = new NewBodyBean(2, "test" + i, null, "url" + i, comments);
 //            }
             newBodyBeanList.add(newBodyBean);
         }
@@ -152,7 +139,7 @@ public class WebDetailActivity extends AppCompatActivity {
     public static class NewBodyBean {
         private int tyoe;
         private String title;
-        private String data;
+        private List<String> data;
         private List<String> comments;
         private String url;
 
@@ -164,7 +151,7 @@ public class WebDetailActivity extends AppCompatActivity {
             this.url = url;
         }
 
-        public NewBodyBean(int tyoe, String title, String data, String url, List<String> comments) {
+        public NewBodyBean(int tyoe, String title, List<String> data, String url, List<String> comments) {
             this.tyoe = tyoe;
             this.title = title;
             this.data = data;
@@ -196,11 +183,11 @@ public class WebDetailActivity extends AppCompatActivity {
             this.title = title;
         }
 
-        public String getData() {
+        public List<String> getData() {
             return data;
         }
 
-        public void setData(String data) {
+        public void setData(List<String> data) {
             this.data = data;
         }
     }

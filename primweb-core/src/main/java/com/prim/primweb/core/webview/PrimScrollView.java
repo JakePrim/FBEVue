@@ -8,6 +8,8 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -121,6 +123,9 @@ public class PrimScrollView extends ViewGroup {
         super.onFinishInflate();
         for (int i = 0; i < getChildCount(); i++) {
             View childAt = getChildAt(i);
+            if (childAt.getVisibility() == GONE) {
+                continue;
+            }
             if (childAt instanceof IDetailListView) {
                 commentListView = (IDetailListView) childAt;
             } else if (childAt instanceof IDetailWebView) {
@@ -131,12 +136,54 @@ public class PrimScrollView extends ViewGroup {
             commentListView.setScrollView(this);
             commentListView.setOnScrollBarShowListener(scrollBarShowListener);
             commentListView.setOnDetailScrollChangeListener(onScrollChangeListener);
+//            observeListViewHeightChange();
         }
         if (detailWebView != null) {
             detailWebView.setScrollView(this);
             detailWebView.setOnScrollBarShowListener(scrollBarShowListener);
             detailWebView.setOnDetailScrollChangeListener(onScrollChangeListener);
             observeWebViewHeightChange();
+        }
+    }
+
+    @Override
+    public void addView(View child, int index, ViewGroup.LayoutParams params) {
+        super.addView(child, index, params);
+        if (child instanceof ViewGroup) {
+            ViewGroup viewGroup = (ViewGroup) child;
+            for (int i = 0; i < viewGroup.getChildCount(); i++) {
+                View childAt = viewGroup.getChildAt(i);
+                if (childAt instanceof IDetailWebView) {
+                    detailWebView = (IDetailWebView) childAt;
+                    detailWebView.setScrollView(this);
+                    detailWebView.setOnScrollBarShowListener(scrollBarShowListener);
+                    detailWebView.setOnDetailScrollChangeListener(onScrollChangeListener);
+                    observeWebViewHeightChange();
+                }
+            }
+        }
+    }
+
+    private void observeListViewHeightChange() {
+        if (commentListView instanceof RecyclerView) {
+            final RecyclerView recyclerView = (RecyclerView) commentListView;
+            recyclerView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                private int mOldListViewConentHeight;
+
+                @Override
+                public boolean onPreDraw() {
+                    int measuredHeight = recyclerView.getMeasuredHeight();
+                    PWLog.e(TAG + ".observeListViewHeightChange...measuredHeight:" + measuredHeight);
+                    if (mOldListViewConentHeight == measuredHeight) {
+                        return true;
+                    }
+                    mOldListViewConentHeight = measuredHeight;
+                    ViewGroup.LayoutParams layoutParams = recyclerView.getLayoutParams();
+                    layoutParams.height = measuredHeight;
+                    recyclerView.setLayoutParams(layoutParams);
+                    return true;
+                }
+            });
         }
     }
 
@@ -177,7 +224,8 @@ public class PrimScrollView extends ViewGroup {
     }
 
     public void setWebHeight(int height) {
-        LayoutParams layoutParams = mWebView.getLayoutParams();
+        PWLog.e(TAG + ".observeWebViewHeightChange...setWebHeight:" + height);
+        LayoutParams layoutParams = (LayoutParams) mWebView.getLayoutParams();
         layoutParams.height = height;
         mWebView.setLayoutParams(layoutParams);
     }
@@ -195,7 +243,6 @@ public class PrimScrollView extends ViewGroup {
         mWebHeight = 0;
         mListHeight = 0;
         mOtherHeight = 0;
-        PWLog.e(TAG + ".onLayout...parentBottom+" + parentBottom);
         //遍历子view 设置子view的高度和宽度
         for (int i = 0; i < childCount; i++) {
             View childAt = getChildAt(i);//获得子view
@@ -216,7 +263,7 @@ public class PrimScrollView extends ViewGroup {
                         + " ,bottom" + (childTop + height));
                 childAt.layout(childLeft, childTop, childLeft + width, childTop + height);
                 //改变 parentBottom 下一个view的位置在当前子view的下方 改变顶部的距离
-                parentBottom = childTop + height + lp.bottomMargin;
+                parentBottom = (childTop + height + lp.bottomMargin);
                 maxScrollY += lp.topMargin;
                 maxScrollY += lp.bottomMargin;
                 if (childAt instanceof IDetailWebView) {
@@ -239,21 +286,54 @@ public class PrimScrollView extends ViewGroup {
         }
     }
 
+
+    /**
+     * 计算childView的测量值以及模式 和设置自己的宽和高
+     *
+     * @param widthMeasureSpec
+     * @param heightMeasureSpec
+     */
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        //onMeasure 在onLayout之前
+        int parentHeight = 0;
+        //onMeasure 在onLayout之前 遍历所有的子 view并测量他们
         final int childCount = getChildCount();
         for (int i = 0; i < childCount; i++) {
+            int childHeight = 0;
             View childAt = getChildAt(i);
-            //如果子View也为ViewGroup则先测量子View
+            //如果子 view不可见，当他不存在
+            if (childAt.getVisibility() == GONE) {
+                continue;
+            }
+            //测量该子view
             measureChildWithMargins(childAt, widthMeasureSpec, 0, heightMeasureSpec, 0);
+            childHeight = childAt.getMeasuredHeight();
+            PWLog.e(TAG + ".onMeasure...childView -> " + childAt + "\n"
+                    + "...childHeight -> " + childHeight);
+            MarginLayoutParams params = (MarginLayoutParams) childAt.getLayoutParams();
+            int totalHeight = 0;
+            parentHeight += (childHeight + totalHeight + params.topMargin + params.bottomMargin);
         }
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        PWLog.e(TAG + ".onMeasure...parentHeight -> " + parentHeight);
+        setMeasuredDimension(widthMeasureSpec, resolveSizeAndState(parentHeight, heightMeasureSpec, 0));
     }
 
+
     @Override
-    protected void measureChild(View child, int parentWidthMeasureSpec, int parentHeightMeasureSpec) {
-        super.measureChild(child, parentWidthMeasureSpec, parentHeightMeasureSpec);
+    protected void measureChildWithMargins(View child, int parentWidthMeasureSpec, int widthUsed, int parentHeightMeasureSpec, int heightUsed) {
+        MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
+
+        int childWidthMeasureSpec = getChildMeasureSpec(
+                parentWidthMeasureSpec,
+                widthUsed + lp.leftMargin + lp.rightMargin,
+                lp.width);
+
+        int childHeightMeasureSpec = getChildMeasureSpec(
+                parentHeightMeasureSpec,
+                heightUsed + lp.topMargin + lp.bottomMargin,
+                lp.height);
+
+        child.measure(childWidthMeasureSpec, childHeightMeasureSpec);
     }
 
     @Override
@@ -287,28 +367,23 @@ public class PrimScrollView extends ViewGroup {
                         + ",isAtTop=" + isAtTop + "\n"
                         + ",isBottom=" + isAtBottom + "\n"
                         + ",maxScrollY=" + maxScrollY + "\n"
-                        + ",getScaleY=" + getScrollY());
+                        + ",getScaleY=" + getScrollY() + "\n"
+                        + ",commentListView.canScrollVertically(DIRECT_TOP)=" + commentListView.canScrollVertically(DIRECT_TOP));
                 if (dY != 0) {//下滑操作
                     if (commentListView != null && commentListView.canScrollVertically(DIRECT_TOP) && isAtTop) {////因为ListView上滑操作导致ListView可以继续下滑，故要先ListView滑到顶部，再滑动MyScrollView
                         commentListView.customScrollBy((int) -delta);
                         PWLog.e(TAG + ".onTouchEvent dY != 0.commentListView.customScrollBy...交给listview 滚动delta:" + delta);
                     } else if (detailWebView != null && detailWebView.canScrollVertically(DIRECT_BOTTOM) && isAtBottom) {////因为WebView下滑，导致WebView可以继续上滑，故要先让WebView滑到底部，再滑动MyScrollView
                         detailWebView.customScrollBy((int) -delta);
-                        PWLog.e(TAG + ".onTouchEvent dY != 0.commentListView.customScrollBy...交给listview 滚动delta:" + delta);
+                        PWLog.e(TAG + ".onTouchEvent dY != 0.commentListView.customScrollBy...交给webview 滚动delta:" + delta);
                     } else {//当listview处于顶部 webview处于底部时 滑动ScrollView
                         customScrollBy(dY);
-//                        if (webToCommentListener != null) {
-//                            webToCommentListener.onComment(false);
-//                        }
                         PWLog.e(TAG + ".onTouchEvent dY != 0.customScrollBy...交给ScrollView 滚动adjustScrollY:" + dY);
                     }
                 } else {//dY == 0表示滑动到顶部或者底部了
                     if (delta < 0 && isAtTop && commentListView != null) {//上滑操作
                         PWLog.e(TAG + ".onTouchEvent dY = 0.customScrollBy...交给listView 滚动delta:" + delta);
                         commentListView.customScrollBy((int) -delta);
-//                        if (webToCommentListener != null) {
-//                            webToCommentListener.onComment(true);
-//                        }
                     } else if (delta > 0 && isAtBottom && detailWebView != null) {
                         detailWebView.customScrollBy((int) -delta);
                         PWLog.e(TAG + ".onTouchEvent dY = 0.customScrollBy...交给WebView 滚动delta:" + delta);
@@ -710,5 +785,23 @@ public class PrimScrollView extends ViewGroup {
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+    }
+
+    public static class PWLog {
+        public static boolean LOG = true;
+
+        private static String TAG = "PrimWeb";
+
+        public static void e(String msg) {
+            if (LOG) {
+                Log.e(TAG, "e: " + msg);
+            }
+        }
+
+        public static void d(String msg) {
+            if (LOG) {
+                Log.e(TAG, "d: " + msg);
+            }
+        }
     }
 }

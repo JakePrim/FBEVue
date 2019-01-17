@@ -17,6 +17,7 @@ import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,7 +53,7 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.BaseViewHo
             View inflate = LayoutInflater.from(context).inflate(R.layout.item_detail_title, parent, false);
             return new TitleViewHolder(inflate);
         } else if (viewType == 1) {
-            View inflate = LayoutInflater.from(context).inflate(R.layout.item_web_layout, parent, false);
+            View inflate = LayoutInflater.from(context).inflate(R.layout.item_detail_title, parent, false);
             return new WebViewHolder(inflate);
         } else if (viewType == 2) {
             View inflate = LayoutInflater.from(context).inflate(R.layout.item_comment_layout, parent, false);
@@ -92,19 +93,28 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.BaseViewHo
     class TitleViewHolder extends BaseViewHolder {
 
         TextView tv_item_title;
+        LinearLayout item_list;
 
         public TitleViewHolder(View itemView) {
             super(itemView);
             tv_item_title = itemView.findViewById(R.id.tv_item_title);
+            item_list = itemView.findViewById(R.id.item_list);
         }
 
         @Override
         public void setItem(WebDetailActivity.NewBodyBean bodyBean, final int position) {
-            tv_item_title.setText("评论内容:你点我啊 "+bodyBean.getTitle());
+            tv_item_title.setText(bodyBean.getTitle());
+            List<String> data = bodyBean.getData();
+            for (String datum : data) {
+                TextView textView = new TextView(context);
+                textView.setText(datum);
+                textView.setPadding(10, 10, 10, 10);
+                item_list.addView(textView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            }
             tv_item_title.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(context, "你点到我了！" + position, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "我是推荐阅读啦，你点到我了！" + position, Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -112,43 +122,22 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.BaseViewHo
 
     class WebViewHolder extends BaseViewHolder {
 
-        private FrameLayout webParent;
-
-        private android.webkit.WebView mWebView;
+        TextView tv_item_title;
 
         public WebViewHolder(View itemView) {
             super(itemView);
-            webParent = itemView.findViewById(R.id.webParent);
-            mWebView = itemView.findViewById(R.id.mWebView);
-            //支持javascript
-            mWebView.getSettings().setJavaScriptEnabled(true);
-            // 设置可以支持缩放
-            mWebView.getSettings().setSupportZoom(true);
-            // 设置出现缩放工具
-            mWebView.getSettings().setBuiltInZoomControls(true);
-            //扩大比例的缩放
-            mWebView.getSettings().setUseWideViewPort(true);
-            //自适应屏幕
-            mWebView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
-            mWebView.getSettings().setLoadWithOverviewMode(true);
-            mWebView.setWebViewClient(new WebViewClient() {
-                @Override
-                public boolean shouldOverrideUrlLoading(android.webkit.WebView view, String url) {
-                    view.loadUrl(url);
-                    return super.shouldOverrideUrlLoading(view, url);
-                }
-            });
+            tv_item_title = itemView.findViewById(R.id.tv_item_title);
         }
 
         @Override
-        public void setItem(WebDetailActivity.NewBodyBean bodyBean, int position) {
-            //TODO 初始化WebView 占用一定的时间
-//            PrimWeb.with((Activity) context)
-//                    .setWebParent(webParent, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
-//                    .useDefaultUI()
-//                    .useDefaultTopIndicator().setWebViewType(PrimWeb.WebViewType.X5)
-//                    .buildWeb().launch(bodyBean.getUrl());
-            mWebView.loadUrl(bodyBean.getUrl());
+        public void setItem(WebDetailActivity.NewBodyBean bodyBean, final int position) {
+            tv_item_title.setText(bodyBean.getTitle());
+            tv_item_title.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(context, "我是广告啦！你点到我了！" + position, Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 
@@ -163,7 +152,7 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.BaseViewHo
 
         @Override
         public void setItem(WebDetailActivity.NewBodyBean bodyBean, final int position) {
-            tv_item_comment_content.setText(bodyBean.getComments().get(0));
+            tv_item_comment_content.setText("评论内容:你点我啊 " + bodyBean.getComments().get(0));
             tv_item_comment_content.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

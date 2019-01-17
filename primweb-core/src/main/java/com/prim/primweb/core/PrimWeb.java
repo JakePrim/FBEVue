@@ -425,9 +425,22 @@ public class PrimWeb {
             return new UIControllerBuilder(this);
         }
 
+        public UIControllerBuilder setWebParent(@NonNull ViewGroup v) {
+            this.mViewGroup = v;
+            this.mLayoutParams = new ViewGroup.MarginLayoutParams(ViewGroup.MarginLayoutParams.MATCH_PARENT, ViewGroup.MarginLayoutParams.MATCH_PARENT);
+            return new UIControllerBuilder(this);
+        }
+
         public UIControllerBuilder setWebParent(@NonNull ViewGroup v, @NonNull ViewGroup.LayoutParams lp, int index) {
             this.mViewGroup = v;
             this.mLayoutParams = lp;
+            this.mIndex = index;
+            return new UIControllerBuilder(this);
+        }
+
+        public UIControllerBuilder setWebParent(@NonNull ViewGroup v, @NonNull int index) {
+            this.mViewGroup = v;
+            this.mLayoutParams = new ViewGroup.MarginLayoutParams(ViewGroup.MarginLayoutParams.MATCH_PARENT, ViewGroup.MarginLayoutParams.MATCH_PARENT);
             this.mIndex = index;
             return new UIControllerBuilder(this);
         }
