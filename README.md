@@ -30,6 +30,8 @@ PrimWeb 是一个代理的WebView基于的 Android WebView 和 腾讯 x5 WebView
 - 1.0.1
 
 1. 优化初始化
+2. 添加详情页Web+原生混合功能
+3. 优化部分代码
 
 
 Activity调用PrimWeb | Fragment调用PrimWeb | 识别电话短信邮箱
