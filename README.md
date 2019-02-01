@@ -25,6 +25,22 @@ PrimWeb 是一个代理的WebView基于的 Android WebView 和 腾讯 x5 WebView
 15. 支持自定义错误页面
 16. 支持跳转到其他应用页面
 
+## How Do I Use ?
+
+```
+repositories {
+    jcenter()
+    maven{url 'https://dl.bintray.com/jakeprim/maven'}
+}
+
+dependencies {
+    compile 'com.prim.lib:prim-web:1.0.2'
+    //若无法依赖可以试试 末尾加上 @aar
+    compile 'com.prim.lib:prim-web:1.0.2@aar'
+}
+```
+
+
 ## Update Log
 
 - 1.0.1
@@ -425,6 +441,10 @@ if (!primWeb.handlerBack()) {
                     this.finish();
                 }
 ```
+### 关于疑问
+
+![有什么问题可以加此群提问](https://upload-images.jianshu.io/upload_images/2005932-587b1cc6224fa33f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
 
 ## 关于我
 Android开发爱好者，喜欢钻研技术，目前位于北京工作，如果你有任何问题或工作机会请联系Email:sufululove@gmail.com

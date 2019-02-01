@@ -1,5 +1,5 @@
 apply plugin: 'com.android.library'
-//apply plugin: 'com.novoda.bintray-release'
+apply plugin: 'com.novoda.bintray-release'
 
 android {
     compileSdkVersion 27
@@ -14,13 +14,16 @@ android {
         }
     }
 
+    lintOptions {
+        abortOnError false
+    }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
 }
 
 dependencies {
@@ -38,15 +41,20 @@ repositories {
 }
 
 ////添加
-//publish {
-//    userOrg = 'jakeprim'//bintray.com用户名
-//    groupId = 'com.prim.lib'//jcenter上的路径
-//    artifactId = 'prim-picker'//项目名称
-//    publishVersion = '1.0.4'//版本号
-//    desc = 'This is an android file selector'
-//    website = 'https://github.com/JakePrim/PrimFilePicker'
-//}
+publish {
+    userOrg = 'jakeprim'//bintray.com用户名
+    groupId = 'com.prim.lib'//jcenter上的路径
+    artifactId = 'prim-web'//项目名称
+    publishVersion = '1.0.2'//版本号
+    desc = 'This is an android web'
+    website = 'https://github.com/JakePrim/PrimWeb'
+}
 
+//tasks.withType(Javadoc) {
+//    options.encoding = "UTF-8"
+//}
 tasks.withType(Javadoc) {
-    options.encoding = "UTF-8"
+    options.addStringOption('Xdoclint:none', '-quiet')
+    options.addStringOption('encoding', 'UTF-8')
+    options.addStringOption('charSet', 'UTF-8')
 }

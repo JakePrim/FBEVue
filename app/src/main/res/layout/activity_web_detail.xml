@@ -59,7 +59,7 @@
         <com.prim.primweb.core.webview.DetailRecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="wrap_content" />
     </com.prim.primweb.core.webview.PrimScrollView>
 
     <LinearLayout

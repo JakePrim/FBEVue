@@ -96,7 +96,7 @@ public class WebDetailActivity extends AppCompatActivity {
             list.add("推荐阅读:" + i);
         }
         //模拟详情页接口
-        for (int i = 0; i < 200; i++) {
+        for (int i = 0; i < 2; i++) {
             List<String> comments = new ArrayList<>();
             comments.add("comment::" + i);
             NewBodyBean newBodyBean = null;
