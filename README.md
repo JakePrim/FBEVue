@@ -34,9 +34,9 @@ repositories {
 }
 
 dependencies {
-    compile 'com.prim.lib:prim-web:1.0.2'
+    compile 'com.prim.lib:prim-web:1.1.2'
     //若无法依赖可以试试 末尾加上 @aar
-    compile 'com.prim.lib:prim-web:1.0.2@aar'
+    compile 'com.prim.lib:prim-web:1.1.2@aar'
 }
 ```
 

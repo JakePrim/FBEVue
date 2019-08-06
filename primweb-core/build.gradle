@@ -45,7 +45,7 @@ publish {
     userOrg = 'jakeprim'//bintray.com用户名
     groupId = 'com.prim.lib'//jcenter上的路径
     artifactId = 'prim-web'//项目名称
-    publishVersion = '1.0.2'//版本号
+    publishVersion = '1.1.2'//版本号
     desc = 'This is an android web'
     website = 'https://github.com/JakePrim/PrimWeb'
 }
