@@ -10,6 +10,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/primweb-core" />
+            <option value="$PROJECT_DIR$/primwebx5_core" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
