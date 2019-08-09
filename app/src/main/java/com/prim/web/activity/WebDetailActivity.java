@@ -18,10 +18,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.prim.primweb.core.PrimWeb;
-import com.prim.primweb.core.webview.FullyLinearLayoutManager;
-import com.prim.primweb.core.webview.MyLinearLayoutManger;
-import com.prim.primweb.core.webview.PrimScrollView;
+//import com.prim.primweb.core.webview.FullyLinearLayoutManager;
+//import com.prim.primweb.core.webview.MyLinearLayoutManger;
+//import com.prim.primweb.core.webview.PrimScrollView;
 import com.prim.primweb.core.webview.X5AgentWebView;
+import com.prim.primweb.core.webview.detail.PrimScrollView;
 import com.prim.web.R;
 import com.prim.web.adapter.DetailAdapter;
 
@@ -55,7 +56,7 @@ public class WebDetailActivity extends AppCompatActivity {
         PrimWeb.with(this)
                 .setWebParent(scrollView, 0)
                 .useDefaultUI()
-                .useDefaultTopIndicator()
+                .useDefaultTopIndicator(true)
                 .setWebViewType(PrimWeb.WebViewType.X5)
                 .buildWeb()
                 .lastGo()
@@ -121,7 +122,7 @@ public class WebDetailActivity extends AppCompatActivity {
     }
 
     public void commentPosition(View view) {
-        scrollView.scrollToCommentListView(5);
+        scrollView.forceScrollToListView();
     }
 
     public void zanClick(View view) {

@@ -2,6 +2,7 @@ package com.prim.primweb.core.webclient.webviewclient;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -40,7 +41,7 @@ import static com.prim.primweb.core.webclient.ClientConstance.SCHEME_SMS;
  */
 public class DefaultAndroidWebViewClient extends BaseAndroidWebClient {
 
-    private WeakReference<Activity> weakReference;
+    private WeakReference<Context> weakReference;
 
     private static final String TAG = "DefaultAndroidWebViewCl";
 
@@ -55,7 +56,7 @@ public class DefaultAndroidWebViewClient extends BaseAndroidWebClient {
 
     private Set<String> mWaitLoadUrl = new HashSet<>();
 
-    public DefaultAndroidWebViewClient(Activity activity, PrimWebClient.Builder builder) {
+    public DefaultAndroidWebViewClient(Context activity, PrimWebClient.Builder builder) {
         weakReference = new WeakReference<>(activity);
         alwaysOpenOtherPage = builder.alwaysOpenOtherPage;
         mAbsWebUIController = new WeakReference<>(builder.absWebUIController);
@@ -224,7 +225,7 @@ public class DefaultAndroidWebViewClient extends BaseAndroidWebClient {
                 return true;
             }
 
-            Activity activity = weakReference.get();
+            Context activity = weakReference.get();
             PackageManager packageManager = activity.getPackageManager();
             intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
             ResolveInfo resolveInfo = packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
@@ -253,7 +254,7 @@ public class DefaultAndroidWebViewClient extends BaseAndroidWebClient {
                 || url.startsWith(WebView.SCHEME_MAILTO)
                 || url.startsWith(WebView.SCHEME_GEO)) {
             try {
-                Activity mActivity = null;
+                Context mActivity = null;
                 if ((mActivity = weakReference.get()) == null) {
                     return false;
                 }

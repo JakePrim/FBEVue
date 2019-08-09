@@ -2,6 +2,7 @@ package com.prim.primweb.core.webclient.webviewclient;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -39,7 +40,7 @@ import static com.prim.primweb.core.webclient.ClientConstance.SCHEME_SMS;
  */
 public class DefaultX5WebViewClient extends BaseX5WebViewClient {
 
-    private WeakReference<Activity> weakReference;
+    private WeakReference<Context> weakReference;
     /**
      * 是否允许打开其他界面 默认为允许
      */
@@ -51,10 +52,12 @@ public class DefaultX5WebViewClient extends BaseX5WebViewClient {
 
     private Set<String> mWaitLoadUrl = new HashSet<>();
 
-    public DefaultX5WebViewClient(Activity activity, PrimWebClient.Builder builder) {
+    public DefaultX5WebViewClient(Context activity, PrimWebClient.Builder builder) {
         weakReference = new WeakReference<>(activity);
-        alwaysOpenOtherPage = builder.alwaysOpenOtherPage;
-        mAbsWebUIController = new WeakReference<>(builder.absWebUIController);
+        if (builder != null) {
+            alwaysOpenOtherPage = builder.alwaysOpenOtherPage;
+            mAbsWebUIController = new WeakReference<>(builder.absWebUIController);
+        }
     }
 
     @Override
@@ -201,7 +204,7 @@ public class DefaultX5WebViewClient extends BaseX5WebViewClient {
                 return true;
             }
 
-            Activity activity = weakReference.get();
+            Context activity = weakReference.get();
             PackageManager packageManager = activity.getPackageManager();
             intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
             ResolveInfo resolveInfo = packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
@@ -219,9 +222,7 @@ public class DefaultX5WebViewClient extends BaseX5WebViewClient {
     /**
      * 电话 短信 邮箱的跳转
      *
-     * @param url
-     *         url
-     *
+     * @param url url
      * @return boolean
      */
     private boolean handleCommonLink(String url) {
@@ -230,7 +231,7 @@ public class DefaultX5WebViewClient extends BaseX5WebViewClient {
                 || url.startsWith(WebView.SCHEME_MAILTO)
                 || url.startsWith(WebView.SCHEME_GEO)) {
             try {
-                Activity mActivity = null;
+                Context mActivity = null;
                 if ((mActivity = weakReference.get()) == null) {
                     return false;
                 }

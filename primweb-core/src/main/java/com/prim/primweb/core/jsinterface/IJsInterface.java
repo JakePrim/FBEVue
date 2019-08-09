@@ -16,5 +16,7 @@ public interface IJsInterface {
 
     IJsInterface addJavaObject(Object o, String name);
 
+    IJsInterface removeJavaObject(String name);
+
     boolean checkJsInterface(Object o);
 }

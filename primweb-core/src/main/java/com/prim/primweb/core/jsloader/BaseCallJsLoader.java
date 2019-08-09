@@ -31,8 +31,7 @@ public abstract class BaseCallJsLoader implements ICallJsLoader {
     }
 
     protected void call(String js, AgentValueCallback<String> callback) {
-        Log.e(TAG, "call: js --> " + js);
-//        showLogCompletion(js,300);
+        showLogCompletion(js,4000);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             this.evaluateJs(js, callback);
         } else {
@@ -76,7 +75,7 @@ public abstract class BaseCallJsLoader implements ICallJsLoader {
     }
 
     /** 拼接参数 */
-    private StringBuilder splice(Object... params) {
+    private CharSequence splice(Object... params) {
         StringBuilder sb = new StringBuilder();
         for (Object param : params) {
             if (param instanceof String) {
@@ -88,7 +87,8 @@ public abstract class BaseCallJsLoader implements ICallJsLoader {
         }
         sb.deleteCharAt(sb.length() - 1);
         sb.append(")");
-        return sb;
+//        showLogCompletion(sb.toString(),4000);
+        return sb.toString();
     }
 
     /** 切割json字符串,append 不能传大量的字符串 */
@@ -112,16 +112,16 @@ public abstract class BaseCallJsLoader implements ICallJsLoader {
     private void showLogCompletion(String log, int showCount) {
         if (log.length() > showCount) {
             String show = log.substring(0, showCount);
-            Log.i("TAG-PRIM", show + "");
+            Log.i("TAG-PRIM CONSOLE", show + "");
             if ((log.length() - showCount) > showCount) {//剩下的文本还是大于规定长度
                 String partLog = log.substring(showCount, log.length());
                 showLogCompletion(partLog, showCount);
             } else {
                 String surplusLog = log.substring(showCount, log.length());
-                Log.i("TAG-PRIM", surplusLog + "");
+                Log.i("TAG-PRIM CONSOLE", surplusLog + "");
             }
         } else {
-            Log.i("TAG-PRIM", log + "");
+            Log.i("TAG-PRIM CONSOLE", log + "");
         }
     }
 

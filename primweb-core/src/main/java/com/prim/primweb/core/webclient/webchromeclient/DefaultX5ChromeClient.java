@@ -73,7 +73,7 @@ public class DefaultX5ChromeClient extends BaseX5ChromeClient {
 
     @Override
     public void onGeolocationPermissionsShowPrompt(final String origin, final GeolocationPermissionsCallback callback) {
-        if (!builder.isGeolocation) {
+        if (builder != null && !builder.isGeolocation) {
             super.onGeolocationPermissionsShowPrompt(origin, callback);
             return;
         }
@@ -98,7 +98,7 @@ public class DefaultX5ChromeClient extends BaseX5ChromeClient {
 
     @Override
     public void openFileChooser(ValueCallback<Uri> valueCallback, String acceptType, String capture) {
-        if (!builder.allowUploadFile) {
+        if (builder != null && !builder.allowUploadFile) {
             super.openFileChooser(valueCallback, acceptType, capture);
             return;
         }
@@ -110,7 +110,7 @@ public class DefaultX5ChromeClient extends BaseX5ChromeClient {
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
-        if (!builder.allowUploadFile) {
+        if (builder != null && !builder.allowUploadFile) {
             return super.onShowFileChooser(webView, filePathCallback, fileChooserParams);
         }
         super.onShowFileChooser(webView, filePathCallback, fileChooserParams);
@@ -119,10 +119,12 @@ public class DefaultX5ChromeClient extends BaseX5ChromeClient {
         return true;
     }
 
-    /** 选择文件上传 */
+    /**
+     * 选择文件上传
+     */
     private void fileChooser(FilePermissionWrap filePermissionWrap) {
         if (mActivity != null && mActivity.get() != null) {
-            new FileChooser(filePermissionWrap, mActivity.get()).updateFile(builder.invokingThird);
+            new FileChooser(filePermissionWrap, mActivity.get()).updateFile(builder != null && builder.invokingThird);
         }
     }
 }

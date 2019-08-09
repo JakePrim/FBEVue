@@ -39,16 +39,10 @@ public class SafeJsInterface extends BaseJsInterface {
         Set<Map.Entry<String, Object>> entries = maps.entrySet();
         for (Map.Entry<String, Object> entry : entries) {
             Object value = entry.getValue();
-//            boolean checkJsInterface = checkJsInterface(value);
-//            if (!checkJsInterface) {
-//                throw new RuntimeException("This object has not offer method javascript to call ,please check addJavascriptInterface annotation was be added");
-//            } else {
-//                Log.e(TAG, "addJavaObjects: object --> " + value.getClass().getSimpleName() + "| name --> " + entry.getKey());
-//            }
             try {
                 webView.addJavascriptInterfaceAgent(value, entry.getKey());
             } catch (Exception e) {
-
+                e.printStackTrace();
             }
         }
         return this;
@@ -56,17 +50,21 @@ public class SafeJsInterface extends BaseJsInterface {
 
     @Override
     public IJsInterface addJavaObject(Object o, String name) {
-//        boolean checkJsInterface = checkJsInterface(o);
-//        if (!checkJsInterface) {
-//            throw new RuntimeException("This object has not offer method javascript to call ,please check addJavascriptInterface annotation was be added");
-//        } else {
-//        }
         try {
             webView.addJavascriptInterfaceAgent(o, name);
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
+        return this;
+    }
 
+    @Override
+    public IJsInterface removeJavaObject(String name) {
+        try {
+            webView.removeJavascriptInterfaceAgent(name);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return this;
     }
 
@@ -75,7 +73,6 @@ public class SafeJsInterface extends BaseJsInterface {
      *
      * @param key
      * @param js
-     *
      * @return
      */
     public String buildNotRepeatInjectJS(String key, String js) {
@@ -97,7 +94,6 @@ public class SafeJsInterface extends BaseJsInterface {
      * 构建一个“带try catch”的js脚本；
      *
      * @param js
-     *
      * @return
      */
     public String buildTryCatchInjectJS(String js) {

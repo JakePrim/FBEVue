@@ -293,6 +293,10 @@ public class WebViewManager implements IWebViewManager {
     private View webView() {
         View webView = null;
         if (this.mWebView != null) {
+            ViewGroup parentViewGroup = (ViewGroup) mWebView.getParent();
+            if (parentViewGroup != null) {
+                parentViewGroup.removeView(mWebView);
+            }
             webView = mWebView;
         } else {
             webView = new AndroidAgentWebView(mActivity.get());

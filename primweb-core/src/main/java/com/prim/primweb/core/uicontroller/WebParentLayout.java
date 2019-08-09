@@ -1,5 +1,6 @@
 package com.prim.primweb.core.uicontroller;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.IdRes;
@@ -161,6 +162,7 @@ public class WebParentLayout extends FrameLayout {
         this.loadView = view;
     }
 
+    @SuppressLint("ResourceType")
     public void setLoadLayoutRes(@LayoutRes int layoutRes) {
         this.loadLayoutRes = layoutRes;
         if (layoutRes <= 0) {

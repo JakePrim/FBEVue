@@ -5,13 +5,16 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.os.Looper;
+import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.ActionMode;
 import android.view.ContextMenu;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.webkit.DownloadListener;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -19,8 +22,10 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.prim.primweb.core.jsloader.AgentValueCallback;
-import com.prim.primweb.core.utils.PWLog;
+import com.prim.primweb.core.listener.OnDownloadListener;
 import com.prim.primweb.core.utils.PrimWebUtils;
+import com.prim.primweb.core.webview.detail.PrimScrollView;
+import com.prim.primweb.core.webview.detail.WebViewTouchHelper;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -37,11 +42,18 @@ import java.util.Map;
  * 修订历史：1.0.0
  * ================================================
  */
-public class AndroidAgentWebView extends WebView implements IAgentWebView<WebSettings> {
+public class AndroidAgentWebView extends WebView implements IAgentWebView<WebSettings>, View.OnLongClickListener {
 
     private static final String TAG = "PrimAgentWebView";
     public com.prim.primweb.core.listener.OnScrollChangeListener listener;
     private WebView.HitTestResult result;
+    private OnDownloadListener onDownloadListener;
+
+    private WebViewTouchHelper helper;
+
+    private boolean isTouched;
+
+    private OnWebViewLongClick onWebViewLongClick;
 
     public AndroidAgentWebView(Context context) {
         this(context, null);
@@ -49,7 +61,25 @@ public class AndroidAgentWebView extends WebView implements IAgentWebView<WebSet
 
     public AndroidAgentWebView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        result = this.getHitTestResult();
+        init();
+    }
+
+    public AndroidAgentWebView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        init();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public AndroidAgentWebView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        super(context, attrs, defStyleAttr, defStyleRes);
+        init();
+    }
+
+    private void init() {
+        setOnLongClickListener(this);
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+//            setWebContentsDebuggingEnabled(true);
+//        }
     }
 
     @Override
@@ -58,11 +88,97 @@ public class AndroidAgentWebView extends WebView implements IAgentWebView<WebSet
         if (null != listener) {
             listener.onScrollChange(this, l, t, oldl, oldt);
         }
+        if (scrollBarShowListener != null) {
+            scrollBarShowListener.onShow();
+        }
+        int deltaY = t - oldt;
+        int height = getHeight() - getPaddingTop() - getPaddingBottom();
+        if (helper != null) {
+            helper.overScrollBy(deltaY, oldt, computeVerticalScrollRange() - height, isTouched);//计算速度
+        }
+    }
+
+    @Override
+    public boolean onLongClick(View v) {
+        result = this.getHitTestResult();
+        if (null == result)
+            return false;
+        int type = result.getType();
+        if (type == WebView.HitTestResult.IMAGE_TYPE || type == WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE) {
+            final String saveImgUrl = result.getExtra();
+            if (onWebViewLongClick != null) {
+                return onWebViewLongClick.onClickWebImage(saveImgUrl);
+            }
+            return false;
+        }
+        if (onWebViewLongClick != null) {
+            return onWebViewLongClick.onClick(type, result);
+        }
+        return false;
+    }
+
+    @Override
+    public void setOnWebViewLongClick(OnWebViewLongClick onWebViewLongClick) {
+        this.onWebViewLongClick = onWebViewLongClick;
+    }
+
+    @Override
+    public void setOnLongClickListener(@Nullable View.OnLongClickListener l) {
+        super.setOnLongClickListener(l);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent e) {
+        if (helper == null) {
+            return super.onTouchEvent(e);
+        }
+        if (!helper.onTouchEvent(e)) {
+            return false;
+        }
+        return super.onTouchEvent(e);
     }
 
     @Override
     public void setOnScrollChangeListener(com.prim.primweb.core.listener.OnScrollChangeListener listener) {
         this.listener = listener;
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        isTouched = ev.getAction() == MotionEvent.ACTION_DOWN || ev.getAction() == MotionEvent.ACTION_MOVE;
+        return super.dispatchTouchEvent(ev);
+    }
+
+    @Override
+    public void setDownloadListener(DownloadListener downloadListener) {
+        DownloadListener downloadListener1 = new DownloadListener() {
+            @Override
+            public void onDownloadStart(String s, String s1, String s2, String s3, long l) {
+                if (onDownloadListener != null) {
+                    onDownloadListener.onDownloadStart(s, s1, s2, s3, l);
+                }
+            }
+        };
+        super.setDownloadListener(downloadListener1);
+    }
+
+    @Override
+    public void setAgentDownloadListener(OnDownloadListener onDownloadListener) {
+        this.onDownloadListener = onDownloadListener;
+    }
+
+    @Override
+    public void clearWeb() {
+        this.stopLoading();
+        this.loadUrl("about:blank");
+        if (this.getHandler() != null) {
+            this.getHandler().removeCallbacksAndMessages(null);
+        }
+        this.setWebChromeClient(null);
+        this.setWebViewClient(null);
+        this.setTag(null);
+        this.clearCache(true);
+        this.clearHistory();
     }
 
     @Override
@@ -87,7 +203,6 @@ public class AndroidAgentWebView extends WebView implements IAgentWebView<WebSet
         if (Looper.myLooper() != Looper.getMainLooper()) {
             return;
         }
-        this.loadUrl("about:blank");
         this.stopLoading();
         if (this.getHandler() != null) {
             this.getHandler().removeCallbacksAndMessages(null);
@@ -106,7 +221,6 @@ public class AndroidAgentWebView extends WebView implements IAgentWebView<WebSet
 
     @Override
     public boolean goBackAgent() {
-        Log.e(TAG, "goBackAgent: " + this.canGoBack());
         if (this.canGoBack()) {
             this.goBack();
             return true;
@@ -155,6 +269,11 @@ public class AndroidAgentWebView extends WebView implements IAgentWebView<WebSet
         this.removeJavascriptInterface("searchBoxJavaBridge_");
         this.removeJavascriptInterface("accessibility");
         this.removeJavascriptInterface("accessibilityTraversal");
+    }
+
+    @Override
+    public void removeJavascriptInterfaceAgent(String name) {
+        this.removeJavascriptInterface(name);
     }
 
     /**
@@ -299,7 +418,7 @@ public class AndroidAgentWebView extends WebView implements IAgentWebView<WebSet
             Method emulateShiftHeld = getClass().getMethod("emulateShiftHeld", new Class[0]);
             emulateShiftHeld.setAccessible(true);
             emulateShiftHeld.invoke(this, (Object[]) null);
-        }  catch (NoSuchMethodException e) {
+        } catch (NoSuchMethodException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -352,46 +471,67 @@ public class AndroidAgentWebView extends WebView implements IAgentWebView<WebSet
 
     @Override
     public void setScrollView(PrimScrollView scrollView) {
-
+        helper = new WebViewTouchHelper(scrollView, this);
     }
 
     @Override
     public void customScrollBy(int dy) {
-
+        scrollBy(0, dy);
     }
 
     @Override
     public void customScrollTo(int toY) {
-
+        scrollTo(0, toY);
     }
 
     @Override
     public int customGetContentHeight() {
-        return 0;
+        return (int) (getContentHeight() * getScale());
     }
 
     @Override
     public int customGetWebScrollY() {
-        return 0;
+        return getScrollY();
     }
 
     @Override
     public int customComputeVerticalScrollRange() {
-        return 0;
+        return super.computeVerticalScrollRange();
     }
 
     @Override
     public void startFling(int vy) {
-
+        flingScroll(0, vy);
     }
+
+    private PrimScrollView.OnScrollBarShowListener scrollBarShowListener;
+
+    private PrimScrollView.OnScrollChangeListener scrollChangeListener;
 
     @Override
     public void setOnDetailScrollChangeListener(PrimScrollView.OnScrollChangeListener scrollChangeListener) {
-
+        this.scrollChangeListener = scrollChangeListener;
     }
 
     @Override
     public void setOnScrollBarShowListener(PrimScrollView.OnScrollBarShowListener listener) {
+        this.scrollBarShowListener = listener;
+    }
 
+    @Override
+    public boolean canScrollVertically(int direction) {
+        return super.canScrollVertically(direction);
+    }
+
+    @Override
+    public boolean canScrollHorizontally(int direction) {
+        return super.canScrollHorizontally(direction);
+    }
+
+    @Override
+    public void clearHistoryAgent() {
+        this.loadUrl("about:blank");//about:blank
+        this.clearHistory();//清除历史记录 但是会保留当前页面
+        this.clearView();
     }
 }

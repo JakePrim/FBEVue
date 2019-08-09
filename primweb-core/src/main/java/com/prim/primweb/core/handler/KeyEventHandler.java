@@ -2,6 +2,7 @@ package com.prim.primweb.core.handler;
 
 import android.view.KeyEvent;
 
+import com.prim.primweb.core.utils.PWLog;
 import com.prim.primweb.core.webview.IAgentWebView;
 
 /**
@@ -39,8 +40,9 @@ public class KeyEventHandler implements IKeyEvent {
         if (keyEventInterceptor != null && keyEventInterceptor.event()) {
             return true;
         }
+        PWLog.e("Web-Log:" + webView.getAgentUrl());
         if (webView != null) {
-            if (webView.goBackAgent()) {
+            if (webView.goBackAgent() && !webView.getAgentUrl().equals("about:blank")) {
                 return true;
             }
         }

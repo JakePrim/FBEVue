@@ -1,6 +1,7 @@
 package com.prim.primweb.core.webclient;
 
 import android.app.Activity;
+import android.content.Context;
 import android.webkit.WebViewClient;
 
 import com.prim.primweb.core.PrimWeb;
@@ -23,7 +24,7 @@ import java.lang.ref.WeakReference;
  * ================================================
  */
 public class PrimWebClient {
-    private WeakReference<Activity> mActivity;
+    private WeakReference<Context> mActivity;
 
     private WebViewClient andWebViewClient;
 
@@ -75,7 +76,7 @@ public class PrimWebClient {
     }
 
     public static class Builder implements Serializable {
-        public Activity activity;
+        public Context activity;
 
         public WebViewClient andWebViewClient;
 

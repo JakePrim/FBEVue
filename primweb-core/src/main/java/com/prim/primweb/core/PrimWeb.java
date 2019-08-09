@@ -7,6 +7,8 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.ColorInt;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
@@ -20,12 +22,16 @@ import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import com.prim.primweb.core.config.ConfigAnnotation;
+import com.prim.primweb.core.config.ConfigKey;
+import com.prim.primweb.core.config.Configurator;
 import com.prim.primweb.core.file.FileValueCallbackMiddleActivity;
 import com.prim.primweb.core.handler.IKeyEvent;
 import com.prim.primweb.core.handler.IKeyEventInterceptor;
 import com.prim.primweb.core.handler.KeyEventHandler;
 import com.prim.primweb.core.jsloader.CommonJSListener;
 import com.prim.primweb.core.jsloader.CommonJavaObject;
+import com.prim.primweb.core.listener.OnDownloadListener;
 import com.prim.primweb.core.service.X5InitService;
 import com.prim.primweb.core.uicontroller.AbsWebUIController;
 import com.prim.primweb.core.uicontroller.BaseIndicatorView;
@@ -44,6 +50,7 @@ import com.prim.primweb.core.webclient.webchromeclient.AgentChromeClient;
 import com.prim.primweb.core.webclient.webviewclient.AgentWebViewClient;
 import com.prim.primweb.core.weblife.IWebLifeCycle;
 import com.prim.primweb.core.weblife.WebLifeCycle;
+import com.prim.primweb.core.websetting.BaseAgentWebSetting;
 import com.prim.primweb.core.websetting.DefaultWebSetting;
 import com.prim.primweb.core.websetting.IAgentWebSetting;
 import com.prim.primweb.core.websetting.X5DefaultWebSetting;
@@ -52,6 +59,8 @@ import com.prim.primweb.core.urlloader.UrlLoader;
 import com.prim.primweb.core.webview.IAgentWebView;
 import com.prim.primweb.core.webview.AndroidAgentWebView;
 import com.prim.primweb.core.webview.X5AgentWebView;
+import com.prim.primweb.core.webview.webpool.IJavascriptInterface;
+import com.prim.primweb.core.webview.webpool.WebViewPool;
 import com.tencent.smtt.sdk.QbSdk;
 import com.tencent.smtt.sdk.WebView;
 
@@ -148,50 +157,52 @@ public class PrimWeb {
 
     private static AtomicBoolean sLazyInitTag = new AtomicBoolean(false);
 
-    //设置是否显示debug 的log，注意线上环境设置为false
-    public static void setLog(boolean isLog) {
-        PWLog.LOG = isLog;
+    /**
+     * 懒初始化
+     *
+     * @param ctx 上下文
+     * @return Configurator
+     */
+    @NonNull
+    public static Configurator lazyInit(@NonNull Context ctx) {
+        return lazyInit(ctx, false);
     }
 
-    public static PrimBuilder with(Activity context) {
+    public static boolean x5CoreInited = false;
+
+    @NonNull
+    public static Configurator lazyInit(@NonNull Context ctx, boolean useX5) {
+        if (sLazyInitTag.get()) return Configurator.getInstance();
+        sLazyInitTag.set(true);
+        Configurator.getInstance().getConfigurator().put(ConfigKey.APPLICATION_CONTEXT, ctx);
+        Configurator.getInstance().getConfigurator().put(ConfigKey.WEB_X5CORE, useX5);
+        return Configurator.getInstance();
+    }
+
+
+    public static void initWebPool(Context ctx, BaseAgentWebSetting setting, IJavascriptInterface javascriptInterface, String name) {
+        boolean enableWebPool = getConfiguration(ConfigKey.WEB_POOL);
+        if (enableWebPool) {
+            WebViewPool.getInstance().initPool(ctx, setting, javascriptInterface, name);
+        }
+    }
+
+    public static <T> T getConfiguration(@ConfigAnnotation int key) {
+        return Configurator.getInstance().getConfiguration(key);
+    }
+
+    @NonNull
+    public static Application getApplicationContext() {
+        return getConfiguration(ConfigKey.APPLICATION_CONTEXT);
+    }
+
+    @NonNull
+    public static PrimBuilder with(@NonNull Activity context) {
         if (context == null) {
             throw new NullPointerException("context can not be null");
         }
         return new PrimBuilder(context);
     }
-
-    /**
-     * 使用系统的内核
-     *
-     * @param application
-     */
-    public static void init(Application application) {
-        init(application, false);
-    }
-
-    /**
-     * 增加构造方法,如果不使用X5的内核，避免不必要的执行操作，不需要初始化X5
-     *
-     * @param application
-     * @param useX5
-     */
-    public static void init(Context application, boolean useX5) {
-        if (useX5) {//避免不必要的初始化
-            Intent intent = new Intent(application, X5InitService.class);
-            application.startService(intent);
-        }
-    }
-
-    public static void lazyInit(Context ctx) {
-
-        if (sLazyInitTag.get()) return;
-
-        sLazyInitTag.set(true);
-
-        // X5浏览器实列化
-        QbSdk.initX5Environment(ctx.getApplicationContext(), null);
-    }
-
 
     /**
      * 飞船建造阶段 -- 初始化各种配置设定
@@ -204,6 +215,7 @@ public class PrimWeb {
         createLayout(builder);
 
         webLifeCycle = new WebLifeCycle(webView);
+
         if (builder.mJavaObject != null && !builder.mJavaObject.isEmpty()) {
             this.mJavaObject.putAll(builder.mJavaObject);
         }
@@ -238,6 +250,7 @@ public class PrimWeb {
         this.isGeolocation = builder.isGeolocation;
         this.allowUploadFile = builder.allowUploadFile;
         this.invokingThird = builder.invokingThird;
+
         if (null == webView) {//webview 不能为空
             webView = new AndroidAgentWebView(context.get());
             mView = webView.getAgentWebView();
@@ -361,6 +374,7 @@ public class PrimWeb {
      * 准备完毕 发起最终阶段 加载url -------> 飞船发射
      */
     PrimWeb launch(String url) {
+        PWLog.d("Web-Log -> 加载URL：" + url);
         if (null == headers || headers.isEmpty()) {
             urlLoader.loadUrl(url);
         } else {
@@ -412,6 +426,8 @@ public class PrimWeb {
         private @LayoutRes
         int loadLayout = 0;
 
+        private Handler handler = new Handler(Looper.getMainLooper());
+
         PrimBuilder(Activity context) {
             this.context = new WeakReference<>(context);
         }
@@ -440,7 +456,7 @@ public class PrimWeb {
 
         public UIControllerBuilder setWebParent(@NonNull ViewGroup v, @NonNull int index) {
             this.mViewGroup = v;
-            this.mLayoutParams = new ViewGroup.MarginLayoutParams(ViewGroup.MarginLayoutParams.MATCH_PARENT, ViewGroup.MarginLayoutParams.MATCH_PARENT);
+            this.mLayoutParams = new ViewGroup.MarginLayoutParams(ViewGroup.MarginLayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             this.mIndex = index;
             return new UIControllerBuilder(this);
         }
@@ -469,20 +485,39 @@ public class PrimWeb {
          * @param webViewType 目前支持两种类型 X5 Android
          *                    TODO WebView初始化会消耗内存 加载速度慢 此处待优化
          */
-        private void setWebViewType(WebViewType webViewType) {
+        private void setWebViewType(final WebViewType webViewType) {
             this.webViewType = webViewType;
+            if (Looper.myLooper() != Looper.getMainLooper()) {
+                this.handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        initWeb(webViewType);
+                    }
+                });
+            } else {
+                initWeb(webViewType);
+            }
+        }
+
+        private void initWeb(WebViewType webViewType) {
             if (null == this.webView) {
                 try {
-                    if (webViewType == WebViewType.X5) {
-                        this.webView = new X5AgentWebView(context.get());
+                    boolean webPool = getConfiguration(ConfigKey.WEB_POOL);
+                    if (webPool) {
+                        this.webView = WebViewPool.getInstance().get(webViewType);
                         this.mView = this.webView.getAgentWebView();
                     } else {
-                        this.webView = new AndroidAgentWebView(context.get());
-                        this.mView = this.webView.getAgentWebView();
+                        if (webViewType == WebViewType.X5) {
+                            this.webView = new X5AgentWebView(context.get());
+                            this.mView = this.webView.getAgentWebView();
+                        } else {
+                            this.webView = new AndroidAgentWebView(context.get());
+                            this.mView = this.webView.getAgentWebView();
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    this.webView = new AndroidAgentWebView(context.get());
+                    this.webView = new X5AgentWebView(context.get());
                     this.mView = this.webView.getAgentWebView();
                 }
             }
@@ -544,14 +579,32 @@ public class PrimWeb {
             this.primBuilder = primBuilder;
         }
 
-        public CommonBuilder useDefaultTopIndicator() {
-            this.primBuilder.needTopIndicator = true;
+        public CommonBuilder useDefaultTopIndicator(boolean isTopIndicator) {
+            if (isTopIndicator) {
+                this.primBuilder.needTopIndicator = true;
+            } else {
+                this.primBuilder.needTopIndicator = false;
+                this.primBuilder.customTopIndicator = false;
+                this.primBuilder.height = 0;
+            }
             return new CommonBuilder(primBuilder);
         }
 
         public CommonBuilder useDefaultTopIndicator(@ColorInt int color) {
             this.primBuilder.needTopIndicator = true;
             this.primBuilder.mColor = color;
+            return new CommonBuilder(primBuilder);
+        }
+
+        public CommonBuilder useDefaultTopIndicator(boolean isTopIndicator, @ColorInt int color) {
+            if (isTopIndicator) {
+                this.primBuilder.needTopIndicator = true;
+                this.primBuilder.mColor = color;
+            } else {
+                this.primBuilder.needTopIndicator = false;
+                this.primBuilder.customTopIndicator = false;
+                this.primBuilder.height = 0;
+            }
             return new CommonBuilder(primBuilder);
         }
 
@@ -790,6 +843,13 @@ public class PrimWeb {
             }
             return primWeb.launch(url);
         }
+
+        public PrimWeb launch(@NonNull String url, boolean enablePool) {
+            if (!isReady) {
+                lastGo();
+            }
+            return enablePool ? primWeb : primWeb.launch(url);
+        }
     }
 
     public WebViewType getWebViewType() {
@@ -901,6 +961,28 @@ public class PrimWeb {
     }
 
     /**
+     * 监听下载监听
+     *
+     * @param onDownloadListener
+     */
+    public void setOnDownloadListener(OnDownloadListener onDownloadListener) {
+        if (onDownloadListener != null) {
+            webView.setAgentDownloadListener(onDownloadListener);
+        }
+    }
+
+    /**
+     * 监听WebView 长按事件
+     *
+     * @param longClick
+     */
+    public void setOnWebViewLongClick(IAgentWebView.OnWebViewLongClick longClick) {
+        if (longClick != null) {
+            webView.setOnWebViewLongClick(longClick);
+        }
+    }
+
+    /**
      * handler back button
      *
      * @return true handler ;false no handler
@@ -951,7 +1033,7 @@ public class PrimWeb {
     }
 
     public void clearWebViewCache() {
-
+        webView.clearWeb();
     }
 
     public void setJsUploadChooserCallback(FileValueCallbackMiddleActivity.JsUploadChooserCallback jsUploadChooserCallback) {

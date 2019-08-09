@@ -2,36 +2,31 @@ package com.prim.primweb.core.webview;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.os.Build;
 import android.os.Looper;
 import android.support.annotation.RequiresApi;
+import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.ActionMode;
-import android.view.ContextMenu;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
-import com.prim.primweb.core.R;
 import com.prim.primweb.core.jsloader.AgentValueCallback;
+import com.prim.primweb.core.listener.OnDownloadListener;
 import com.prim.primweb.core.utils.PWLog;
 import com.prim.primweb.core.utils.PrimWebUtils;
-import com.tencent.smtt.sdk.QbSdk;
+import com.prim.primweb.core.webview.detail.PrimScrollView;
+import com.prim.primweb.core.webview.detail.WebViewTouchHelper;
+import com.tencent.smtt.sdk.DownloadListener;
 import com.tencent.smtt.sdk.ValueCallback;
 import com.tencent.smtt.sdk.WebChromeClient;
 import com.tencent.smtt.sdk.WebSettings;
 import com.tencent.smtt.sdk.WebView;
-import com.tencent.smtt.sdk.WebViewCallbackClient;
 import com.tencent.smtt.sdk.WebViewClient;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
 
@@ -56,6 +51,10 @@ public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings
 
     private boolean isTouched;
 
+    private OnDownloadListener onDownloadListener;
+
+    private OnWebViewLongClick onWebViewLongClick;
+
     public X5AgentWebView(Context context) {
         this(context, null);
     }
@@ -69,25 +68,66 @@ public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings
         init();
     }
 
-    public X5AgentWebView(Context context, AttributeSet attributeSet, int i, boolean b) {
-        super(context, attributeSet, i, b);
-        init();
-    }
-
-    public X5AgentWebView(Context context, AttributeSet attributeSet, int i, Map<String, Object> map, boolean b) {
-        super(context, attributeSet, i, map, b);
-        init();
-    }
-
     private void init() {
         getView().setVerticalScrollBarEnabled(false);
         getView().setOverScrollMode(OVER_SCROLL_NEVER);
+
+        setOnLongClickListener(this);
     }
+
+    @Override
+    public void setDownloadListener(DownloadListener downloadListener) {
+        DownloadListener downloadListener1 = new DownloadListener() {
+            @Override
+            public void onDownloadStart(String s, String s1, String s2, String s3, long l) {
+                if (onDownloadListener != null) {
+                    onDownloadListener.onDownloadStart(s, s1, s2, s3, l);
+                }
+            }
+        };
+        super.setDownloadListener(downloadListener1);
+    }
+
+    @Override
+    public void setOnWebViewLongClick(OnWebViewLongClick onWebViewLongClick) {
+        this.onWebViewLongClick = onWebViewLongClick;
+    }
+
+
+    @Override
+    public boolean onLongClick(View view) {
+        result = this.getHitTestResult();
+        if (null == result)
+            return false;
+        int type = result.getType();
+        if (type == WebView.HitTestResult.IMAGE_TYPE || type == WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE) {
+            final String saveImgUrl = result.getExtra();
+            if (onWebViewLongClick != null) {
+                return onWebViewLongClick.onClickWebImage(saveImgUrl);
+            }
+            return false;
+        }
+        if (onWebViewLongClick != null) {
+            return onWebViewLongClick.onClick(type, result);
+        }
+        return false;
+    }
+
+    @Override
+    public void setAgentDownloadListener(OnDownloadListener onDownloadListener) {
+        this.onDownloadListener = onDownloadListener;
+    }
+
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         isTouched = ev.getAction() == MotionEvent.ACTION_DOWN || ev.getAction() == MotionEvent.ACTION_MOVE;
         return super.dispatchTouchEvent(ev);
+    }
+
+    @Override
+    public void removeJavascriptInterfaceAgent(String name) {
+        this.removeJavascriptInterface(name);
     }
 
     @Override
@@ -233,6 +273,7 @@ public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings
 
     }
 
+
     @Override
     public void setAgentWebChromeClient(WebChromeClient webChromeClient) {
         this.setWebChromeClient(webChromeClient);
@@ -252,15 +293,11 @@ public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings
     @Override
     protected void onScrollChanged(int l, int t, int oldl, int oldt) {
         super.onScrollChanged(l, t, oldl, oldt);
-        PWLog.e(TAG + ".onScrollChanged...l:" + l + " t:" + t);
         if (null != listener) {
             listener.onScrollChange(this, l, t, oldl, oldt);
         }
         if (scrollBarShowListener != null) {
             scrollBarShowListener.onShow();
-        }
-        if (scrollChangeListener != null) {
-            scrollChangeListener.onChange(PrimScrollView.ViewType.WEB);
         }
         int deltaY = t - oldt;
         int height = getHeight() - getPaddingTop() - getPaddingBottom();
@@ -282,11 +319,6 @@ public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings
 
 
     @Override
-    public boolean onLongClick(View view) {
-        return super.onLongClick(view);
-    }
-
-    @Override
     public ActionMode startActionMode(ActionMode.Callback callback) {
         PWLog.e("startActionMode");
         return super.startActionMode(callback);
@@ -306,34 +338,8 @@ public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings
 
     @Override
     public ActionMode startActionModeForChild(View originalView, ActionMode.Callback callback, int type) {
-        PWLog.e("startActionModeForChild");
         return super.startActionModeForChild(originalView, callback, type);
     }
-
-//    @Override
-//    protected boolean drawChild(Canvas canvas, View child, long drawingTime) {
-//        boolean ret = super.drawChild(canvas, child, drawingTime);
-//        canvas.save();
-//        Paint paint = new Paint();
-//        paint.setColor(0x7fff0000);
-//        paint.setTextSize(24.f);
-//        paint.setAntiAlias(true);
-//        if (getX5WebViewExtension() != null) {
-//            canvas.drawText(this.getContext().getPackageName() + "-pid:"
-//                    + android.os.Process.myPid(), 10, 50, paint);
-//            canvas.drawText(
-//                    "X5  Core:" + QbSdk.getTbsVersion(this.getContext()), 10,
-//                    100, paint);
-//        } else {
-//            canvas.drawText(this.getContext().getPackageName() + "-pid:"
-//                    + android.os.Process.myPid(), 10, 50, paint);
-//            canvas.drawText("Sys Core", 10, 100, paint);
-//        }
-//        canvas.drawText(Build.MANUFACTURER, 10, 150, paint);
-//        canvas.drawText(Build.MODEL, 10, 200, paint);
-//        canvas.restore();
-//        return ret;
-//    }
 
     @Override
     public void destroy() {
@@ -386,7 +392,7 @@ public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings
 
     @Override
     public boolean goBackAgent() {
-        if (this.canGoBack()) {
+        if (this.canGoBack() && !getUrl().equals("about:blank")) {
             this.goBack();
             return true;
         }
@@ -442,8 +448,48 @@ public class X5AgentWebView extends WebView implements IAgentWebView<WebSettings
         this.scrollBarShowListener = listener;
     }
 
+//    @Override
+//    public boolean canScrollVertically(int direction) {
+//        return super.canScrollVertically(direction);///direction = -1 表示能否向下滚动 = 1 表示能否向上滚动
+//    }
+
     @Override
     public boolean canScrollVertically(int direction) {
-        return getView().canScrollVertically(direction);///direction = -1 表示能否向下滚动 = 1 表示能否向上滚动
+        final int offset = getWebScrollY();
+        final int range = computeVerticalScrollRange() - computeVerticalScrollExtent();
+        if (range == 0) return false;
+        if (direction < 0) {
+            return offset > 0;
+        } else {
+            return offset < range - 1;
+        }
+    }
+
+    @Override
+    public boolean canScrollHorizontally(int direction) {
+        return super.canScrollHorizontally(direction);
+    }
+
+    @Override
+    public void clearWeb() {
+        PWLog.e("Web-Log - clearWeb");
+        this.loadUrl("about:blank");//about:blank
+        this.stopLoading();
+        if (this.getHandler() != null) {
+            this.getHandler().removeCallbacksAndMessages(null);
+        }
+        this.setWebChromeClient(null);
+        this.setWebViewClient(null);
+        this.setTag(null);
+        this.clearCache(true);
+        this.clearHistory();
+        PWLog.e("Web-Log - clearWeb url:" + getUrl());
+    }
+
+    @Override
+    public void clearHistoryAgent() {
+        this.loadUrl("about:blank");//about:blank
+        clearHistory();//清除历史记录 但是会保留当前页面
+        clearView();
     }
 }

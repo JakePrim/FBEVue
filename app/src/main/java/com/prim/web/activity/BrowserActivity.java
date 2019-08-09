@@ -29,7 +29,7 @@ public class BrowserActivity extends AppCompatActivity {
         PrimWeb.with(this)
                 .setWebParent(webParent, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
                 .useDefaultUI()
-                .useDefaultTopIndicator()
+                .useDefaultTopIndicator(true)
                 .setWebViewType(PrimWeb.WebViewType.X5)
                 .buildWeb()
                 .launch(mHomeUrl);

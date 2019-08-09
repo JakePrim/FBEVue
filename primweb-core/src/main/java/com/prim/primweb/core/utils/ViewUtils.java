@@ -2,11 +2,10 @@ package com.prim.primweb.core.utils;
 
 import android.view.View;
 
+import com.tencent.smtt.sdk.WebView;
+
 import java.lang.reflect.Method;
 
-/**
- * Created by LinXin on 2017/4/1.
- */
 public class ViewUtils {
 
     public static int computeVerticalScrollRange(View view) throws Exception {

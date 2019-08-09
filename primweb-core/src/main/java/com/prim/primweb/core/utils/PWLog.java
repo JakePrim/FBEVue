@@ -21,7 +21,7 @@ public class PWLog {
 
     public static void d(String msg) {
         if (LOG) {
-            Log.e(TAG, "d: " + msg);
+            Log.d(TAG, "d: " + msg);
         }
     }
 }
