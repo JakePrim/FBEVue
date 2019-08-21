@@ -39,6 +39,7 @@ public class WebViewPool implements IWebPool {
     //当前正在使用的webview
     private List<IAgentWebView> mInUse;
 
+    //是否使用x5
     private List<IAgentWebView> mX5InUse;
 
     //可复用的webview

@@ -43,11 +43,42 @@ dependencies {
 
 ## Update Log
 
+- 1.1.2
+
+        1. WebView 预加载初始化(如果你用的是本地模版，对WebView 初始化，加载本地模版，进入页面直接调用JS方法，达到秒开的效果)
+        2. 修改部分bug
+        3. webView + 原生 混合详情页，类似头条详情页(beta 暂时还不稳定正在完善中)
+
 - 1.0.2
 
-1. 优化初始化
-2. 添加详情页Web+原生混合功能
-3. 优化部分代码
+        1. 优化初始化
+        2. 添加详情页Web+原生混合功能
+        3. 优化部分代码
+
+- v1.0.1
+
+        1. 回退和返回键的简化处理
+        2. 添加返回拦截，处理特殊情况
+        3. 添加进度条指示器可自定义
+        4. 添加错误页面可自定义
+        5. 优化文件上传
+
+- v1.0.0
+
+        完善功能
+
+
+
+## TODO
+
+0. 优化代码，将X5 与原生的WebView分开(减少无用的包,减少大小)
+1. 调起支付宝和微信
+2. 支持将WebView加载到一个新的进程中
+3. 实现刷新回弹功能
+4. 实现JS通信文件上传(只能支持图片上传,不建议这样使用)
+5. webView 可定制化下载文件
+6. webView + 原生 混合详情页，类似头条详情页(完善)
+7. 添加proxy代理功能
 
 
 Activity调用PrimWeb | Fragment调用PrimWeb | 识别电话短信邮箱
@@ -72,31 +103,6 @@ PrimWeb.with(getActivity())
                     .lastGo()
                     .launch(mParam1);
  ```
-
-## Update Log
-
-- v1.0.0
-
-        完善功能
-- v1.0.1
-
-        1. 回退和返回键的简化处理
-        2. 添加返回拦截，处理特殊情况
-        3. 添加进度条指示器可自定义
-        4. 添加错误页面可自定义
-        5. 优化文件上传
-
-
-## TODO 正在实现的功能
-
-0. 优化代码，将X5 与原生的WebView分开(减少无用的包,减少大小)
-1. WebView 预加载初始化(如果你用的是本地模版，对WebView 初始化，加载本地模版，进入页面直接调用JS方法，达到秒开的效果)
-2. 调起支付宝和微信
-3. 支持将WebView加载到一个新的进程中
-4. 实现刷新回弹功能
-5. 实现JS通信文件上传(只能支持图片上传,不建议这样使用)
-6. webView 可定制化下载文件
-
 
 ### API 详解
 
@@ -445,18 +451,18 @@ if (!primWeb.handlerBack()) {
                     this.finish();
                 }
 ```
-### 关于疑问
+### About Question
 
 ![有什么问题可以加此群提问](https://upload-images.jianshu.io/upload_images/2005932-587b1cc6224fa33f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 
-## 关于我
-Android开发爱好者，喜欢钻研技术，目前位于北京工作，如果你有任何问题或工作机会请联系Email:sufululove@gmail.com
+## About Me
+Android OS/大前端 开发爱好者，喜欢钻研技术，目前位于北京工作，如果你有任何问题或工作机会请联系Email:sufululove@gmail.com
 
 
-## Thinks
+## Thanks
 
-[AgentWeb](https://github.com/JakePrim/AgentWeb) SourceCode
+[AgentWeb](https://github.com/JakePrim/AgentWeb) Thanks SourceCode
 
 ## License
 ```
