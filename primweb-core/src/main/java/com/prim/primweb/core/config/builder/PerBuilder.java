@@ -7,7 +7,7 @@ import com.prim.primweb.core.PrimWeb;
 /**
  * @author prim
  * @version 1.0.0
- * @desc
+ * @desc 准备的某些配置
  * @time 2019-08-26 - 18:42
  */
 public class PerBuilder {

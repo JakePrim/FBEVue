@@ -19,7 +19,7 @@ import com.tencent.smtt.sdk.WebView;
 /**
  * @author prim
  * @version 1.0.0
- * @desc
+ * @desc 通用设置配置
  * @time 2019-08-26 - 18:37
  */
 public class CommonBuilder {

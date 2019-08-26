@@ -37,7 +37,7 @@ import static com.prim.primweb.core.PrimWeb.getConfiguration;
 /**
  * @author prim
  * @version 1.0.0
- * @desc
+ * @desc PrimWeb的总配置
  * @time 2019-08-26 - 18:16
  */
 public class PrimBuilder {

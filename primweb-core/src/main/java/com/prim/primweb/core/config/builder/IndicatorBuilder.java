@@ -8,7 +8,7 @@ import com.prim.primweb.core.uicontroller.BaseIndicatorView;
 /**
  * @author prim
  * @version 1.0.0
- * @desc
+ * @desc 顶部进度条配置
  * @time 2019-08-26 - 18:37
  */
 public class IndicatorBuilder {
