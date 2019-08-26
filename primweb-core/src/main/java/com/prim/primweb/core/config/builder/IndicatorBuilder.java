@@ -1,9 +1,8 @@
-package com.prim.primweb.core.config;
+package com.prim.primweb.core.config.builder;
 
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 
-import com.prim.primweb.core.PrimWeb;
 import com.prim.primweb.core.uicontroller.BaseIndicatorView;
 
 /**

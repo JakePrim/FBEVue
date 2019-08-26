@@ -1,4 +1,4 @@
-package com.prim.primweb.core.config;
+package com.prim.primweb.core.config.builder;
 
 import android.support.annotation.NonNull;
 import android.webkit.WebChromeClient;

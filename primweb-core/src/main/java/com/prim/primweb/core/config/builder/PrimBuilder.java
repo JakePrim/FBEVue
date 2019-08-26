@@ -1,4 +1,4 @@
-package com.prim.primweb.core.config;
+package com.prim.primweb.core.config.builder;
 
 import android.app.Activity;
 import android.os.Handler;
@@ -13,6 +13,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebViewClient;
 
 import com.prim.primweb.core.PrimWeb;
+import com.prim.primweb.core.config.ConfigKey;
 import com.prim.primweb.core.jsloader.CommonJSListener;
 import com.prim.primweb.core.jsloader.ICallJsLoader;
 import com.prim.primweb.core.uicontroller.AbsWebUIController;

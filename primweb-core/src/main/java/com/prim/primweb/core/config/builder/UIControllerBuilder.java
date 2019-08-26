@@ -1,11 +1,9 @@
-package com.prim.primweb.core.config;
+package com.prim.primweb.core.config.builder;
 
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.view.View;
-
-import com.prim.primweb.core.PrimWeb;
 
 /**
  * @author prim
