@@ -43,17 +43,19 @@ dependencies {
 
 ## Update Log
 
-- 1.1.2
+- 1.1.3-beta(功能正在添加中,目前还不稳定)
 
         1. WebView 预加载初始化(如果你用的是本地模版，对WebView 初始化，加载本地模版，进入页面直接调用JS方法，达到秒开的效果)
         2. 修改部分bug
-        3. webView + 原生 混合详情页，类似头条详情页(beta 暂时还不稳定正在完善中)
+        3. webView + 原生 混合详情页，类似头条详情页(1.1.3-beta 暂时还不稳定正在完善中)
+        ......
 
-- 1.0.2
+- 1.1.2
 
         1. 优化初始化
         2. 添加详情页Web+原生混合功能
         3. 优化部分代码
+        4. 修复bug
 
 - v1.0.1
 
@@ -90,7 +92,32 @@ Activity调用PrimWeb | Fragment调用PrimWeb | 识别电话短信邮箱
 JS通信 | 文件上传 | 自定义错误页面
 ---|---|---
 ![js.gif](https://upload-images.jianshu.io/upload_images/2005932-74258121fbcd8b87.gif?imageMogr2/auto-orient/strip) | ![input.gif](https://upload-images.jianshu.io/upload_images/2005932-a268f8c2f1c268a7.gif?imageMogr2/auto-orient/strip) | ![error.gif](https://upload-images.jianshu.io/upload_images/2005932-5b8128c6a9831d50.gif?imageMogr2/auto-orient/strip)
+
 ## How Do I Use?
+
+### 初始化(注意:这里的初始化建议在使用页面的Activity/Fragment中,尽量不要在Application中初始化,否则会导致页面冷启动慢)
+
+ ```
+ PrimWeb.lazyInit(ApplicationRepository.application(), false)
+                 .enableWebPool(enablePool) //是否使用WebView复用池
+                 .setDebugLog(BuildInfo.LOG_DEBUG) //log是否开启
+                 .withWebHost(Constants.BASE_ASSETS_URL + "article.html")//如果是本地的html文件可以添加,动态的url就不需要填写了
+                 .configure(new Configurator.OnX5CoreCallback() {//主要是x5的回调,如果不使用x5,则不要传递参数直接调用configure()完成配置
+                 //x5初始化需要耗费一定的时间,必须等x5初始化完毕后,才可以初始化WebView,否则就会报一些错误信息
+                     @Override
+                     public void onCoreInitFinished() {
+
+                     }
+
+                     @Override
+                     public void onInitFinished(boolean b) {
+                         MLog.printTimePointStart("Web-Log -> onInitFinished:" + b);
+                         preInitWeb(viewGroup, url, isTopIndicator, enablePool);
+                     }
+                 });
+ ```
+
+1. 常情况下的使用
 
 ```
 PrimWeb.with(getActivity())
@@ -103,6 +130,13 @@ PrimWeb.with(getActivity())
                     .lastGo()
                     .launch(mParam1);
  ```
+ 2. 使用WebView复用池,避免每次初始化WebView,常用于类似今日头条的详情页中,可快速显示页面
+
+ ```
+
+ ```
+
+
 
 ### API 详解
 

@@ -25,6 +25,7 @@ import android.widget.Toast;
 import com.prim.primweb.core.config.ConfigAnnotation;
 import com.prim.primweb.core.config.ConfigKey;
 import com.prim.primweb.core.config.Configurator;
+import com.prim.primweb.core.config.PrimBuilder;
 import com.prim.primweb.core.file.FileValueCallbackMiddleActivity;
 import com.prim.primweb.core.handler.IKeyEvent;
 import com.prim.primweb.core.handler.IKeyEventInterceptor;
@@ -75,6 +76,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * 版    本：1.0
  * 创建日期：5/11 0011
  * 描    述：代理webview的总入口
+ * TODO 优化等级SSR
  * 修订历史：
  * ================================================
  */
@@ -209,11 +211,20 @@ public class PrimWeb {
      *
      * @param builder 飞船设定系统
      */
-    private PrimWeb(PrimBuilder builder) {
+    public PrimWeb(PrimBuilder builder) {
+        //处理WebView复用池
+//        boolean enableWebPool = getConfiguration(ConfigKey.WEB_POOL);
+//        if (!WebViewPool.getInstance().isInitPool() && enableWebPool) {  //初始化时将setting设置进去
+//            initWebPool(builder.context.get(), (BaseAgentWebSetting) builder.setting, builder.javaBridge, "nativeBridge");
+//        }
+
+        //检查设置是否合理
         doCheckSafe(builder);
 
+        //创建WebView的父View
         createLayout(builder);
 
+        //WebView的生命周期
         webLifeCycle = new WebLifeCycle(webView);
 
         if (builder.mJavaObject != null && !builder.mJavaObject.isEmpty()) {
@@ -292,7 +303,7 @@ public class PrimWeb {
     /**
      * 飞船建造完毕进入 --- 准备阶段,检查所有引擎是否正常工作
      */
-    void ready() {
+    public void ready() {
         //加载 webView设置
         createSetting();
 
@@ -373,7 +384,7 @@ public class PrimWeb {
     /**
      * 准备完毕 发起最终阶段 加载url -------> 飞船发射
      */
-    PrimWeb launch(String url) {
+    public PrimWeb launch(String url) {
         PWLog.d("Web-Log -> 加载URL：" + url);
         if (null == headers || headers.isEmpty()) {
             urlLoader.loadUrl(url);
@@ -381,475 +392,6 @@ public class PrimWeb {
             urlLoader.loadUrl(url, headers);
         }
         return this;
-    }
-
-    public static class PrimBuilder {
-        private IAgentWebView webView;
-        private View mView;
-        private WeakReference<Activity> context;
-        private ViewGroup mViewGroup;
-        private ViewGroup.LayoutParams mLayoutParams;
-        private int mIndex;
-        private IAgentWebSetting setting;
-        private Map<String, String> headers;
-        private IUrlLoader urlLoader;
-        private ICallJsLoader callJsLoader;
-        private ModeType modeType = ModeType.Normal;
-        private HashMap<String, Object> mJavaObject;
-        private AgentWebViewClient agentWebViewClient;
-        private WebViewType webViewType = WebViewType.Android;
-        private WebViewClient webViewClient;
-        private com.tencent.smtt.sdk.WebViewClient x5WebViewClient;
-        private WebChromeClient webChromeClient;
-        private com.tencent.smtt.sdk.WebChromeClient x5WebChromeClient;
-        private AgentChromeClient agentWebChromeClient;
-        private CommonJSListener commonJSListener;
-        private boolean alwaysOpenOtherPage;
-        private AbsWebUIController absWebUIController;
-        private boolean isGeolocation = true;
-        private boolean allowUploadFile = true;
-        private boolean invokingThird = false;
-        //UI Controller
-        private boolean needTopIndicator;
-        private boolean customTopIndicator;
-        private View errorView;
-        private View loadView;
-        private BaseIndicatorView mIndicatorView;
-        private @ColorInt
-        int mColor = -1;
-        private String colorPaser;
-        private int height = 0;
-        private @LayoutRes
-        int errorLayout = 0;
-        private @IdRes
-        int errorClickId = 0;
-        private @LayoutRes
-        int loadLayout = 0;
-
-        private Handler handler = new Handler(Looper.getMainLooper());
-
-        PrimBuilder(Activity context) {
-            this.context = new WeakReference<>(context);
-        }
-
-        /**
-         * 设置webview的父类
-         */
-        public UIControllerBuilder setWebParent(@NonNull ViewGroup v, @NonNull ViewGroup.LayoutParams lp) {
-            this.mViewGroup = v;
-            this.mLayoutParams = lp;
-            return new UIControllerBuilder(this);
-        }
-
-        public UIControllerBuilder setWebParent(@NonNull ViewGroup v) {
-            this.mViewGroup = v;
-            this.mLayoutParams = new ViewGroup.MarginLayoutParams(ViewGroup.MarginLayoutParams.MATCH_PARENT, ViewGroup.MarginLayoutParams.MATCH_PARENT);
-            return new UIControllerBuilder(this);
-        }
-
-        public UIControllerBuilder setWebParent(@NonNull ViewGroup v, @NonNull ViewGroup.LayoutParams lp, int index) {
-            this.mViewGroup = v;
-            this.mLayoutParams = lp;
-            this.mIndex = index;
-            return new UIControllerBuilder(this);
-        }
-
-        public UIControllerBuilder setWebParent(@NonNull ViewGroup v, @NonNull int index) {
-            this.mViewGroup = v;
-            this.mLayoutParams = new ViewGroup.MarginLayoutParams(ViewGroup.MarginLayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-            this.mIndex = index;
-            return new UIControllerBuilder(this);
-        }
-
-        /**
-         * 所有设置完成
-         */
-        public PerBuilder build() {
-            if (mViewGroup == null) {
-                throw new NullPointerException("ViewGroup not null,please check your code!");
-            }
-            return new PerBuilder(new PrimWeb(this));
-        }
-
-        private void addJavaObject(String key, Object o) {
-            if (mJavaObject == null) {
-                mJavaObject = new HashMap<>(30);//初始化个数 30 * 0.75 多个左右,考虑到哈希表 默认大小只有 4 * 0.75 个
-                // 而哈希表的缺点是:扩容性能会下降 初始化时提前计算好上限.
-            }
-            mJavaObject.put(key, o);
-        }
-
-        /**
-         * 设置webview的类型
-         *
-         * @param webViewType 目前支持两种类型 X5 Android
-         *                    TODO WebView初始化会消耗内存 加载速度慢 此处待优化
-         */
-        private void setWebViewType(final WebViewType webViewType) {
-            this.webViewType = webViewType;
-            if (Looper.myLooper() != Looper.getMainLooper()) {
-                this.handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        initWeb(webViewType);
-                    }
-                });
-            } else {
-                initWeb(webViewType);
-            }
-        }
-
-        private void initWeb(WebViewType webViewType) {
-            if (null == this.webView) {
-                try {
-                    boolean webPool = getConfiguration(ConfigKey.WEB_POOL);
-                    if (webPool) {
-                        this.webView = WebViewPool.getInstance().get(webViewType);
-                        this.mView = this.webView.getAgentWebView();
-                    } else {
-                        if (webViewType == WebViewType.X5) {
-                            this.webView = new X5AgentWebView(context.get());
-                            this.mView = this.webView.getAgentWebView();
-                        } else {
-                            this.webView = new AndroidAgentWebView(context.get());
-                            this.mView = this.webView.getAgentWebView();
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    this.webView = new X5AgentWebView(context.get());
-                    this.mView = this.webView.getAgentWebView();
-                }
-            }
-        }
-    }
-
-    /**
-     * webview的UI控制器设置
-     * 包括错误页面的设置和加载页面的设置
-     */
-    public static class UIControllerBuilder {
-        private PrimBuilder primBuilder;
-
-        public UIControllerBuilder(PrimBuilder primBuilder) {
-            this.primBuilder = primBuilder;
-        }
-
-        public IndicatorBuilder useDefaultUI() {
-            return new IndicatorBuilder(primBuilder);
-        }
-
-        public IndicatorBuilder useCustomUI(@LayoutRes int errorLayout, @LayoutRes int loadLayout, @IdRes int errorClickId) {
-            this.primBuilder.errorLayout = errorLayout;
-            this.primBuilder.loadLayout = loadLayout;
-            this.primBuilder.errorClickId = errorClickId;
-            return new IndicatorBuilder(primBuilder);
-        }
-
-        public IndicatorBuilder useCustomUI(@LayoutRes int errorLayout, @IdRes int errorClickId) {
-            this.primBuilder.errorLayout = errorLayout;
-            this.primBuilder.errorClickId = errorClickId;
-            return new IndicatorBuilder(primBuilder);
-        }
-
-        public IndicatorBuilder useCustomUI(@LayoutRes int errorLayout) {
-            this.primBuilder.errorLayout = errorLayout;
-            return new IndicatorBuilder(primBuilder);
-        }
-
-        public IndicatorBuilder useCustomUI(@NonNull View errorView, @NonNull View loadView) {
-            this.primBuilder.errorView = errorView;
-            this.primBuilder.loadView = loadView;
-            return new IndicatorBuilder(primBuilder);
-        }
-
-        public IndicatorBuilder useCustomUI(@NonNull View errorView) {
-            this.primBuilder.errorView = errorView;
-            return new IndicatorBuilder(primBuilder);
-        }
-    }
-
-    /**
-     * webView 指示器设置
-     */
-    public static class IndicatorBuilder {
-        private PrimBuilder primBuilder;
-
-        public IndicatorBuilder(PrimBuilder primBuilder) {
-            this.primBuilder = primBuilder;
-        }
-
-        public CommonBuilder useDefaultTopIndicator(boolean isTopIndicator) {
-            if (isTopIndicator) {
-                this.primBuilder.needTopIndicator = true;
-            } else {
-                this.primBuilder.needTopIndicator = false;
-                this.primBuilder.customTopIndicator = false;
-                this.primBuilder.height = 0;
-            }
-            return new CommonBuilder(primBuilder);
-        }
-
-        public CommonBuilder useDefaultTopIndicator(@ColorInt int color) {
-            this.primBuilder.needTopIndicator = true;
-            this.primBuilder.mColor = color;
-            return new CommonBuilder(primBuilder);
-        }
-
-        public CommonBuilder useDefaultTopIndicator(boolean isTopIndicator, @ColorInt int color) {
-            if (isTopIndicator) {
-                this.primBuilder.needTopIndicator = true;
-                this.primBuilder.mColor = color;
-            } else {
-                this.primBuilder.needTopIndicator = false;
-                this.primBuilder.customTopIndicator = false;
-                this.primBuilder.height = 0;
-            }
-            return new CommonBuilder(primBuilder);
-        }
-
-        public CommonBuilder useDefaultTopIndicator(@ColorInt int color, int height) {
-            this.primBuilder.needTopIndicator = true;
-            this.primBuilder.mColor = color;
-            this.primBuilder.height = height;
-            return new CommonBuilder(primBuilder);
-        }
-
-        public CommonBuilder useDefaultTopIndicator(@NonNull String color) {
-            this.primBuilder.needTopIndicator = true;
-            this.primBuilder.colorPaser = color;
-            return new CommonBuilder(primBuilder);
-        }
-
-        public CommonBuilder useDefaultTopIndicator(@NonNull String color, int height) {
-            this.primBuilder.height = height;
-            this.primBuilder.needTopIndicator = true;
-            this.primBuilder.colorPaser = color;
-            return new CommonBuilder(primBuilder);
-        }
-
-        /**
-         * 使用自定义的进度指示器 注意需要继承{@link BaseIndicatorView}
-         *
-         * @param indicatorView 自定义的指示器view
-         * @return CommonBuilder
-         */
-        public CommonBuilder useCustomTopIndicator(@NonNull BaseIndicatorView indicatorView) {
-            this.primBuilder.mIndicatorView = indicatorView;
-            this.primBuilder.needTopIndicator = true;
-            this.primBuilder.customTopIndicator = true;
-            return new CommonBuilder(primBuilder);
-        }
-
-        /**
-         * 关闭进度指示器
-         *
-         * @return CommonBuilder
-         */
-        public CommonBuilder colseTopIndicator() {
-            this.primBuilder.needTopIndicator = false;
-            this.primBuilder.customTopIndicator = false;
-            this.primBuilder.height = 0;
-            return new CommonBuilder(primBuilder);
-        }
-    }
-
-    /**
-     * webView的通用设置
-     */
-    public static class CommonBuilder {
-        private PrimBuilder primBuilder;
-
-        public CommonBuilder(PrimBuilder primBuilder) {
-            this.primBuilder = primBuilder;
-        }
-
-        /**
-         * 设置代理的webview 若不设置使用默认的
-         */
-        public CommonBuilder setAgentWebView(IAgentWebView webView) {
-            primBuilder.webView = webView;
-            primBuilder.mView = webView.getAgentWebView();
-            if (primBuilder.mView instanceof WebView) {
-                primBuilder.setWebViewType(WebViewType.X5);
-            } else {
-                primBuilder.setWebViewType(WebViewType.Android);
-            }
-            return this;
-        }
-
-        /**
-         * web的代理设置
-         */
-        public CommonBuilder setWebSetting(IAgentWebSetting agentWebSetting) {
-            primBuilder.setting = agentWebSetting;
-            return this;
-        }
-
-        /**
-         * 设置自定义的url加载器
-         */
-        public CommonBuilder setUrlLoader(IUrlLoader urlLoader) {
-            primBuilder.urlLoader = urlLoader;
-            return this;
-        }
-
-        /**
-         * 设置自定义js 方法加载器
-         */
-        public CommonBuilder setCallJsLoader(ICallJsLoader callJsLoader) {
-            primBuilder.callJsLoader = callJsLoader;
-            return this;
-        }
-
-        /**
-         * 设置模式 js脚本的注入模式
-         */
-        public CommonBuilder setModeType(ModeType modeType) {
-            primBuilder.modeType = modeType;
-            return this;
-        }
-
-        /**
-         * 设置WebView的类型 如果设置了setAgentWebView 此方法最好不要调用setAgentWebView 会默认判断webview的类型
-         */
-        public CommonBuilder setWebViewType(WebViewType webViewType) {
-            primBuilder.setWebViewType(webViewType);
-            return this;
-        }
-
-        /**
-         * 设置代理的WebViewClient 兼容android webView 和 x5 webView
-         */
-        public CommonBuilder setWebViewClient(AgentWebViewClient agentWebViewClient) {
-            primBuilder.agentWebViewClient = agentWebViewClient;
-            return this;
-        }
-
-        public CommonBuilder setWebViewClient(WebViewClient webViewClient) {
-            primBuilder.webViewClient = webViewClient;
-            return this;
-        }
-
-        public CommonBuilder setWebViewClient(com.tencent.smtt.sdk.WebViewClient webViewClient) {
-            primBuilder.x5WebViewClient = webViewClient;
-            return this;
-        }
-
-        /**
-         * 设置代理的WebChromeClient 兼容android webView 和 x5 webView
-         */
-        public CommonBuilder setWebChromeClient(AgentChromeClient agentWebChromeClient) {
-            primBuilder.agentWebChromeClient = agentWebChromeClient;
-            return this;
-        }
-
-        public CommonBuilder setWebChromeClient(WebChromeClient webChromeClient) {
-            primBuilder.webChromeClient = webChromeClient;
-            return this;
-        }
-
-        public CommonBuilder setWebChromeClient(com.tencent.smtt.sdk.WebChromeClient webChromeClient) {
-            primBuilder.x5WebChromeClient = webChromeClient;
-            return this;
-        }
-
-        /**
-         * 检查js方法是否存在
-         */
-        public CommonBuilder setListenerCheckJsFunction(CommonJSListener commonJSListener) {
-            primBuilder.commonJSListener = commonJSListener;
-            return this;
-        }
-
-        /**
-         * 注入js脚本
-         */
-        public CommonBuilder addJavascriptInterface(@NonNull String name, @NonNull Object o) {
-            primBuilder.addJavaObject(name, o);
-            return this;
-        }
-
-        /**
-         * 是否允许打开其他应用
-         */
-        public CommonBuilder alwaysOpenOtherPage(boolean alwaysOpenOtherPage) {
-            primBuilder.alwaysOpenOtherPage = alwaysOpenOtherPage;
-            return this;
-        }
-
-        /**
-         * 设置自定义的UI控制器
-         */
-        public CommonBuilder setWebUIController(AbsWebUIController absWebUIController) {
-            primBuilder.absWebUIController = absWebUIController;
-            return this;
-        }
-
-        /**
-         * 设置是否允许上传文件 默认为允许
-         */
-        public CommonBuilder setAllowUploadFile(boolean flag) {
-            primBuilder.allowUploadFile = flag;
-            return this;
-        }
-
-        /**
-         * 设置是否允许定位 默认为允许
-         */
-        public CommonBuilder setGeolocation(boolean flag) {
-            primBuilder.isGeolocation = flag;
-            return this;
-        }
-
-        /**
-         * 上传文件 false 调用系统文件  true 调用自定义的文件库
-         */
-        public CommonBuilder setUpdateInvokThrid(boolean flag) {
-            primBuilder.invokingThird = flag;
-            return this;
-        }
-
-        /**
-         * 设置完成开始建造
-         */
-        public PerBuilder buildWeb() {
-            return primBuilder.build();
-        }
-    }
-
-    /**
-     * 设置完成准备发射
-     */
-    public static class PerBuilder {
-        private PrimWeb primWeb;
-        private boolean isReady = false;
-
-        public PerBuilder(PrimWeb primWeb) {
-            this.primWeb = primWeb;
-        }
-
-        public PerBuilder lastGo() {
-            if (!isReady) {
-                primWeb.ready();
-                isReady = true;
-            }
-            return this;
-        }
-
-        public PrimWeb launch(@NonNull String url) {
-            if (!isReady) {
-                lastGo();
-            }
-            return primWeb.launch(url);
-        }
-
-        public PrimWeb launch(@NonNull String url, boolean enablePool) {
-            if (!isReady) {
-                lastGo();
-            }
-            return enablePool ? primWeb : primWeb.launch(url);
-        }
     }
 
     public WebViewType getWebViewType() {

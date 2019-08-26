@@ -131,13 +131,6 @@ public class Configurator {
         void onInitFinished(boolean b);
     }
 
-//    private void initWebPool(Context ctx) {
-//        boolean enableWebPool = getConfiguration(ConfigKey.WEB_POOL);
-//        if (enableWebPool) {
-//            WebViewPool.getInstance().initPool(ctx);
-//        }
-//    }
-
     private void checkConfiguration() {
         final boolean isReady = (boolean) CONFIGS.get(CONFIG_READY);
         if (!isReady) {
@@ -150,7 +143,7 @@ public class Configurator {
         checkConfiguration();
         final Object value = CONFIGS.get(key);
         if (value == null) {
-            throw new NullPointerException(key + " IS NULL");
+            PWLog.e("not configuration key:"+key);
         }
         return (T) CONFIGS.get(key);
     }
