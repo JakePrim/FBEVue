@@ -65,9 +65,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * 作    者：linksus
  * 版    本：1.0
  * 创建日期：5/11 0011
- * 描    述：代理webview的总入口
+ * 描    述：PrimWeb的总入口
  * TODO 优化等级SSR
- * 修订历史：
+ * 修订历史：1.1.3
  * ================================================
  */
 public class PrimWeb {
@@ -207,19 +207,26 @@ public class PrimWeb {
 //        if (!WebViewPool.getInstance().isInitPool() && enableWebPool) {  //初始化时将setting设置进去
 //            initWebPool(builder.context.get(), (BaseAgentWebSetting) builder.setting, builder.javaBridge, "nativeBridge");
 //        }
+        //创建webView复用池
+        createWebPool();
 
         //检查设置是否合理
         doCheckSafe(builder);
 
         //创建WebView的父View
-        createLayout(builder);
+        createUILayout(builder);
 
         //WebView的生命周期
         webLifeCycle = new WebLifeCycle(webView);
 
+        //存储js脚本
         if (builder.mJavaObject != null && !builder.mJavaObject.isEmpty()) {
             this.mJavaObject.putAll(builder.mJavaObject);
         }
+    }
+
+    private void createWebPool() {
+
     }
 
 
@@ -268,7 +275,7 @@ public class PrimWeb {
      *
      * @param builder PrimBuilder
      */
-    private void createLayout(PrimBuilder builder) {
+    private void createUILayout(PrimBuilder builder) {
         webViewManager = WebViewManager.createWebView()
                 .setActivity(context.get())
                 .setViewGroup(mViewGroup)
@@ -310,6 +317,9 @@ public class PrimWeb {
         createJsInterface();
     }
 
+    /**
+     * url加载器
+     */
     private void createUrlLoader() {
         // 加载 url加载器
         if (null == urlLoader) {
@@ -317,6 +327,9 @@ public class PrimWeb {
         }
     }
 
+    /**
+     * 加载js脚本注入
+     */
     private void createJsInterface() {
         if (null == mJsInterface) {
             mJsInterface = SafeJsInterface.getInstance(webView, modeType);
@@ -330,6 +343,9 @@ public class PrimWeb {
         }
     }
 
+    /**
+     * 初始化设置
+     */
     private void createSetting() {
         if (null == setting) {
             if (webViewType == WebViewType.Android) {
@@ -341,6 +357,9 @@ public class PrimWeb {
         setting.setSetting(webView);
     }
 
+    /**
+     * WebChromeClient
+     */
     private void createWebChromeClient() {
         IndicatorController indicatorController = IndicatorHandler.getInstance().setIndicator(webViewManager.getIndicator());
         PrimChromeClient.createChromeBuilder()
@@ -358,6 +377,9 @@ public class PrimWeb {
                 .build();
     }
 
+    /**
+     * WebViewClient
+     */
     private void createWebViewClient() {
         PrimWebClient.createClientBuilder()
                 .setActivity(context.get())
@@ -384,6 +406,9 @@ public class PrimWeb {
         return this;
     }
 
+    /**
+     * 获取WebView的类型
+     */
     public WebViewType getWebViewType() {
         return webViewType;
     }
