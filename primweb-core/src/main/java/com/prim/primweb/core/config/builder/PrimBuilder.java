@@ -93,17 +93,17 @@ public class PrimBuilder {
      *
      * @return 配置 UIControllerBuilder
      */
-    public UIControllerBuilder UIBudiler() {
+    public UIControllerBuilder addUIBudiler() {
         return new UIControllerBuilder(this);
     }
 
     /**
-     * 1.1.3 版本新添加,可以不用按照配置步骤自行选择配置项
+     * 1.1.3 版本新添加,可以不用按照配置步骤可自行选择配置项
      * 配置指示器
      *
-     * @return 配置 IndicatorBuilder
+     * @return 配置 addIndicatorBuilder
      */
-    public IndicatorBuilder IndicatorBuilder() {
+    public IndicatorBuilder addIndicatorBuilder() {
         return new IndicatorBuilder(this);
     }
 
@@ -111,9 +111,9 @@ public class PrimBuilder {
      * 1.1.3 版本新添加,可以不用按照配置步骤自行选择配置项
      * 配置基本的WebView配置
      *
-     * @return 配置 WebBuilder
+     * @return 配置 addWebBuilder
      */
-    public WebBuilder WebBuilder() {
+    public WebBuilder addWebBuilder() {
         return new WebBuilder(this);
     }
 

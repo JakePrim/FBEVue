@@ -66,7 +66,6 @@ public class WebActivity extends AppCompatActivity {
                 .setWebViewClient(agentWebViewClient)
                 .alwaysOpenOtherPage(false)
                 .buildWeb()
-                .lastGo()
                 .launch("file:///android_asset/webpage/hitTestResult.html");
     }
 

@@ -75,11 +75,8 @@ public class WebFragment extends Fragment implements ItemSelected, FragmentKeyDo
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1
-     *         Parameter 1.
-     * @param param2
-     *         Parameter 2.
-     *
+     * @param param1 Parameter 1.
+     * @param param2 Parameter 2.
      * @return A new instance of fragment WebFragment.
      */
     // TODO: Rename and change types and number of parameters
@@ -137,13 +134,18 @@ public class WebFragment extends Fragment implements ItemSelected, FragmentKeyDo
     private void initArg() {
         if (mParam2.equals("CustomErrorPage")) {
             primWeb = PrimWeb.with(getActivity())
+                    .addUIBudiler()
+                    .addCustomErrorUI(R.layout.custom_error_page, R.id.click_refush)
                     .setWebParent(webParent, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
-                    .useCustomUI(R.layout.custom_error_page, R.id.click_refush)
-                    .useDefaultTopIndicator(true)
+                    .next()
+                    .addWebBuilder()
                     .setWebViewType(PrimWeb.WebViewType.Android)
-                    .buildWeb()
-                    .lastGo()
-                    .launch(mParam1);
+                    .next()
+                    .addIndicatorBuilder()
+                    .useDefaultIndicator("#000000")
+                    .next()
+                    .build()
+                    .launch("test");
         } else if (mParam2.equals("JS")) {
             primWeb = PrimWeb.with(getActivity())
                     .setWebParent(webParent, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
@@ -152,7 +154,6 @@ public class WebFragment extends Fragment implements ItemSelected, FragmentKeyDo
                     .setWebViewType(PrimWeb.WebViewType.X5)
                     .setListenerCheckJsFunction(this)
                     .buildWeb()
-                    .lastGo()
                     .launch(mParam1);
             ll_JS.setVisibility(View.VISIBLE);
             primWeb.getJsInterface().addJavaObject(new MyJsInterface(), "android");
@@ -164,7 +165,6 @@ public class WebFragment extends Fragment implements ItemSelected, FragmentKeyDo
                     .setWebViewType(PrimWeb.WebViewType.X5)
                     .setListenerCheckJsFunction(this)
                     .buildWeb()
-                    .lastGo()
                     .launch(mParam1);
             primWeb.getJsInterface().addJavaObject(new MyUploadJsInterface(), "upload");
             primWeb.setJsUploadChooserCallback(new FileValueCallbackMiddleActivity.JsUploadChooserCallback() {
@@ -185,7 +185,6 @@ public class WebFragment extends Fragment implements ItemSelected, FragmentKeyDo
                     .setAllowUploadFile(true)
                     .setWebChromeClient(agentChromeClient)
                     .buildWeb()
-                    .lastGo()
                     .launch(mParam1);
         } else if (mParam2.equals("setting")) {
             primWeb = PrimWeb.with(getActivity())
@@ -196,7 +195,6 @@ public class WebFragment extends Fragment implements ItemSelected, FragmentKeyDo
                     .setListenerCheckJsFunction(this)
                     .setWebSetting(new CustomX5Setting())
                     .buildWeb()
-                    .lastGo()
                     .launch(mParam1);
         } else {
             primWeb = PrimWeb.with(getActivity())
@@ -206,7 +204,6 @@ public class WebFragment extends Fragment implements ItemSelected, FragmentKeyDo
                     .setWebViewType(PrimWeb.WebViewType.X5)
                     .setListenerCheckJsFunction(this)
                     .buildWeb()
-                    .lastGo()
                     .launch(mParam1);
         }
     }

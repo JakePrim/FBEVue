@@ -18,7 +18,7 @@ public class PerBuilder {
         this.primWeb = primWeb;
     }
 
-    public PerBuilder lastGo() {
+    private PerBuilder lastGo() {
         if (!isReady) {
             primWeb.ready();
             isReady = true;

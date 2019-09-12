@@ -39,7 +39,7 @@ public class IndicatorBuilder {
     }
 
     /**
-     * 关闭进度指示器
+     * 关闭进度指示器,
      */
     public IndicatorBuilder colseIndicator() {
         this.primBuilder.needTopIndicator = false;
@@ -55,7 +55,6 @@ public class IndicatorBuilder {
         enableNeed();
         return this;
     }
-
 
     /**
      * 使用默认的指示器，设置默认指示器的颜色
@@ -76,7 +75,6 @@ public class IndicatorBuilder {
         this.primBuilder.colorPaser = color;
         return this;
     }
-
 
     /**
      * 设置指示器的高度
@@ -164,7 +162,7 @@ public class IndicatorBuilder {
      * 使用自定义的进度指示器 注意需要继承{@link BaseIndicatorView}
      *
      * @param indicatorView 自定义的指示器view
-     * @return WebBuilder
+     * @return addWebBuilder
      */
     public WebBuilder useCustomTopIndicator(@NonNull BaseIndicatorView indicatorView) {
         this.primBuilder.mIndicatorView = indicatorView;
@@ -176,7 +174,7 @@ public class IndicatorBuilder {
     /**
      * 关闭进度指示器
      *
-     * @return WebBuilder
+     * @return addWebBuilder
      */
     public WebBuilder colseTopIndicator() {
         this.primBuilder.needTopIndicator = false;

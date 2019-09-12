@@ -59,7 +59,6 @@ public class WebDetailActivity extends AppCompatActivity {
                 .useDefaultTopIndicator(true)
                 .setWebViewType(PrimWeb.WebViewType.X5)
                 .buildWeb()
-                .lastGo()
                 .launch("https://www.toutiao.com/a6647258207351734787/");
 
         recyclerView.postDelayed(new Runnable() {

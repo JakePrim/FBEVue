@@ -123,7 +123,7 @@ public class UIControllerBuilder {
      * @param errorLayout  errorLayout id
      * @param loadLayout   loadLayout id
      * @param errorClickId 发生错误时，点击某个view重新请求,传递view的ID即可
-     * @return IndicatorBuilder 进入指示器配置
+     * @return addIndicatorBuilder 进入指示器配置
      */
     public IndicatorBuilder useCustomUI(@LayoutRes int errorLayout, @LayoutRes int loadLayout, @IdRes int errorClickId) {
         this.primBuilder.errorLayout = errorLayout;
@@ -137,7 +137,7 @@ public class UIControllerBuilder {
      *
      * @param errorView 错误的view
      * @param loadView  加载中的view
-     * @return IndicatorBuilder 进入指示器配置
+     * @return addIndicatorBuilder 进入指示器配置
      */
     public IndicatorBuilder useCustomUI(@NonNull View errorView, @NonNull View loadView) {
         this.primBuilder.errorView = errorView;
@@ -150,7 +150,7 @@ public class UIControllerBuilder {
      *
      * @param errorLayout  xml id
      * @param errorClickId 发生错误时，点击某个view重新请求,传递view的ID即可
-     * @return IndicatorBuilder 进入指示器配置
+     * @return addIndicatorBuilder 进入指示器配置
      */
     public IndicatorBuilder useOnlyCustomErrorUI(@LayoutRes int errorLayout, @IdRes int errorClickId) {
         this.primBuilder.errorLayout = errorLayout;
@@ -162,7 +162,7 @@ public class UIControllerBuilder {
      * 仅设置错误UI配置
      *
      * @param errorView 错误UI的View
-     * @return IndicatorBuilder 进入指示器配置
+     * @return addIndicatorBuilder 进入指示器配置
      */
     public IndicatorBuilder useOnlyCustomErrorUI(@NonNull View errorView) {
         this.primBuilder.errorView = errorView;
@@ -173,7 +173,7 @@ public class UIControllerBuilder {
      * 仅设置加载UI配置
      *
      * @param loadLayout xml
-     * @return IndicatorBuilder 进入指示器配置
+     * @return addIndicatorBuilder 进入指示器配置
      */
     public IndicatorBuilder userOnlyCustomLoadUI(@LayoutRes int loadLayout) {
         this.primBuilder.loadLayout = loadLayout;
@@ -184,7 +184,7 @@ public class UIControllerBuilder {
      * 仅设置加载UI配置
      *
      * @param loadView view
-     * @return IndicatorBuilder 进入指示器配置
+     * @return addIndicatorBuilder 进入指示器配置
      */
     public IndicatorBuilder userOnlyCustomLoadUI(@NonNull View loadView) {
         this.primBuilder.loadView = loadView;

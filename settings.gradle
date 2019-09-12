@@ -1,1 +1,2 @@
-include ':app', ':primweb-core',':primwebx5_core'
+include ':app', ':primweb-core',':primwebx5_core', ':plugin'
+

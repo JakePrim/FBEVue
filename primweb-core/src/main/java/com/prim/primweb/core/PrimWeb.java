@@ -202,11 +202,7 @@ public class PrimWeb {
      * @param builder 飞船设定系统
      */
     public PrimWeb(PrimBuilder builder) {
-        //处理WebView复用池
-//        boolean enableWebPool = getConfiguration(ConfigKey.WEB_POOL);
-//        if (!WebViewPool.getInstance().isInitPool() && enableWebPool) {  //初始化时将setting设置进去
-//            initWebPool(builder.context.get(), (BaseAgentWebSetting) builder.setting, builder.javaBridge, "nativeBridge");
-//        }
+
         //创建webView复用池
         createWebPool();
 
@@ -226,7 +222,11 @@ public class PrimWeb {
     }
 
     private void createWebPool() {
-
+        //处理WebView复用池
+//        boolean enableWebPool = getConfiguration(ConfigKey.WEB_POOL);
+//        if (!WebViewPool.getInstance().isInitPool() && enableWebPool) {  //初始化时将setting设置进去
+//            initWebPool(builder.context.get(), (BaseAgentWebSetting) builder.setting, builder.javaBridge, "nativeBridge");
+//        }
     }
 
 

@@ -62,7 +62,7 @@ public class CommonActivity extends AppCompatActivity implements WebFragment.OnF
                 fragmentTransaction.add(R.id.frame_layout, webFragment = WebFragment.newInstance(url, "SMS"), WebFragment.class.getSimpleName());
                 break;
             case "2":
-                url = "https://m.jd.com/";
+                url = "https://jakeprim.cn";
                 fragmentTransaction.add(R.id.frame_layout, webFragment = WebFragment.newInstance(url, "CustomErrorPage"), WebFragment.class.getSimpleName());
                 break;
             case "3":
@@ -146,8 +146,7 @@ public class CommonActivity extends AppCompatActivity implements WebFragment.OnF
     /**
      * 显示更多菜单
      *
-     * @param view
-     *         菜单依附在该View下面
+     * @param view 菜单依附在该View下面
      */
     private void showPoPup(View view) {
         if (mPopupMenu == null) {
