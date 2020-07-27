@@ -1,0 +1,3 @@
+include ':ALibrary'
+include ':app'
+rootProject.name = "AKitDemo"
