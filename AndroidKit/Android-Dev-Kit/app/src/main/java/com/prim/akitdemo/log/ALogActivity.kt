@@ -4,9 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.prim.akitdemo.R
-import com.prim.alibrary.log.ALog
-import com.prim.alibrary.log.LogConfig
-import com.prim.alibrary.log.LogType
+import com.prim.alibrary.log.*
 
 /**
  * @desc
@@ -17,12 +15,17 @@ import com.prim.alibrary.log.LogType
  * @version 1.0.0
  */
 class ALogActivity : AppCompatActivity() {
+    var viewPrinter: ViewPrinter? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_log)
+        viewPrinter= ViewPrinter(this)
+
+        viewPrinter!!.viewProvider.showFloatingView()
     }
 
     fun print(view: View) {
+        LogManager.getInstance().addPrinter(viewPrinter)
         ALog.e("hello log","papa")
         ALog.eT("TestLog", "hello log","haha")
         ALog.log(object:LogConfig(){
@@ -34,6 +37,5 @@ class ALogActivity : AppCompatActivity() {
                 return 0
             }
         },LogType.E,"--------","5566","9988")
-        ALog.a("9900")
     }
 }

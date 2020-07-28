@@ -16,6 +16,7 @@ import java.util.List;
  * @name AKitDemo
  */
 public class ALog {
+    //TODO 动态配置堆栈忽略包名
     private static final String A_Log_PACKAGE;
 
     static {
