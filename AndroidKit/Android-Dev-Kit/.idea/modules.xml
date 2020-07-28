@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/AKitDemo.iml" filepath="$PROJECT_DIR$/.idea/modules/AKitDemo.iml" group="AKitDemo" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/app.iml" group="AKitDemo/app" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/kit-library/kit-library.iml" filepath="$PROJECT_DIR$/.idea/modules/kit-library/kit-library.iml" group="AKitDemo/kit-library" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kit-ui/kit-ui.iml" filepath="$PROJECT_DIR$/.idea/modules/kit-ui/kit-ui.iml" group="AKitDemo/kit-ui" />
     </modules>
   </component>
 </project>

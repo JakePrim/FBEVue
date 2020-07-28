@@ -51,6 +51,7 @@ public class ViewPrinterProvider {
         floatingView.setBackgroundColor(Color.BLACK);
         floatingView.setAlpha(0.8f);
         layoutParams.bottomMargin = DisplayUtils.dp2px(100,rootView.getResources());
+        layoutParams.rightMargin = DisplayUtils.dp2px(10,recyclerView.getResources());
         rootView.addView(floatingView,layoutParams);
     }
 
@@ -88,7 +89,7 @@ public class ViewPrinterProvider {
             return;
         }
         FrameLayout.LayoutParams layoutParams =
-                new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, DisplayUtils.dp2px(160,rootView.getResources()));
+                new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, DisplayUtils.dp2px(200,rootView.getResources()));
         layoutParams.gravity = Gravity.BOTTOM;
         View logView = getLogView();
         logView.setTag(TAG_LOG_VIEW);

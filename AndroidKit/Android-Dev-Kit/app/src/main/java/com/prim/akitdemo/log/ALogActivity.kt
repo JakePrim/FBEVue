@@ -23,20 +23,20 @@ class ALogActivity : AppCompatActivity() {
         viewPrinter= ViewPrinter(this)
 
         viewPrinter!!.viewProvider.showFloatingView()
+        LogManager.getInstance().addPrinter(viewPrinter)
     }
 
     fun print(view: View) {
-        LogManager.getInstance().addPrinter(viewPrinter)
         ALog.e("hello log","papa")
-        ALog.eT("TestLog", "hello log","haha")
-        ALog.log(object:LogConfig(){
-            override fun isThreadInfo(): Boolean {
-                return true
-            }
-
-            override fun stackTraceDepth(): Int {
-                return 0
-            }
-        },LogType.E,"--------","5566","9988")
+//        ALog.eT("TestLog", "hello log","haha")
+//        ALog.log(object:LogConfig(){
+//            override fun isThreadInfo(): Boolean {
+//                return true
+//            }
+//
+//            override fun stackTraceDepth(): Int {
+//                return 0
+//            }
+//        },LogType.E,"--------","5566","9988")
     }
 }

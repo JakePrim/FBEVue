@@ -1,6 +1,7 @@
 package com.prim.alibrary.log.printer;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,6 +53,7 @@ public class ViewPrinter implements LogPrinter {
 
     @Override
     public void print(@NonNull LogConfig config, int level, String tag, String content) {
+        Log.i("ViewPrinter","添加日志");
         logAdapter.addItem(new LogBean(System.currentTimeMillis(),level,tag,content));
         //滚动到log显示的最新位置
         recyclerView.smoothScrollToPosition(logAdapter.getItemCount() - 1);
