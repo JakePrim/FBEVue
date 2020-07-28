@@ -2,7 +2,7 @@ package com.prim.akitdemo
 
 import android.app.Application
 import com.google.gson.Gson
-import com.prim.alibrary.log.ConsolePrinter
+import com.prim.alibrary.log.printer.ConsolePrinter
 import com.prim.alibrary.log.LogConfig
 import com.prim.alibrary.log.LogManager
 
@@ -29,6 +29,6 @@ class App : Application() {
             override fun enable(): Boolean {
                 return true
             }
-        },ConsolePrinter())
+        }, ConsolePrinter())
     }
 }

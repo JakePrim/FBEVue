@@ -1,6 +1,7 @@
 package com.prim.alibrary.log;
 
-import java.lang.reflect.Array;
+import com.prim.alibrary.log.printer.LogPrinter;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

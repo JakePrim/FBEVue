@@ -1,8 +1,10 @@
-package com.prim.alibrary.log;
+package com.prim.alibrary.log.printer;
 
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+
+import com.prim.alibrary.log.LogConfig;
 
 /**
  * @author prim

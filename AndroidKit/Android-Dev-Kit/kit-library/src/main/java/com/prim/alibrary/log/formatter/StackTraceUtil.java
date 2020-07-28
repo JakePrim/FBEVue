@@ -1,4 +1,4 @@
-package com.prim.alibrary.log;
+package com.prim.alibrary.log.formatter;
 
 /**
  * @author prim

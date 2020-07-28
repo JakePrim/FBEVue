@@ -11,7 +11,7 @@ import java.util.Locale;
  * @contact https://jakeprim.cn
  * @name AKitDemo
  */
-class LogBean {
+public class LogBean {
     private static SimpleDateFormat sdf = new SimpleDateFormat("yy-MM-dd HH:mm:ss", Locale.CHINA);
     public long timeMillis;//时间戳
     public int level;//日志级别

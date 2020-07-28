@@ -1,4 +1,4 @@
-package com.prim.alibrary.log;
+package com.prim.alibrary.log.printer;
 
 import android.app.Activity;
 import android.view.LayoutInflater;
@@ -10,6 +10,10 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.prim.alibrary.R;
+import com.prim.alibrary.log.LogBean;
+import com.prim.alibrary.log.LogConfig;
+import com.prim.alibrary.log.LogType;
+
 import java.util.ArrayList;
 import java.util.List;
 

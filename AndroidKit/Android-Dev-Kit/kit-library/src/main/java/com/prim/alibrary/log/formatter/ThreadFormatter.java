@@ -1,4 +1,4 @@
-package com.prim.alibrary.log;
+package com.prim.alibrary.log.formatter;
 
 /**
  * @author prim
@@ -8,7 +8,7 @@ package com.prim.alibrary.log;
  * @contact https://jakeprim.cn
  * @name AKitDemo
  */
-class ThreadFormatter implements LogFormatter<Thread> {
+public class ThreadFormatter implements LogFormatter<Thread> {
     @Override
     public String format(Thread thread) {
         return "Thread:" + thread.getName();

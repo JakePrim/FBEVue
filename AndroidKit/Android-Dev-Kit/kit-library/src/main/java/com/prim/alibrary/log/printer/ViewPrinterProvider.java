@@ -1,4 +1,4 @@
-package com.prim.alibrary.log;
+package com.prim.alibrary.log.printer;
 
 import android.graphics.Color;
 import android.view.Gravity;

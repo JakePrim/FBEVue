@@ -1,5 +1,9 @@
 package com.prim.alibrary.log;
 
+import com.prim.alibrary.log.formatter.StackTraceFormatter;
+import com.prim.alibrary.log.formatter.ThreadFormatter;
+import com.prim.alibrary.log.printer.LogPrinter;
+
 /**
  * @author prim
  * @version 1.0.0
@@ -12,17 +16,17 @@ public abstract class LogConfig {
     /**
      * 配置打印最大的长度
      */
-    static int MAX_LEN = 512;
+    public static int MAX_LEN = 512;
 
     /**
      * 初始化线程格式化器
      */
-    static ThreadFormatter THREAD_FORMATTER = new ThreadFormatter();
+    public static ThreadFormatter THREAD_FORMATTER = new ThreadFormatter();
 
     /**
      * 初始化堆栈格式化器
      */
-    static StackTraceFormatter STACK_TRACE_FORMATTER = new StackTraceFormatter();
+    public static StackTraceFormatter STACK_TRACE_FORMATTER = new StackTraceFormatter();
 
     /**
      * 配置全局的TAG

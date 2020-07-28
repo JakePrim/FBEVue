@@ -5,6 +5,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.prim.akitdemo.R
 import com.prim.alibrary.log.*
+import com.prim.alibrary.log.printer.ViewPrinter
 
 /**
  * @desc
