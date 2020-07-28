@@ -5,6 +5,8 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.prim.akitdemo.R
 import com.prim.alibrary.log.ALog
+import com.prim.alibrary.log.LogConfig
+import com.prim.alibrary.log.LogType
 
 /**
  * @desc
@@ -23,5 +25,15 @@ class ALogActivity : AppCompatActivity() {
     fun print(view: View) {
         ALog.e("hello log","papa")
         ALog.eT("TestLog", "hello log","haha")
+        ALog.log(object:LogConfig(){
+            override fun isThreadInfo(): Boolean {
+                return true
+            }
+
+            override fun stackTraceDepth(): Int {
+                return 0
+            }
+        },LogType.E,"--------","5566","9988")
+        ALog.a("9900")
     }
 }

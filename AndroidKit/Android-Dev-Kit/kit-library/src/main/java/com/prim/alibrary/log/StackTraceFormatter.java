@@ -8,7 +8,7 @@ package com.prim.alibrary.log;
  * @contact https://jakeprim.cn
  * @name AKitDemo
  */
-public class AStackTraceFormatter implements ALogFormatter<StackTraceElement[]> {
+public class StackTraceFormatter implements LogFormatter<StackTraceElement[]> {
     @Override
     public String format(StackTraceElement[] stackTraceElements) {
         StringBuilder sb = new StringBuilder(128);
@@ -23,7 +23,7 @@ public class AStackTraceFormatter implements ALogFormatter<StackTraceElement[]> 
                 }
                 if (i != len - 1) {
                     sb.append("\t|- ");
-                    sb.append(stackTraceElements[i].toString());
+                    sb.append(stackTraceElements[i].toString());//堆栈信息
                     sb.append("\n");
                 } else {
                     sb.append("\t「");

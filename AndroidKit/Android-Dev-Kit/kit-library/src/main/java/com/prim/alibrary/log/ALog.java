@@ -3,7 +3,9 @@ package com.prim.alibrary.log;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author prim
@@ -14,73 +16,107 @@ import androidx.annotation.Nullable;
  * @name AKitDemo
  */
 public class ALog {
+    private static final String A_Log_PACKAGE;
+
+    static {
+        String className = ALog.class.getName();
+        A_Log_PACKAGE = className.substring(0, className.lastIndexOf(".") + 1);
+    }
+
     public static void v(Object... contents) {
-        log(ALogType.V, contents);
+        log(LogType.V, contents);
     }
 
     public static void vT(String tag, Object... contents) {
-        log(ALogType.V, tag, contents);
+        log(LogType.V, tag, contents);
     }
 
     public static void w(Object... contents) {
-        log(ALogType.W, contents);
+        log(LogType.W, contents);
     }
 
     public static void wT(String tag, Object... contents) {
-        log(ALogType.W, tag, contents);
+        log(LogType.W, tag, contents);
     }
 
     public static void d(Object... contents) {
-        log(ALogType.D, contents);
+        log(LogType.D, contents);
     }
 
     public static void dT(String tag, Object... contents) {
-        log(ALogType.D, tag, contents);
+        log(LogType.D, tag, contents);
     }
 
     public static void i(Object... contents) {
-        log(ALogType.I, contents);
+        log(LogType.I, contents);
     }
 
     public static void iT(String tag, Object... contents) {
-        log(ALogType.I, tag, contents);
+        log(LogType.I, tag, contents);
     }
 
     public static void e(Object... contents) {
-        log(ALogType.E, contents);
+        log(LogType.E, contents);
     }
 
     public static void eT(String tag, Object... contents) {
-        log(ALogType.E, tag, contents);
+        log(LogType.E, tag, contents);
     }
 
     public static void a(Object... contents) {
-        log(ALogType.A, contents);
+        log(LogType.A, contents);
     }
 
     public static void aT(String tag, Object... contents) {
-        log(ALogType.A, tag, contents);
+        log(LogType.A, tag, contents);
     }
 
-    private static void log(@ALogType.Type int type, Object... contents) {
-        log(type, ALogManager.getInstance().getLogConfig().getGlobalTag(), contents);
+    public static void log(@LogType.Type int type, Object... contents) {
+        log(type, LogManager.getInstance().getLogConfig().getGlobalTag(), contents);
     }
 
-    private static void log(@ALogType.Type int type, String tag, Object... contents) {
-        log(ALogManager.getInstance().getLogConfig(), type, tag, contents);
+    public static void log(@LogType.Type int type, String tag, Object... contents) {
+        log(LogManager.getInstance().getLogConfig(), type, tag, contents);
     }
 
-    private static void log(@NonNull ALogConfig config, @ALogType.Type int type, @NonNull String tag, @NonNull Object... contents) {
+    public static void log(@NonNull LogConfig config, @LogType.Type int type, @NonNull String tag, @NonNull Object... contents) {
+        //日志是否需要打印要使用全局的配置
         if (!config.enable()) {
             return;
         }
-        StringBuilder stringBuilder = new StringBuilder();
-        String body = parseBody(contents);
-        stringBuilder.append(body);
-        Log.println(type, tag, stringBuilder.toString());
+        StringBuilder sb = new StringBuilder();
+        //判断是否包含线程信息
+        if (config.isThreadInfo()) {
+            String threadInfo = LogConfig.THREAD_FORMATTER.format(Thread.currentThread());
+            sb.append(threadInfo).append("\n");
+        }
+
+        //判断是否包含堆栈信息
+        if (config.stackTraceDepth() > 0) {
+            String stackInfo = LogConfig.STACK_TRACE_FORMATTER.format(
+                    StackTraceUtil.getCroppedStackTrace(new Throwable().getStackTrace(), A_Log_PACKAGE,
+                            config.stackTraceDepth()));
+            sb.append(stackInfo).append("\n");
+        }
+        String body = parseBody(contents, config);
+        sb.append(body);
+        //使用日志打印器进行打印
+        List<LogPrinter> logPrinters = config.printer() != null ? Arrays.asList(config.printer())
+                : LogManager.getInstance().getPrinters();
+        if (logPrinters == null || logPrinters.size() == 0) {
+            return;
+        }
+        for (LogPrinter printer : logPrinters) {
+            printer.print(config, type, tag, sb.toString());
+        }
     }
 
-    private static String parseBody(Object[] contents) {
+    private static String parseBody(Object[] contents, LogConfig config) {
+        if (config.jsonParser() != null) {
+            //json格式化
+            return config.jsonParser().toJson(contents);
+        }
+
         StringBuilder stringBuilder = new StringBuilder();
         for (Object content : contents) {
             stringBuilder.append(content.toString()).append(";");

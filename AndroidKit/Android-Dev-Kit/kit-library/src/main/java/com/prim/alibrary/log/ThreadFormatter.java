@@ -8,7 +8,7 @@ package com.prim.alibrary.log;
  * @contact https://jakeprim.cn
  * @name AKitDemo
  */
-class AThreadFormatter implements ALogFormatter<Thread> {
+class ThreadFormatter implements LogFormatter<Thread> {
     @Override
     public String format(Thread thread) {
         return "Thread:" + thread.getName();

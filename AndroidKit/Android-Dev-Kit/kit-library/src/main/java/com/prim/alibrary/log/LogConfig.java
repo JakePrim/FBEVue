@@ -8,15 +8,21 @@ package com.prim.alibrary.log;
  * @contact https://jakeprim.cn
  * @name AKitDemo
  */
-public abstract class ALogConfig {
+public abstract class LogConfig {
     /**
-     * 配置打印最大的行数
+     * 配置打印最大的长度
      */
     static int MAX_LEN = 512;
 
-    static AThreadFormatter THREAD_FORMATTER = new AThreadFormatter();
+    /**
+     * 初始化线程格式化器
+     */
+    static ThreadFormatter THREAD_FORMATTER = new ThreadFormatter();
 
-    static AStackTraceFormatter STACK_TRACE_FORMATTER = new AStackTraceFormatter();
+    /**
+     * 初始化堆栈格式化器
+     */
+    static StackTraceFormatter STACK_TRACE_FORMATTER = new StackTraceFormatter();
 
     /**
      * 配置全局的TAG
@@ -62,7 +68,15 @@ public abstract class ALogConfig {
     }
 
     /**
-     * 定义json 解析器接口 json 的解析交给调用者实现
+     * 允许用户注册打印器
+     * @return 默认返回null
+     */
+    public LogPrinter[] printer(){
+        return null;
+    }
+
+    /**
+     * 定义json 解析器接口 json 的解析交给调用者实现 本身库不需要实现序列化的工具可以一定程度上防止冲突
      */
     public interface JsonParser {
         String toJson(Object obj);

@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
  * @contact https://jakeprim.cn
  * @name AKitDemo
  */
-public class ALogType {
+public class LogType {
     public static final int V = Log.VERBOSE;
     public static final int I = Log.INFO;
     public static final int W = Log.WARN;

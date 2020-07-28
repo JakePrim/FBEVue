@@ -1,8 +1,10 @@
 package com.prim.akitdemo
 
 import android.app.Application
-import com.prim.alibrary.log.ALogConfig
-import com.prim.alibrary.log.ALogManager
+import com.google.gson.Gson
+import com.prim.alibrary.log.ConsolePrinter
+import com.prim.alibrary.log.LogConfig
+import com.prim.alibrary.log.LogManager
 
 /**
  * @desc
@@ -15,14 +17,18 @@ import com.prim.alibrary.log.ALogManager
 class App : Application() {
     override fun onCreate() {
         super.onCreate()
-        ALogManager.init(object : ALogConfig() {
+        LogManager.init(object : LogConfig() {
             override fun getGlobalTag(): String {
                 return "ALogDemo"
+            }
+
+            override fun jsonParser(): JsonParser {
+                return JsonParser { src -> Gson().toJson(src) }
             }
 
             override fun enable(): Boolean {
                 return true
             }
-        })
+        },ConsolePrinter())
     }
 }
