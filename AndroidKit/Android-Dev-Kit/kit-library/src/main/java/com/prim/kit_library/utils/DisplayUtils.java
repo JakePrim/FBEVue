@@ -1,4 +1,4 @@
-package com.prim.alibrary.utils;
+package com.prim.kit_library.utils;
 
 import android.content.Context;
 import android.content.res.Resources;

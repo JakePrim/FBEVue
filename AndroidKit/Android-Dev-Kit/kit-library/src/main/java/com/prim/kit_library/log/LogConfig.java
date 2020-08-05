@@ -1,8 +1,8 @@
-package com.prim.alibrary.log;
+package com.prim.kit_library.log;
 
-import com.prim.alibrary.log.formatter.StackTraceFormatter;
-import com.prim.alibrary.log.formatter.ThreadFormatter;
-import com.prim.alibrary.log.printer.LogPrinter;
+import com.prim.kit_library.log.formatter.StackTraceFormatter;
+import com.prim.kit_library.log.formatter.ThreadFormatter;
+import com.prim.kit_library.log.printer.LogPrinter;
 
 /**
  * @author prim

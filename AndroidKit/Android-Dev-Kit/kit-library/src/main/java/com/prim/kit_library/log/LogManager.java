@@ -1,6 +1,6 @@
-package com.prim.alibrary.log;
+package com.prim.kit_library.log;
 
-import com.prim.alibrary.log.printer.LogPrinter;
+import com.prim.kit_library.log.printer.LogPrinter;
 
 import java.util.ArrayList;
 import java.util.Arrays;

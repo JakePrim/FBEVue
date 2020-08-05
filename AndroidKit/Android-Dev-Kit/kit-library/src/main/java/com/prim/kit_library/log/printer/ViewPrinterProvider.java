@@ -1,4 +1,4 @@
-package com.prim.alibrary.log.printer;
+package com.prim.kit_library.log.printer;
 
 import android.graphics.Color;
 import android.view.Gravity;
@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.prim.alibrary.utils.DisplayUtils;
+import com.prim.kit_library.utils.DisplayUtils;
 
 /**
  * @author prim

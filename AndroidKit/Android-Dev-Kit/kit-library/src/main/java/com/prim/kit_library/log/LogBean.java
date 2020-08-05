@@ -1,4 +1,4 @@
-package com.prim.alibrary.log;
+package com.prim.kit_library.log;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;

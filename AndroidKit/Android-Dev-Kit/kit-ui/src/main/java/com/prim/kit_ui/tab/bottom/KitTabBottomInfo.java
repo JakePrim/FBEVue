@@ -9,13 +9,13 @@ import androidx.fragment.app.Fragment;
  * @version 1.0.0
  * @desc tab bottom 的实体类信息
  * @time 2020/7/28 - 5:07 PM
- * @param <Color> 颜色可扩展 int string
+ * @param <Color> 颜色可扩展 int/string
  * @contact https://jakeprim.cn
  * @name AKitDemo
  */
 public class KitTabBottomInfo<Color> {
     /**
-     * Tab类型可以包括:Bitmap Icon Lottie动画
+     * Tab类型可以包括:Bitmap / Icon / Lottie动画
      */
     public enum TabType{
         BITMAP,ICON,LOTTIE
@@ -39,6 +39,12 @@ public class KitTabBottomInfo<Color> {
     public Color tintColor;
     public TabType tabType;
 
+    /**
+     * 创建实例
+     * @param name tab name
+     * @param defaultBitmap tab default bitmap
+     * @param selectedBitmap tab selected bitmap
+     */
     public KitTabBottomInfo(String name, Bitmap defaultBitmap, Bitmap selectedBitmap) {
         this.name = name;
         this.defaultBitmap = defaultBitmap;
@@ -46,7 +52,16 @@ public class KitTabBottomInfo<Color> {
         this.tabType = TabType.BITMAP;
     }
 
-    public KitTabBottomInfo(String name, String iconFont, String defaultIconName, String selectedIconName, Color defaultColor, Color tintColor, TabType tabType) {
+    /**
+     * 创建实例
+     * @param name tab name
+     * @param iconFont 字体图标
+     * @param defaultIconName 默认字体图标名称
+     * @param selectedIconName 选中的字体图标名称
+     * @param defaultColor 默认颜色
+     * @param tintColor 选中的颜色
+     */
+    public KitTabBottomInfo(String name, String iconFont, String defaultIconName, String selectedIconName, Color defaultColor, Color tintColor) {
         this.name = name;
         this.iconFont = iconFont;
         this.defaultIconName = defaultIconName;

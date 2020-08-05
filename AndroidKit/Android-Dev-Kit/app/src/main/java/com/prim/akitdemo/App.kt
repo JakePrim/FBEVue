@@ -2,9 +2,9 @@ package com.prim.akitdemo
 
 import android.app.Application
 import com.google.gson.Gson
-import com.prim.alibrary.log.printer.ConsolePrinter
-import com.prim.alibrary.log.LogConfig
-import com.prim.alibrary.log.LogManager
+import com.prim.kit_library.log.printer.ConsolePrinter
+import com.prim.kit_library.log.LogConfig
+import com.prim.kit_library.log.LogManager
 
 /**
  * @desc

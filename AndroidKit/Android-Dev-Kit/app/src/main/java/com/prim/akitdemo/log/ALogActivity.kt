@@ -4,8 +4,8 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.prim.akitdemo.R
-import com.prim.alibrary.log.*
-import com.prim.alibrary.log.printer.ViewPrinter
+import com.prim.kit_library.log.*
+import com.prim.kit_library.log.printer.ViewPrinter
 
 /**
  * @desc

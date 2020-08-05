@@ -1,4 +1,4 @@
-package com.prim.alibrary;
+package com.prim.kit_library;
 
 import org.junit.Test;
 

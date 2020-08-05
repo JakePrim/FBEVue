@@ -1,9 +1,9 @@
-package com.prim.alibrary.log;
+package com.prim.kit_library.log;
 
 import androidx.annotation.NonNull;
 
-import com.prim.alibrary.log.formatter.StackTraceUtil;
-import com.prim.alibrary.log.printer.LogPrinter;
+import com.prim.kit_library.log.formatter.StackTraceUtil;
+import com.prim.kit_library.log.printer.LogPrinter;
 
 import java.util.Arrays;
 import java.util.List;

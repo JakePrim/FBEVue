@@ -45,5 +45,7 @@ public interface KitTabLayout<Tab extends ViewGroup,D> {
          * @param nextInfo 下一个tab
          */
         void onTabSelectedChange(int index,@NonNull D prevInfo,@NonNull D nextInfo);
+
+        //TODO 扩展双击事件 监听手势事件 -- 双击
     }
 }
