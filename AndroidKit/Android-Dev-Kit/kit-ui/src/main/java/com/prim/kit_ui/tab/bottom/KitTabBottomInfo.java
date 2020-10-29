@@ -33,8 +33,14 @@ public class KitTabBottomInfo<Color> {
     public Bitmap selectedBitmap;
     public String iconFont;
 
+    /**
+     * iconfont 名称
+     */
     public String defaultIconName;
     public String selectedIconName;
+    /**
+     * 颜色
+     */
     public Color defaultColor;
     public Color tintColor;
     public TabType tabType;

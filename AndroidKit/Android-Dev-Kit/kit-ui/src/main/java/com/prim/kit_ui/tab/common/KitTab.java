@@ -9,6 +9,10 @@ package com.prim.kit_ui.tab.common;
  * @name AKitDemo
  */
 public interface KitTab<D> extends KitTabLayout.OnTabSelectedListener<D>{
+    /**
+     * 设置当前tab的信息
+     * @param data
+     */
     void setTabInfo(D data);
 
     /**
