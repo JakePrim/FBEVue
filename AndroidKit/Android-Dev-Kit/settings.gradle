@@ -1,4 +1,0 @@
-include ':kit-ui'
-include ':kit-library'
-include ':app'
-rootProject.name = "AKitDemo"
