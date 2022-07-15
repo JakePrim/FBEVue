@@ -38,6 +38,11 @@ public class InsertSort {
         }
     }
 
+    /**
+     * 优化替换操作
+     * @param arr
+     * @param <E>
+     */
     public static <E extends Comparable<E>> void sort2(E[] arr) {
         for (int i = 0; i < arr.length; i++) {
             E temp = arr[i];
