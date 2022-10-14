@@ -1,1 +1,1 @@
-> Reactic-Native:旨在高效率、高质量ReactNative开发跨端通用的解决方案及开发模版
+> Vueic:旨在使用Vue高效率、高质量通用的解决方案及开发模版(包括PC端和移动端)
